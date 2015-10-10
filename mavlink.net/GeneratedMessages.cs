@@ -61,7 +61,10 @@ namespace MavLinkNet
         Armazila = 15, 
 
         /// <summary> Aerob -- http://aerob.ru </summary>
-        Aerob = 16 };
+        Aerob = 16, 
+
+        /// <summary> ASLUAV autopilot -- http://www.asl.ethz.ch </summary>
+        Asluav = 17 };
 
     public enum MavType { 
 
@@ -117,7 +120,34 @@ namespace MavLinkNet
         FlappingWing = 16, 
 
         /// <summary> Flapping wing </summary>
-        Kite = 17 };
+        Kite = 17, 
+
+        /// <summary> Onboard companion controller </summary>
+        OnboardController = 18, 
+
+        /// <summary> Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter. </summary>
+        VtolDuorotor = 19, 
+
+        /// <summary> Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter. </summary>
+        VtolQuadrotor = 20, 
+
+        /// <summary> VTOL reserved 1 </summary>
+        VtolReserved1 = 21, 
+
+        /// <summary> VTOL reserved 2 </summary>
+        VtolReserved2 = 22, 
+
+        /// <summary> VTOL reserved 3 </summary>
+        VtolReserved3 = 23, 
+
+        /// <summary> VTOL reserved 4 </summary>
+        VtolReserved4 = 24, 
+
+        /// <summary> VTOL reserved 5 </summary>
+        VtolReserved5 = 25, 
+
+        /// <summary> Onboard gimbal </summary>
+        Gimbal = 26 };
 
     /// <summary>
     /// These flags encode the MAV mode.
@@ -336,7 +366,10 @@ namespace MavLinkNet
         MavCompIdServo13 = 152, 
 
         /// <summary>  </summary>
-        MavCompIdServo14 = 153 };
+        MavCompIdServo14 = 153, 
+
+        /// <summary>  </summary>
+        MavCompIdGimbal = 154 };
 
     /// <summary>
     /// These encode the sensors whose status is sent as part of the SYS_STATUS message.
@@ -392,7 +425,25 @@ namespace MavLinkNet
         MotorOutputs = 32768, 
 
         /// <summary> 0x10000 rc receiver </summary>
-        RcReceiver = 65536 };
+        RcReceiver = 65536, 
+
+        /// <summary> 0x20000 2nd 3D gyro </summary>
+        _3dGyro2 = 131072, 
+
+        /// <summary> 0x40000 2nd 3D accelerometer </summary>
+        _3dAccel2 = 262144, 
+
+        /// <summary> 0x80000 2nd 3D magnetometer </summary>
+        _3dMag2 = 524288, 
+
+        /// <summary> 0x100000 geofence </summary>
+        MavSysStatusGeofence = 1048576, 
+
+        /// <summary> 0x200000 AHRS subsystem health </summary>
+        MavSysStatusAhrs = 2097152, 
+
+        /// <summary> 0x400000 Terrain subsystem health </summary>
+        MavSysStatusTerrain = 4194304 };
 
     public enum MavFrame { 
 
@@ -409,7 +460,28 @@ namespace MavLinkNet
         GlobalRelativeAlt = 3, 
 
         /// <summary> Local coordinate frame, Z-down (x: east, y: north, z: up) </summary>
-        LocalEnu = 4 };
+        LocalEnu = 4, 
+
+        /// <summary> Global coordinate frame, WGS84 coordinate system. First value / x: latitude in degrees*1.0e-7, second value / y: longitude in degrees*1.0e-7, third value / z: positive altitude over mean sea level (MSL) </summary>
+        GlobalInt = 5, 
+
+        /// <summary> Global coordinate frame, WGS84 coordinate system, relative altitude over ground with respect to the home position. First value / x: latitude in degrees*10e-7, second value / y: longitude in degrees*10e-7, third value / z: positive altitude with 0 being at the altitude of the home location. </summary>
+        GlobalRelativeAltInt = 6, 
+
+        /// <summary> Offset to the current local frame. Anything expressed in this frame should be added to the current local frame position. </summary>
+        LocalOffsetNed = 7, 
+
+        /// <summary> Setpoint in body NED frame. This makes sense if all position control is externalized - e.g. useful to command 2 m/s^2 acceleration to the right. </summary>
+        BodyNed = 8, 
+
+        /// <summary> Offset in body NED frame. This makes sense if adding setpoints to the current flight path, to avoid an obstacle - e.g. useful to command 2 m/s^2 acceleration to the east. </summary>
+        BodyOffsetNed = 9, 
+
+        /// <summary> Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees, second value / y: longitude in degrees, third value / z: positive altitude in meters with 0 being at ground level in terrain model. </summary>
+        GlobalTerrainAlt = 10, 
+
+        /// <summary> Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees*10e-7, second value / y: longitude in degrees*10e-7, third value / z: positive altitude in meters with 0 being at ground level in terrain model. </summary>
+        GlobalTerrainAltInt = 11 };
 
     public enum MavlinkDataStreamType { 
 
@@ -430,6 +502,54 @@ namespace MavLinkNet
 
         /// <summary>  </summary>
         MavlinkDataStreamImgPng = 6 };
+
+    public enum FenceAction { 
+
+        /// <summary> Disable fenced mode </summary>
+        None = 0, 
+
+        /// <summary> Switched to guided mode to return point (fence point 0) </summary>
+        Guided = 1, 
+
+        /// <summary> Report fence breach, but don't take action </summary>
+        Report = 2, 
+
+        /// <summary> Switched to guided mode to return point (fence point 0) with manual throttle control </summary>
+        GuidedThrPass = 3 };
+
+    public enum FenceBreach { 
+
+        /// <summary> No last fence breach </summary>
+        None = 0, 
+
+        /// <summary> Breached minimum altitude </summary>
+        Minalt = 1, 
+
+        /// <summary> Breached maximum altitude </summary>
+        Maxalt = 2, 
+
+        /// <summary> Breached fence boundary </summary>
+        Boundary = 3 };
+
+    /// <summary>
+    /// Enumeration of possible mount operation modes
+    /// </summary>
+    public enum MavMountMode { 
+
+        /// <summary> Load and keep safe position (Roll,Pitch,Yaw) from permant memory and stop stabilization </summary>
+        Retract = 0, 
+
+        /// <summary> Load and keep neutral position (Roll,Pitch,Yaw) from permanent memory. </summary>
+        Neutral = 1, 
+
+        /// <summary> Load neutral position and start MAVLink Roll,Pitch,Yaw control with stabilization </summary>
+        MavlinkTargeting = 2, 
+
+        /// <summary> Load neutral position and start RC Roll,Pitch,Yaw control with stabilization </summary>
+        RcTargeting = 3, 
+
+        /// <summary> Load neutral position and start to point to Lat,Lon,Alt </summary>
+        GpsPoint = 4 };
 
     /// <summary>
     /// Commands to be executed by the MAV. They can be executed on user request, or as part of a mission script. If the action is used in a mission, the parameter mapping to the waypoint/mission message is as follows: Param 1, Param 2, Param 3, Param 4, X: Param 5, Y:Param 6, Z:Param 7. This command list is similar what ARINC 424 is for commercial aircraft: A data format how to interpret waypoint/mission data.
@@ -457,11 +577,20 @@ namespace MavLinkNet
         /// <summary> Takeoff from ground / hand </summary>
         NavTakeoff = 22, 
 
+        /// <summary> Continue on the current course and climb/descend to specified altitude.  When the altitude is reached continue to the next command (i.e., don't proceed to the next command until the desired altitude is reached. </summary>
+        NavContinueAndChangeAlt = 30, 
+
         /// <summary> Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras. </summary>
         NavRoi = 80, 
 
         /// <summary> Control autonomous path planning on the MAV. </summary>
         NavPathplanning = 81, 
+
+        /// <summary> Navigate to MISSION using a spline path. </summary>
+        NavSplineWaypoint = 82, 
+
+        /// <summary> hand control over to an external controller </summary>
+        NavGuidedEnable = 92, 
 
         /// <summary> NOP - This command is only used to mark the upper limit of the NAV/ACTION commands in the enumeration </summary>
         NavLast = 95, 
@@ -508,11 +637,56 @@ namespace MavLinkNet
         /// <summary> Cycle a between its nominal setting and a desired PWM for a desired number of cycles with a desired period. </summary>
         DoRepeatServo = 184, 
 
+        /// <summary> Terminate flight immediately </summary>
+        DoFlighttermination = 185, 
+
+        /// <summary> Mission command to perform a landing. This is used as a marker in a mission to tell the autopilot where a sequence of mission items that represents a landing starts. It may also be sent via a COMMAND_LONG to trigger a landing, in which case the nearest (geographically) landing sequence in the mission will be used. The Latitude/Longitude is optional, and may be set to 0/0 if not needed. If specified then it will be used to help find the closest landing sequence. </summary>
+        DoLandStart = 189, 
+
+        /// <summary> Mission command to perform a landing from a rally point. </summary>
+        DoRallyLand = 190, 
+
+        /// <summary> Mission command to safely abort an autonmous landing. </summary>
+        DoGoAround = 191, 
+
         /// <summary> Control onboard camera system. </summary>
         DoControlVideo = 200, 
 
         /// <summary> Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras. </summary>
         DoSetRoi = 201, 
+
+        /// <summary> Mission command to configure an on-board camera controller system. </summary>
+        DoDigicamConfigure = 202, 
+
+        /// <summary> Mission command to control an on-board camera controller system. </summary>
+        DoDigicamControl = 203, 
+
+        /// <summary> Mission command to configure a camera or antenna mount </summary>
+        DoMountConfigure = 204, 
+
+        /// <summary> Mission command to control a camera or antenna mount </summary>
+        DoMountControl = 205, 
+
+        /// <summary> Mission command to set CAM_TRIGG_DIST for this flight </summary>
+        DoSetCamTriggDist = 206, 
+
+        /// <summary> Mission command to enable the geofence </summary>
+        DoFenceEnable = 207, 
+
+        /// <summary> Mission command to trigger a parachute </summary>
+        DoParachute = 208, 
+
+        /// <summary> Change to/from inverted flight </summary>
+        DoInvertedFlight = 210, 
+
+        /// <summary> Mission command to control a camera or antenna mount, using a quaternion as reference. </summary>
+        DoMountControlQuat = 220, 
+
+        /// <summary> set id of master controller </summary>
+        DoGuidedMaster = 221, 
+
+        /// <summary> set limits for external control </summary>
+        DoGuidedLimits = 222, 
 
         /// <summary> NOP - This command is only used to mark the upper limit of the DO commands in the enumeration </summary>
         DoLast = 240, 
@@ -541,20 +715,29 @@ namespace MavLinkNet
         /// <summary> Starts receiver pairing </summary>
         StartRxPair = 500, 
 
-        /// <summary> Mission command to configure an on-board camera controller system. </summary>
-        DoDigicamConfigure = 202, 
+        /// <summary> Request autopilot capabilities </summary>
+        RequestAutopilotCapabilities = 520, 
 
-        /// <summary> Mission command to control an on-board camera controller system. </summary>
-        DoDigicamControl = 203, 
+        /// <summary> Start image capture sequence </summary>
+        ImageStartCapture = 2000, 
 
-        /// <summary> Mission command to configure a camera or antenna mount </summary>
-        DoMountConfigure = 204, 
+        /// <summary> Stop image capture sequence </summary>
+        ImageStopCapture = 2001, 
 
-        /// <summary> Mission command to control a camera or antenna mount </summary>
-        DoMountControl = 205, 
+        /// <summary> Starts video capture </summary>
+        VideoStartCapture = 2500, 
 
-        /// <summary> Mission command to set CAM_TRIGG_DIST for this flight </summary>
-        DoSetCamTriggDist = 206 };
+        /// <summary> Stop the current video capture </summary>
+        VideoStopCapture = 2501, 
+
+        /// <summary> Create a panorama at the current position </summary>
+        PanoramaCreate = 2800, 
+
+        /// <summary> Deploy payload on a Lat / Lon / Alt position. This includes the navigation to reach the required release position and velocity. </summary>
+        PayloadPrepareDeploy = 30001, 
+
+        /// <summary> Control the payload deployment. </summary>
+        PayloadControlDeploy = 30002 };
 
     /// <summary>
     /// Data stream IDs. A data stream is not a fixed set of messages, but rather a       recommendation to the autopilot software. Individual autopilots may or may not obey       the recommended messages.
@@ -775,94 +958,173 @@ namespace MavLinkNet
         Debug = 7 };
 
     /// <summary>
-    /// Enumeration of possible mount operation modes
+    /// Power supply status flags (bitmask)
     /// </summary>
-    public enum MavMountMode { 
+    public enum MavPowerStatus { 
 
-        /// <summary> Load and keep safe position (Roll,Pitch,Yaw) from EEPROM and stop stabilization </summary>
-        Retract = 0, 
+        /// <summary> main brick power supply valid </summary>
+        BrickValid = 1, 
 
-        /// <summary> Load and keep neutral position (Roll,Pitch,Yaw) from EEPROM. </summary>
-        Neutral = 1, 
+        /// <summary> main servo power supply valid for FMU </summary>
+        ServoValid = 2, 
 
-        /// <summary> Load neutral position and start MAVLink Roll,Pitch,Yaw control with stabilization </summary>
-        MavlinkTargeting = 2, 
+        /// <summary> USB power is connected </summary>
+        UsbConnected = 4, 
 
-        /// <summary> Load neutral position and start RC Roll,Pitch,Yaw control with stabilization </summary>
-        RcTargeting = 3, 
+        /// <summary> peripheral supply is in over-current state </summary>
+        PeriphOvercurrent = 8, 
 
-        /// <summary> Load neutral position and start to point to Lat,Lon,Alt </summary>
-        GpsPoint = 4 };
+        /// <summary> hi-power peripheral supply is in over-current state </summary>
+        PeriphHipowerOvercurrent = 16, 
 
-    public enum FenceAction { 
-
-        /// <summary> Disable fenced mode </summary>
-        None = 0, 
-
-        /// <summary> Switched to guided mode to return point (fence point 0) </summary>
-        Guided = 1, 
-
-        /// <summary> Report fence breach, but don't take action </summary>
-        Report = 2, 
-
-        /// <summary> Switched to guided mode to return point (fence point 0) with manual throttle control </summary>
-        GuidedThrPass = 3 };
-
-    public enum FenceBreach { 
-
-        /// <summary> No last fence breach </summary>
-        None = 0, 
-
-        /// <summary> Breached minimum altitude </summary>
-        Minalt = 1, 
-
-        /// <summary> Breached maximum altitude </summary>
-        Maxalt = 2, 
-
-        /// <summary> Breached fence boundary </summary>
-        Boundary = 3 };
-
-    public enum LimitsState { 
-
-        /// <summary>  pre-initialization </summary>
-        LimitsInit = 0, 
-
-        /// <summary>  disabled </summary>
-        LimitsDisabled = 1, 
-
-        /// <summary>  checking limits </summary>
-        LimitsEnabled = 2, 
-
-        /// <summary>  a limit has been breached </summary>
-        LimitsTriggered = 3, 
-
-        /// <summary>  taking action eg. RTL </summary>
-        LimitsRecovering = 4, 
-
-        /// <summary>  we're no longer in breach of a limit </summary>
-        LimitsRecovered = 5 };
-
-    public enum LimitModule { 
-
-        /// <summary>  pre-initialization </summary>
-        LimitGpslock = 1, 
-
-        /// <summary>  disabled </summary>
-        LimitGeofence = 2, 
-
-        /// <summary>  checking limits </summary>
-        LimitAltitude = 4 };
+        /// <summary> Power status has changed since boot </summary>
+        Changed = 32 };
 
     /// <summary>
-    /// Flags in RALLY_POINT message
+    /// SERIAL_CONTROL device types
     /// </summary>
-    public enum RallyFlags { 
+    public enum SerialControlDev { 
 
-        /// <summary> Flag set when requiring favorable winds for landing.  </summary>
-        FavorableWind = 1, 
+        /// <summary> First telemetry port </summary>
+        Telem1 = 0, 
 
-        /// <summary> Flag set when plane is to immediately descend to break altitude and land without GCS intervention.  Flag not set when plane is to loiter at Rally point until commanded to land. </summary>
-        LandImmediately = 2 };
+        /// <summary> Second telemetry port </summary>
+        Telem2 = 1, 
+
+        /// <summary> First GPS port </summary>
+        Gps1 = 2, 
+
+        /// <summary> Second GPS port </summary>
+        Gps2 = 3 };
+
+    /// <summary>
+    /// SERIAL_CONTROL flags (bitmask)
+    /// </summary>
+    public enum SerialControlFlag { 
+
+        /// <summary> Set if this is a reply </summary>
+        Reply = 1, 
+
+        /// <summary> Set if the sender wants the receiver to send a response as another SERIAL_CONTROL message </summary>
+        Respond = 2, 
+
+        /// <summary> Set if access to the serial port should be removed from whatever driver is currently using it, giving exclusive access to the SERIAL_CONTROL protocol. The port can be handed back by sending a request without this flag set </summary>
+        Exclusive = 4, 
+
+        /// <summary> Block on writes to the serial port </summary>
+        Blocking = 8, 
+
+        /// <summary> Send multiple replies until port is drained </summary>
+        Multi = 16 };
+
+    /// <summary>
+    /// Enumeration of distance sensor types
+    /// </summary>
+    public enum MavDistanceSensor { 
+
+        /// <summary> Laser altimeter, e.g. LightWare SF02/F or PulsedLight units </summary>
+        Laser = 0, 
+
+        /// <summary> Ultrasound altimeter, e.g. MaxBotix units </summary>
+        Ultrasound = 1 };
+
+    /// <summary>
+    /// Bitmask of (optional) autopilot capabilities (64 bit). If a bit is set, the autopilot supports this capability.
+    /// </summary>
+    public enum MavProtocolCapability { 
+
+        /// <summary> Autopilot supports MISSION float message type. </summary>
+        MissionFloat = 1, 
+
+        /// <summary> Autopilot supports the new param float message type. </summary>
+        ParamFloat = 2, 
+
+        /// <summary> Autopilot supports MISSION_INT scaled integer message type. </summary>
+        MissionInt = 4, 
+
+        /// <summary> Autopilot supports COMMAND_INT scaled integer message type. </summary>
+        CommandInt = 8, 
+
+        /// <summary> Autopilot supports the new param union message type. </summary>
+        ParamUnion = 16, 
+
+        /// <summary> Autopilot supports the new param union message type. </summary>
+        Ftp = 32, 
+
+        /// <summary> Autopilot supports commanding attitude offboard. </summary>
+        SetAttitudeTarget = 64, 
+
+        /// <summary> Autopilot supports commanding position and velocity targets in local NED frame. </summary>
+        SetPositionTargetLocalNed = 128, 
+
+        /// <summary> Autopilot supports commanding position and velocity targets in global scaled integers. </summary>
+        SetPositionTargetGlobalInt = 256, 
+
+        /// <summary> Autopilot supports terrain protocol / data handling. </summary>
+        Terrain = 512, 
+
+        /// <summary> Autopilot supports direct actuator control. </summary>
+        SetActuatorTarget = 1024 };
+
+    /// <summary>
+    /// Enumeration of estimator types
+    /// </summary>
+    public enum MavEstimatorType { 
+
+        /// <summary> This is a naive estimator without any real covariance feedback. </summary>
+        Naive = 1, 
+
+        /// <summary> Computer vision based estimate. Might be up to scale. </summary>
+        Vision = 2, 
+
+        /// <summary> Visual-inertial estimate. </summary>
+        Vio = 3, 
+
+        /// <summary> Plain GPS estimate. </summary>
+        Gps = 4, 
+
+        /// <summary> Estimator integrating GPS and inertial sensing. </summary>
+        GpsIns = 5 };
+
+    /// <summary>
+    /// Enumeration of battery types
+    /// </summary>
+    public enum MavBatteryType { 
+
+        /// <summary> Not specified. </summary>
+        Unknown = 0, 
+
+        /// <summary> Lithium polymere battery </summary>
+        Lipo = 1, 
+
+        /// <summary> Lithium ferrite battery </summary>
+        Life = 2, 
+
+        /// <summary> Lithium-ION battery </summary>
+        Lion = 3, 
+
+        /// <summary> Nickel metal hydride battery </summary>
+        Nimh = 4 };
+
+    /// <summary>
+    /// Enumeration of battery functions
+    /// </summary>
+    public enum MavBatteryFunction { 
+
+        /// <summary> Lithium polymere battery </summary>
+        Unknown = 0, 
+
+        /// <summary> Battery supports all flight systems </summary>
+        All = 1, 
+
+        /// <summary> Battery for the propulsion system </summary>
+        Propulsion = 2, 
+
+        /// <summary> Avionics battery </summary>
+        Avionics = 3, 
+
+        /// <summary> Payload battery </summary>
+        MavBatteryTypePayload = 4 };
 
 
     // ___________________________________________________________________________________
@@ -898,7 +1160,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// System mode bitfield, see MAV_MODE_FLAGS ENUM in mavlink/include/mavlink_types.h
+        /// System mode bitfield, see MAV_MODE_FLAG ENUM in mavlink/include/mavlink_types.h
         /// </summary>
         public MavModeFlag BaseMode {
             get { return mBaseMode; }
@@ -975,7 +1237,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "BaseMode",
-                Description = "System mode bitfield, see MAV_MODE_FLAGS ENUM in mavlink/include/mavlink_types.h",
+                Description = "System mode bitfield, see MAV_MODE_FLAG ENUM in mavlink/include/mavlink_types.h",
                 NumElements = 1,
                 EnumMetadata = UasSummary.GetEnumMetadata("MavModeFlag"),
             });
@@ -1337,7 +1599,7 @@ namespace MavLinkNet
     public class UasPing: UasMessage
     {
         /// <summary>
-        /// Unix timestamp in microseconds
+        /// Unix timestamp in microseconds or since system boot if smaller than MAVLink epoch (1.1.2009)
         /// </summary>
         public UInt64 TimeUsec {
             get { return mTimeUsec; }
@@ -1398,7 +1660,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "TimeUsec",
-                Description = "Unix timestamp in microseconds",
+                Description = "Unix timestamp in microseconds or since system boot if smaller than MAVLink epoch (1.1.2009)",
                 NumElements = 1,
             });
 
@@ -2358,7 +2620,7 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// The global position, as returned by the Global Positioning System (GPS). This is                  NOT the global position estimate of the sytem, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
+    /// The global position, as returned by the Global Positioning System (GPS). This is                  NOT the global position estimate of the system, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame).
     /// </summary>
     public class UasGpsRawInt: UasMessage
     {
@@ -2387,7 +2649,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Altitude (WGS84), in meters * 1000 (positive for up)
+        /// Altitude (AMSL, NOT WGS84), in meters * 1000 (positive for up). Note that virtually all GPS modules provide the AMSL altitude in addition to the WGS84 altitude.
         /// </summary>
         public Int32 Alt {
             get { return mAlt; }
@@ -2427,7 +2689,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// 0-1: no fix, 2: 2D fix, 3: 3D fix. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.
+        /// 0-1: no fix, 2: 2D fix, 3: 3D fix, 4: DGPS, 5: RTK. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.
         /// </summary>
         public byte FixType {
             get { return mFixType; }
@@ -2479,7 +2741,7 @@ namespace MavLinkNet
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "The global position, as returned by the Global Positioning System (GPS). This is                  NOT the global position estimate of the sytem, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame)."
+                Description = "The global position, as returned by the Global Positioning System (GPS). This is                  NOT the global position estimate of the system, but rather a RAW sensor value. See message GLOBAL_POSITION for the global position estimate. Coordinate frame is right-handed, Z-axis up (GPS frame)."
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
@@ -2502,7 +2764,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Alt",
-                Description = "Altitude (WGS84), in meters * 1000 (positive for up)",
+                Description = "Altitude (AMSL, NOT WGS84), in meters * 1000 (positive for up). Note that virtually all GPS modules provide the AMSL altitude in addition to the WGS84 altitude.",
                 NumElements = 1,
             });
 
@@ -2532,7 +2794,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "FixType",
-                Description = "0-1: no fix, 2: 2D fix, 3: 3D fix. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.",
+                Description = "0-1: no fix, 2: 2D fix, 3: 3D fix, 4: DGPS, 5: RTK. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.",
                 NumElements = 1,
             });
 
@@ -3663,7 +3925,7 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion.
+    /// The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
     /// </summary>
     public class UasAttitudeQuaternion: UasMessage
     {
@@ -3676,7 +3938,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Quaternion component 1
+        /// Quaternion component 1, w (1 in null-rotation)
         /// </summary>
         public float Q1 {
             get { return mQ1; }
@@ -3684,7 +3946,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Quaternion component 2
+        /// Quaternion component 2, x (0 in null-rotation)
         /// </summary>
         public float Q2 {
             get { return mQ2; }
@@ -3692,7 +3954,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Quaternion component 3
+        /// Quaternion component 3, y (0 in null-rotation)
         /// </summary>
         public float Q3 {
             get { return mQ3; }
@@ -3700,7 +3962,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Quaternion component 4
+        /// Quaternion component 4, z (0 in null-rotation)
         /// </summary>
         public float Q4 {
             get { return mQ4; }
@@ -3764,7 +4026,7 @@ namespace MavLinkNet
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion."
+                Description = "The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0)."
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
@@ -3775,25 +4037,25 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Q1",
-                Description = "Quaternion component 1",
+                Description = "Quaternion component 1, w (1 in null-rotation)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Q2",
-                Description = "Quaternion component 2",
+                Description = "Quaternion component 2, x (0 in null-rotation)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Q3",
-                Description = "Quaternion component 3",
+                Description = "Quaternion component 3, y (0 in null-rotation)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Q4",
-                Description = "Quaternion component 4",
+                Description = "Quaternion component 4, z (0 in null-rotation)",
                 NumElements = 1,
             });
 
@@ -4013,7 +4275,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Altitude in meters, expressed as * 1000 (millimeters), above MSL
+        /// Altitude in meters, expressed as * 1000 (millimeters), AMSL (not WGS84 - note that virtually all GPS modules provide the AMSL as well)
         /// </summary>
         public Int32 Alt {
             get { return mAlt; }
@@ -4118,7 +4380,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Alt",
-                Description = "Altitude in meters, expressed as * 1000 (millimeters), above MSL",
+                Description = "Altitude in meters, expressed as * 1000 (millimeters), AMSL (not WGS84 - note that virtually all GPS modules provide the AMSL as well)",
                 NumElements = 1,
             });
 
@@ -5020,7 +5282,7 @@ namespace MavLinkNet
     public class UasMissionItem: UasMessage
     {
         /// <summary>
-        /// PARAM1 / For NAV command MISSIONs: Radius in which the MISSION is accepted as reached, in meters
+        /// PARAM1, see MAV_CMD enum
         /// </summary>
         public float Param1 {
             get { return mParam1; }
@@ -5028,7 +5290,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// PARAM2 / For NAV command MISSIONs: Time that the MAV should stay inside the PARAM1 radius before advancing, in milliseconds
+        /// PARAM2, see MAV_CMD enum
         /// </summary>
         public float Param2 {
             get { return mParam2; }
@@ -5036,7 +5298,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// PARAM3 / For LOITER command MISSIONs: Orbit to circle around the MISSION, in meters. If positive the orbit direction should be clockwise, if negative the orbit direction should be counter-clockwise.
+        /// PARAM3, see MAV_CMD enum
         /// </summary>
         public float Param3 {
             get { return mParam3; }
@@ -5044,7 +5306,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// PARAM4 / For NAV and LOITER command MISSIONs: Yaw orientation in degrees, [0..360] 0 = NORTH
+        /// PARAM4, see MAV_CMD enum
         /// </summary>
         public float Param4 {
             get { return mParam4; }
@@ -5068,7 +5330,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// PARAM7 / z position: global: altitude
+        /// PARAM7 / z position: global: altitude (relative or absolute, depending on frame.
         /// </summary>
         public float Z {
             get { return mZ; }
@@ -5181,25 +5443,25 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Param1",
-                Description = "PARAM1 / For NAV command MISSIONs: Radius in which the MISSION is accepted as reached, in meters",
+                Description = "PARAM1, see MAV_CMD enum",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Param2",
-                Description = "PARAM2 / For NAV command MISSIONs: Time that the MAV should stay inside the PARAM1 radius before advancing, in milliseconds",
+                Description = "PARAM2, see MAV_CMD enum",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Param3",
-                Description = "PARAM3 / For LOITER command MISSIONs: Orbit to circle around the MISSION, in meters. If positive the orbit direction should be clockwise, if negative the orbit direction should be counter-clockwise.",
+                Description = "PARAM3, see MAV_CMD enum",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Param4",
-                Description = "PARAM4 / For NAV and LOITER command MISSIONs: Yaw orientation in degrees, [0..360] 0 = NORTH",
+                Description = "PARAM4, see MAV_CMD enum",
                 NumElements = 1,
             });
 
@@ -5217,7 +5479,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Z",
-                Description = "PARAM7 / z position: global: altitude",
+                Description = "PARAM7 / z position: global: altitude (relative or absolute, depending on frame.",
                 NumElements = 1,
             });
 
@@ -5880,7 +6142,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Altitude (WGS84), in meters * 1000 (positive for up)
+        /// Altitude (AMSL), in meters * 1000 (positive for up)
         /// </summary>
         public Int32 Altitude {
             get { return mAltitude; }
@@ -5937,7 +6199,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Altitude",
-                Description = "Altitude (WGS84), in meters * 1000 (positive for up)",
+                Description = "Altitude (AMSL), in meters * 1000 (positive for up)",
                 NumElements = 1,
             });
 
@@ -5981,7 +6243,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Altitude (WGS84), in meters * 1000 (positive for up)
+        /// Altitude (AMSL), in meters * 1000 (positive for up)
         /// </summary>
         public Int32 Altitude {
             get { return mAltitude; }
@@ -6028,7 +6290,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Altitude",
-                Description = "Altitude (WGS84), in meters * 1000 (positive for up)",
+                Description = "Altitude (AMSL), in meters * 1000 (positive for up)",
                 NumElements = 1,
             });
 
@@ -6044,40 +6306,48 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Set the setpoint for a local position controller. This is the position in local coordinates the MAV should fly to. This message is sent by the path/MISSION planner to the onboard position controller. As some MAVs have a degree of freedom in yaw (e.g. all helicopters/quadrotors), the desired yaw angle is part of the message.
+    /// Bind a RC channel to a parameter. The parameter should change accoding to the RC channel value.
     /// </summary>
-    public class UasSetLocalPositionSetpoint: UasMessage
+    public class UasParamMapRc: UasMessage
     {
         /// <summary>
-        /// x position
+        /// Initial parameter value
         /// </summary>
-        public float X {
-            get { return mX; }
-            set { mX = value; NotifyUpdated(); }
+        public float ParamValue0 {
+            get { return mParamValue0; }
+            set { mParamValue0 = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// y position
+        /// Scale, maps the RC range [-1, 1] to a parameter value
         /// </summary>
-        public float Y {
-            get { return mY; }
-            set { mY = value; NotifyUpdated(); }
+        public float Scale {
+            get { return mScale; }
+            set { mScale = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// z position
+        /// Minimum param value. The protocol does not define if this overwrites an onboard minimum value. (Depends on implementation)
         /// </summary>
-        public float Z {
-            get { return mZ; }
-            set { mZ = value; NotifyUpdated(); }
+        public float ParamValueMin {
+            get { return mParamValueMin; }
+            set { mParamValueMin = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Desired yaw angle
+        /// Maximum param value. The protocol does not define if this overwrites an onboard maximum value. (Depends on implementation)
         /// </summary>
-        public float Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
+        public float ParamValueMax {
+            get { return mParamValueMax; }
+            set { mParamValueMax = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored), send -2 to disable any existing map for this rc_channel_index.
+        /// </summary>
+        public Int16 ParamIndex {
+            get { return mParamIndex; }
+            set { mParamIndex = value; NotifyUpdated(); }
         }
 
         /// <summary>
@@ -6097,68 +6367,116 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Coordinate frame - valid values are only MAV_FRAME_LOCAL_NED or MAV_FRAME_LOCAL_ENU
+        /// Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string
         /// </summary>
-        public MavFrame CoordinateFrame {
-            get { return mCoordinateFrame; }
-            set { mCoordinateFrame = value; NotifyUpdated(); }
+        public char[] ParamId {
+            get { return mParamId; }
+            set { mParamId = value; NotifyUpdated(); }
         }
 
-        public UasSetLocalPositionSetpoint()
+        /// <summary>
+        /// Index of parameter RC channel. Not equal to the RC channel id. Typically correpsonds to a potentiometer-knob on the RC.
+        /// </summary>
+        public byte ParameterRcChannelIndex {
+            get { return mParameterRcChannelIndex; }
+            set { mParameterRcChannelIndex = value; NotifyUpdated(); }
+        }
+
+        public UasParamMapRc()
         {
             mMessageId = 50;
-            CrcExtra = 214;
+            CrcExtra = 78;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mX);
-            s.Write(mY);
-            s.Write(mZ);
-            s.Write(mYaw);
+            s.Write(mParamValue0);
+            s.Write(mScale);
+            s.Write(mParamValueMin);
+            s.Write(mParamValueMax);
+            s.Write(mParamIndex);
             s.Write(mTargetSystem);
             s.Write(mTargetComponent);
-            s.Write((byte)mCoordinateFrame);
+            s.Write(mParamId[0]); 
+            s.Write(mParamId[1]); 
+            s.Write(mParamId[2]); 
+            s.Write(mParamId[3]); 
+            s.Write(mParamId[4]); 
+            s.Write(mParamId[5]); 
+            s.Write(mParamId[6]); 
+            s.Write(mParamId[7]); 
+            s.Write(mParamId[8]); 
+            s.Write(mParamId[9]); 
+            s.Write(mParamId[10]); 
+            s.Write(mParamId[11]); 
+            s.Write(mParamId[12]); 
+            s.Write(mParamId[13]); 
+            s.Write(mParamId[14]); 
+            s.Write(mParamId[15]); 
+            s.Write(mParameterRcChannelIndex);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mX = s.ReadSingle();
-            this.mY = s.ReadSingle();
-            this.mZ = s.ReadSingle();
-            this.mYaw = s.ReadSingle();
+            this.mParamValue0 = s.ReadSingle();
+            this.mScale = s.ReadSingle();
+            this.mParamValueMin = s.ReadSingle();
+            this.mParamValueMax = s.ReadSingle();
+            this.mParamIndex = s.ReadInt16();
             this.mTargetSystem = s.ReadByte();
             this.mTargetComponent = s.ReadByte();
-            this.mCoordinateFrame = (MavFrame)s.ReadByte();
+            this.mParamId[0] = s.ReadChar();
+            this.mParamId[1] = s.ReadChar();
+            this.mParamId[2] = s.ReadChar();
+            this.mParamId[3] = s.ReadChar();
+            this.mParamId[4] = s.ReadChar();
+            this.mParamId[5] = s.ReadChar();
+            this.mParamId[6] = s.ReadChar();
+            this.mParamId[7] = s.ReadChar();
+            this.mParamId[8] = s.ReadChar();
+            this.mParamId[9] = s.ReadChar();
+            this.mParamId[10] = s.ReadChar();
+            this.mParamId[11] = s.ReadChar();
+            this.mParamId[12] = s.ReadChar();
+            this.mParamId[13] = s.ReadChar();
+            this.mParamId[14] = s.ReadChar();
+            this.mParamId[15] = s.ReadChar();
+            this.mParameterRcChannelIndex = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Set the setpoint for a local position controller. This is the position in local coordinates the MAV should fly to. This message is sent by the path/MISSION planner to the onboard position controller. As some MAVs have a degree of freedom in yaw (e.g. all helicopters/quadrotors), the desired yaw angle is part of the message."
+                Description = "Bind a RC channel to a parameter. The parameter should change accoding to the RC channel value."
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "X",
-                Description = "x position",
+                Name = "ParamValue0",
+                Description = "Initial parameter value",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Y",
-                Description = "y position",
+                Name = "Scale",
+                Description = "Scale, maps the RC range [-1, 1] to a parameter value",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Z",
-                Description = "z position",
+                Name = "ParamValueMin",
+                Description = "Minimum param value. The protocol does not define if this overwrites an onboard minimum value. (Depends on implementation)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Desired yaw angle",
+                Name = "ParamValueMax",
+                Description = "Maximum param value. The protocol does not define if this overwrites an onboard maximum value. (Depends on implementation)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "ParamIndex",
+                Description = "Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored), send -2 to disable any existing map for this rc_channel_index.",
                 NumElements = 1,
             });
 
@@ -6175,378 +6493,28 @@ namespace MavLinkNet
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "CoordinateFrame",
-                Description = "Coordinate frame - valid values are only MAV_FRAME_LOCAL_NED or MAV_FRAME_LOCAL_ENU",
+                Name = "ParamId",
+                Description = "Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string",
+                NumElements = 16,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "ParameterRcChannelIndex",
+                Description = "Index of parameter RC channel. Not equal to the RC channel id. Typically correpsonds to a potentiometer-knob on the RC.",
                 NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
             });
 
         }
 
-        private float mX;
-        private float mY;
-        private float mZ;
-        private float mYaw;
+        private float mParamValue0;
+        private float mScale;
+        private float mParamValueMin;
+        private float mParamValueMax;
+        private Int16 mParamIndex;
         private byte mTargetSystem;
         private byte mTargetComponent;
-        private MavFrame mCoordinateFrame;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Transmit the current local setpoint of the controller to other MAVs (collision avoidance) and to the GCS.
-    /// </summary>
-    public class UasLocalPositionSetpoint: UasMessage
-    {
-        /// <summary>
-        /// x position
-        /// </summary>
-        public float X {
-            get { return mX; }
-            set { mX = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// y position
-        /// </summary>
-        public float Y {
-            get { return mY; }
-            set { mY = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// z position
-        /// </summary>
-        public float Z {
-            get { return mZ; }
-            set { mZ = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired yaw angle
-        /// </summary>
-        public float Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Coordinate frame - valid values are only MAV_FRAME_LOCAL_NED or MAV_FRAME_LOCAL_ENU
-        /// </summary>
-        public MavFrame CoordinateFrame {
-            get { return mCoordinateFrame; }
-            set { mCoordinateFrame = value; NotifyUpdated(); }
-        }
-
-        public UasLocalPositionSetpoint()
-        {
-            mMessageId = 51;
-            CrcExtra = 223;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mX);
-            s.Write(mY);
-            s.Write(mZ);
-            s.Write(mYaw);
-            s.Write((byte)mCoordinateFrame);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mX = s.ReadSingle();
-            this.mY = s.ReadSingle();
-            this.mZ = s.ReadSingle();
-            this.mYaw = s.ReadSingle();
-            this.mCoordinateFrame = (MavFrame)s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Transmit the current local setpoint of the controller to other MAVs (collision avoidance) and to the GCS."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "X",
-                Description = "x position",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Y",
-                Description = "y position",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Z",
-                Description = "z position",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Desired yaw angle",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "CoordinateFrame",
-                Description = "Coordinate frame - valid values are only MAV_FRAME_LOCAL_NED or MAV_FRAME_LOCAL_ENU",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
-            });
-
-        }
-
-        private float mX;
-        private float mY;
-        private float mZ;
-        private float mYaw;
-        private MavFrame mCoordinateFrame;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Transmit the current local setpoint of the controller to other MAVs (collision avoidance) and to the GCS.
-    /// </summary>
-    public class UasGlobalPositionSetpointInt: UasMessage
-    {
-        /// <summary>
-        /// Latitude (WGS84), in degrees * 1E7
-        /// </summary>
-        public Int32 Latitude {
-            get { return mLatitude; }
-            set { mLatitude = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Longitude (WGS84), in degrees * 1E7
-        /// </summary>
-        public Int32 Longitude {
-            get { return mLongitude; }
-            set { mLongitude = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Altitude (WGS84), in meters * 1000 (positive for up)
-        /// </summary>
-        public Int32 Altitude {
-            get { return mAltitude; }
-            set { mAltitude = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired yaw angle in degrees * 100
-        /// </summary>
-        public Int16 Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Coordinate frame - valid values are only MAV_FRAME_GLOBAL or MAV_FRAME_GLOBAL_RELATIVE_ALT
-        /// </summary>
-        public MavFrame CoordinateFrame {
-            get { return mCoordinateFrame; }
-            set { mCoordinateFrame = value; NotifyUpdated(); }
-        }
-
-        public UasGlobalPositionSetpointInt()
-        {
-            mMessageId = 52;
-            CrcExtra = 141;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mLatitude);
-            s.Write(mLongitude);
-            s.Write(mAltitude);
-            s.Write(mYaw);
-            s.Write((byte)mCoordinateFrame);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mLatitude = s.ReadInt32();
-            this.mLongitude = s.ReadInt32();
-            this.mAltitude = s.ReadInt32();
-            this.mYaw = s.ReadInt16();
-            this.mCoordinateFrame = (MavFrame)s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Transmit the current local setpoint of the controller to other MAVs (collision avoidance) and to the GCS."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Latitude",
-                Description = "Latitude (WGS84), in degrees * 1E7",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Longitude",
-                Description = "Longitude (WGS84), in degrees * 1E7",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Altitude",
-                Description = "Altitude (WGS84), in meters * 1000 (positive for up)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Desired yaw angle in degrees * 100",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "CoordinateFrame",
-                Description = "Coordinate frame - valid values are only MAV_FRAME_GLOBAL or MAV_FRAME_GLOBAL_RELATIVE_ALT",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
-            });
-
-        }
-
-        private Int32 mLatitude;
-        private Int32 mLongitude;
-        private Int32 mAltitude;
-        private Int16 mYaw;
-        private MavFrame mCoordinateFrame;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Set the current global position setpoint.
-    /// </summary>
-    public class UasSetGlobalPositionSetpointInt: UasMessage
-    {
-        /// <summary>
-        /// Latitude (WGS84), in degrees * 1E7
-        /// </summary>
-        public Int32 Latitude {
-            get { return mLatitude; }
-            set { mLatitude = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Longitude (WGS84), in degrees * 1E7
-        /// </summary>
-        public Int32 Longitude {
-            get { return mLongitude; }
-            set { mLongitude = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Altitude (WGS84), in meters * 1000 (positive for up)
-        /// </summary>
-        public Int32 Altitude {
-            get { return mAltitude; }
-            set { mAltitude = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired yaw angle in degrees * 100
-        /// </summary>
-        public Int16 Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Coordinate frame - valid values are only MAV_FRAME_GLOBAL or MAV_FRAME_GLOBAL_RELATIVE_ALT
-        /// </summary>
-        public MavFrame CoordinateFrame {
-            get { return mCoordinateFrame; }
-            set { mCoordinateFrame = value; NotifyUpdated(); }
-        }
-
-        public UasSetGlobalPositionSetpointInt()
-        {
-            mMessageId = 53;
-            CrcExtra = 33;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mLatitude);
-            s.Write(mLongitude);
-            s.Write(mAltitude);
-            s.Write(mYaw);
-            s.Write((byte)mCoordinateFrame);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mLatitude = s.ReadInt32();
-            this.mLongitude = s.ReadInt32();
-            this.mAltitude = s.ReadInt32();
-            this.mYaw = s.ReadInt16();
-            this.mCoordinateFrame = (MavFrame)s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Set the current global position setpoint."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Latitude",
-                Description = "Latitude (WGS84), in degrees * 1E7",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Longitude",
-                Description = "Longitude (WGS84), in degrees * 1E7",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Altitude",
-                Description = "Altitude (WGS84), in meters * 1000 (positive for up)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Desired yaw angle in degrees * 100",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "CoordinateFrame",
-                Description = "Coordinate frame - valid values are only MAV_FRAME_GLOBAL or MAV_FRAME_GLOBAL_RELATIVE_ALT",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
-            });
-
-        }
-
-        private Int32 mLatitude;
-        private Int32 mLongitude;
-        private Int32 mAltitude;
-        private Int16 mYaw;
-        private MavFrame mCoordinateFrame;
+        private char[] mParamId = new char[16];
+        private byte mParameterRcChannelIndex;
     }
 
 
@@ -6894,282 +6862,12 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Set roll, pitch and yaw.
+    /// The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0).
     /// </summary>
-    public class UasSetRollPitchYawThrust: UasMessage
+    public class UasAttitudeQuaternionCov: UasMessage
     {
         /// <summary>
-        /// Desired roll angle in radians
-        /// </summary>
-        public float Roll {
-            get { return mRoll; }
-            set { mRoll = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired pitch angle in radians
-        /// </summary>
-        public float Pitch {
-            get { return mPitch; }
-            set { mPitch = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired yaw angle in radians
-        /// </summary>
-        public float Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Collective thrust, normalized to 0 .. 1
-        /// </summary>
-        public float Thrust {
-            get { return mThrust; }
-            set { mThrust = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        public UasSetRollPitchYawThrust()
-        {
-            mMessageId = 56;
-            CrcExtra = 100;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mRoll);
-            s.Write(mPitch);
-            s.Write(mYaw);
-            s.Write(mThrust);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mRoll = s.ReadSingle();
-            this.mPitch = s.ReadSingle();
-            this.mYaw = s.ReadSingle();
-            this.mThrust = s.ReadSingle();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Set roll, pitch and yaw."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Roll",
-                Description = "Desired roll angle in radians",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pitch",
-                Description = "Desired pitch angle in radians",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Desired yaw angle in radians",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Thrust",
-                Description = "Collective thrust, normalized to 0 .. 1",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mRoll;
-        private float mPitch;
-        private float mYaw;
-        private float mThrust;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Set roll, pitch and yaw.
-    /// </summary>
-    public class UasSetRollPitchYawSpeedThrust: UasMessage
-    {
-        /// <summary>
-        /// Desired roll angular speed in rad/s
-        /// </summary>
-        public float RollSpeed {
-            get { return mRollSpeed; }
-            set { mRollSpeed = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired pitch angular speed in rad/s
-        /// </summary>
-        public float PitchSpeed {
-            get { return mPitchSpeed; }
-            set { mPitchSpeed = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired yaw angular speed in rad/s
-        /// </summary>
-        public float YawSpeed {
-            get { return mYawSpeed; }
-            set { mYawSpeed = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Collective thrust, normalized to 0 .. 1
-        /// </summary>
-        public float Thrust {
-            get { return mThrust; }
-            set { mThrust = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        public UasSetRollPitchYawSpeedThrust()
-        {
-            mMessageId = 57;
-            CrcExtra = 24;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mRollSpeed);
-            s.Write(mPitchSpeed);
-            s.Write(mYawSpeed);
-            s.Write(mThrust);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mRollSpeed = s.ReadSingle();
-            this.mPitchSpeed = s.ReadSingle();
-            this.mYawSpeed = s.ReadSingle();
-            this.mThrust = s.ReadSingle();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Set roll, pitch and yaw."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RollSpeed",
-                Description = "Desired roll angular speed in rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "PitchSpeed",
-                Description = "Desired pitch angular speed in rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "YawSpeed",
-                Description = "Desired yaw angular speed in rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Thrust",
-                Description = "Collective thrust, normalized to 0 .. 1",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mRollSpeed;
-        private float mPitchSpeed;
-        private float mYawSpeed;
-        private float mThrust;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Setpoint in roll, pitch, yaw currently active on the system.
-    /// </summary>
-    public class UasRollPitchYawThrustSetpoint: UasMessage
-    {
-        /// <summary>
-        /// Timestamp in milliseconds since system boot
+        /// Timestamp (milliseconds since system boot)
         /// </summary>
         public UInt32 TimeBootMs {
             get { return mTimeBootMs; }
@@ -7177,499 +6875,143 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Desired roll angle in radians
+        /// Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)
         /// </summary>
-        public float Roll {
-            get { return mRoll; }
-            set { mRoll = value; NotifyUpdated(); }
+        public float[] Q {
+            get { return mQ; }
+            set { mQ = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Desired pitch angle in radians
+        /// Roll angular speed (rad/s)
         /// </summary>
-        public float Pitch {
-            get { return mPitch; }
-            set { mPitch = value; NotifyUpdated(); }
+        public float Rollspeed {
+            get { return mRollspeed; }
+            set { mRollspeed = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Desired yaw angle in radians
+        /// Pitch angular speed (rad/s)
         /// </summary>
-        public float Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
+        public float Pitchspeed {
+            get { return mPitchspeed; }
+            set { mPitchspeed = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Collective thrust, normalized to 0 .. 1
+        /// Yaw angular speed (rad/s)
         /// </summary>
-        public float Thrust {
-            get { return mThrust; }
-            set { mThrust = value; NotifyUpdated(); }
-        }
-
-        public UasRollPitchYawThrustSetpoint()
-        {
-            mMessageId = 58;
-            CrcExtra = 239;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mTimeBootMs);
-            s.Write(mRoll);
-            s.Write(mPitch);
-            s.Write(mYaw);
-            s.Write(mThrust);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mTimeBootMs = s.ReadUInt32();
-            this.mRoll = s.ReadSingle();
-            this.mPitch = s.ReadSingle();
-            this.mYaw = s.ReadSingle();
-            this.mThrust = s.ReadSingle();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Setpoint in roll, pitch, yaw currently active on the system."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TimeBootMs",
-                Description = "Timestamp in milliseconds since system boot",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Roll",
-                Description = "Desired roll angle in radians",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pitch",
-                Description = "Desired pitch angle in radians",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Desired yaw angle in radians",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Thrust",
-                Description = "Collective thrust, normalized to 0 .. 1",
-                NumElements = 1,
-            });
-
-        }
-
-        private UInt32 mTimeBootMs;
-        private float mRoll;
-        private float mPitch;
-        private float mYaw;
-        private float mThrust;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Setpoint in rollspeed, pitchspeed, yawspeed currently active on the system.
-    /// </summary>
-    public class UasRollPitchYawSpeedThrustSetpoint: UasMessage
-    {
-        /// <summary>
-        /// Timestamp in milliseconds since system boot
-        /// </summary>
-        public UInt32 TimeBootMs {
-            get { return mTimeBootMs; }
-            set { mTimeBootMs = value; NotifyUpdated(); }
+        public float Yawspeed {
+            get { return mYawspeed; }
+            set { mYawspeed = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Desired roll angular speed in rad/s
+        /// Attitude covariance
         /// </summary>
-        public float RollSpeed {
-            get { return mRollSpeed; }
-            set { mRollSpeed = value; NotifyUpdated(); }
+        public float[] Covariance {
+            get { return mCovariance; }
+            set { mCovariance = value; NotifyUpdated(); }
         }
 
-        /// <summary>
-        /// Desired pitch angular speed in rad/s
-        /// </summary>
-        public float PitchSpeed {
-            get { return mPitchSpeed; }
-            set { mPitchSpeed = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired yaw angular speed in rad/s
-        /// </summary>
-        public float YawSpeed {
-            get { return mYawSpeed; }
-            set { mYawSpeed = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Collective thrust, normalized to 0 .. 1
-        /// </summary>
-        public float Thrust {
-            get { return mThrust; }
-            set { mThrust = value; NotifyUpdated(); }
-        }
-
-        public UasRollPitchYawSpeedThrustSetpoint()
-        {
-            mMessageId = 59;
-            CrcExtra = 238;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mTimeBootMs);
-            s.Write(mRollSpeed);
-            s.Write(mPitchSpeed);
-            s.Write(mYawSpeed);
-            s.Write(mThrust);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mTimeBootMs = s.ReadUInt32();
-            this.mRollSpeed = s.ReadSingle();
-            this.mPitchSpeed = s.ReadSingle();
-            this.mYawSpeed = s.ReadSingle();
-            this.mThrust = s.ReadSingle();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Setpoint in rollspeed, pitchspeed, yawspeed currently active on the system."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TimeBootMs",
-                Description = "Timestamp in milliseconds since system boot",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RollSpeed",
-                Description = "Desired roll angular speed in rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "PitchSpeed",
-                Description = "Desired pitch angular speed in rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "YawSpeed",
-                Description = "Desired yaw angular speed in rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Thrust",
-                Description = "Collective thrust, normalized to 0 .. 1",
-                NumElements = 1,
-            });
-
-        }
-
-        private UInt32 mTimeBootMs;
-        private float mRollSpeed;
-        private float mPitchSpeed;
-        private float mYawSpeed;
-        private float mThrust;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Setpoint in the four motor speeds
-    /// </summary>
-    public class UasSetQuadMotorsSetpoint: UasMessage
-    {
-        /// <summary>
-        /// Front motor in + configuration, front left motor in x configuration
-        /// </summary>
-        public UInt16 MotorFrontNw {
-            get { return mMotorFrontNw; }
-            set { mMotorFrontNw = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Right motor in + configuration, front right motor in x configuration
-        /// </summary>
-        public UInt16 MotorRightNe {
-            get { return mMotorRightNe; }
-            set { mMotorRightNe = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Back motor in + configuration, back right motor in x configuration
-        /// </summary>
-        public UInt16 MotorBackSe {
-            get { return mMotorBackSe; }
-            set { mMotorBackSe = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Left motor in + configuration, back left motor in x configuration
-        /// </summary>
-        public UInt16 MotorLeftSw {
-            get { return mMotorLeftSw; }
-            set { mMotorLeftSw = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID of the system that should set these motor commands
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        public UasSetQuadMotorsSetpoint()
-        {
-            mMessageId = 60;
-            CrcExtra = 30;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mMotorFrontNw);
-            s.Write(mMotorRightNe);
-            s.Write(mMotorBackSe);
-            s.Write(mMotorLeftSw);
-            s.Write(mTargetSystem);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mMotorFrontNw = s.ReadUInt16();
-            this.mMotorRightNe = s.ReadUInt16();
-            this.mMotorBackSe = s.ReadUInt16();
-            this.mMotorLeftSw = s.ReadUInt16();
-            this.mTargetSystem = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Setpoint in the four motor speeds"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MotorFrontNw",
-                Description = "Front motor in + configuration, front left motor in x configuration",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MotorRightNe",
-                Description = "Right motor in + configuration, front right motor in x configuration",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MotorBackSe",
-                Description = "Back motor in + configuration, back right motor in x configuration",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MotorLeftSw",
-                Description = "Left motor in + configuration, back left motor in x configuration",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID of the system that should set these motor commands",
-                NumElements = 1,
-            });
-
-        }
-
-        private UInt16 mMotorFrontNw;
-        private UInt16 mMotorRightNe;
-        private UInt16 mMotorBackSe;
-        private UInt16 mMotorLeftSw;
-        private byte mTargetSystem;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Setpoint for up to four quadrotors in a group / wing
-    /// </summary>
-    public class UasSetQuadSwarmRollPitchYawThrust: UasMessage
-    {
-        /// <summary>
-        /// Desired roll angle in radians +-PI (+-INT16_MAX)
-        /// </summary>
-        public Int16[] Roll {
-            get { return mRoll; }
-            set { mRoll = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired pitch angle in radians +-PI (+-INT16_MAX)
-        /// </summary>
-        public Int16[] Pitch {
-            get { return mPitch; }
-            set { mPitch = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired yaw angle in radians, scaled to int16 +-PI (+-INT16_MAX)
-        /// </summary>
-        public Int16[] Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Collective thrust, scaled to uint16 (0..UINT16_MAX)
-        /// </summary>
-        public UInt16[] Thrust {
-            get { return mThrust; }
-            set { mThrust = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// ID of the quadrotor group (0 - 255, up to 256 groups supported)
-        /// </summary>
-        public byte Group {
-            get { return mGroup; }
-            set { mGroup = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// ID of the flight mode (0 - 255, up to 256 modes supported)
-        /// </summary>
-        public byte Mode {
-            get { return mMode; }
-            set { mMode = value; NotifyUpdated(); }
-        }
-
-        public UasSetQuadSwarmRollPitchYawThrust()
+        public UasAttitudeQuaternionCov()
         {
             mMessageId = 61;
-            CrcExtra = 240;
+            CrcExtra = 153;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mRoll[0]); 
-            s.Write(mRoll[1]); 
-            s.Write(mRoll[2]); 
-            s.Write(mRoll[3]); 
-            s.Write(mPitch[0]); 
-            s.Write(mPitch[1]); 
-            s.Write(mPitch[2]); 
-            s.Write(mPitch[3]); 
-            s.Write(mYaw[0]); 
-            s.Write(mYaw[1]); 
-            s.Write(mYaw[2]); 
-            s.Write(mYaw[3]); 
-            s.Write(mThrust[0]); 
-            s.Write(mThrust[1]); 
-            s.Write(mThrust[2]); 
-            s.Write(mThrust[3]); 
-            s.Write(mGroup);
-            s.Write(mMode);
+            s.Write(mTimeBootMs);
+            s.Write(mQ[0]); 
+            s.Write(mQ[1]); 
+            s.Write(mQ[2]); 
+            s.Write(mQ[3]); 
+            s.Write(mRollspeed);
+            s.Write(mPitchspeed);
+            s.Write(mYawspeed);
+            s.Write(mCovariance[0]); 
+            s.Write(mCovariance[1]); 
+            s.Write(mCovariance[2]); 
+            s.Write(mCovariance[3]); 
+            s.Write(mCovariance[4]); 
+            s.Write(mCovariance[5]); 
+            s.Write(mCovariance[6]); 
+            s.Write(mCovariance[7]); 
+            s.Write(mCovariance[8]); 
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mRoll[0] = s.ReadInt16();
-            this.mRoll[1] = s.ReadInt16();
-            this.mRoll[2] = s.ReadInt16();
-            this.mRoll[3] = s.ReadInt16();
-            this.mPitch[0] = s.ReadInt16();
-            this.mPitch[1] = s.ReadInt16();
-            this.mPitch[2] = s.ReadInt16();
-            this.mPitch[3] = s.ReadInt16();
-            this.mYaw[0] = s.ReadInt16();
-            this.mYaw[1] = s.ReadInt16();
-            this.mYaw[2] = s.ReadInt16();
-            this.mYaw[3] = s.ReadInt16();
-            this.mThrust[0] = s.ReadUInt16();
-            this.mThrust[1] = s.ReadUInt16();
-            this.mThrust[2] = s.ReadUInt16();
-            this.mThrust[3] = s.ReadUInt16();
-            this.mGroup = s.ReadByte();
-            this.mMode = s.ReadByte();
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mQ[0] = s.ReadSingle();
+            this.mQ[1] = s.ReadSingle();
+            this.mQ[2] = s.ReadSingle();
+            this.mQ[3] = s.ReadSingle();
+            this.mRollspeed = s.ReadSingle();
+            this.mPitchspeed = s.ReadSingle();
+            this.mYawspeed = s.ReadSingle();
+            this.mCovariance[0] = s.ReadSingle();
+            this.mCovariance[1] = s.ReadSingle();
+            this.mCovariance[2] = s.ReadSingle();
+            this.mCovariance[3] = s.ReadSingle();
+            this.mCovariance[4] = s.ReadSingle();
+            this.mCovariance[5] = s.ReadSingle();
+            this.mCovariance[6] = s.ReadSingle();
+            this.mCovariance[7] = s.ReadSingle();
+            this.mCovariance[8] = s.ReadSingle();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Setpoint for up to four quadrotors in a group / wing"
+                Description = "The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right), expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be expressed as (1 0 0 0)."
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Roll",
-                Description = "Desired roll angle in radians +-PI (+-INT16_MAX)",
-                NumElements = 4,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pitch",
-                Description = "Desired pitch angle in radians +-PI (+-INT16_MAX)",
-                NumElements = 4,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Desired yaw angle in radians, scaled to int16 +-PI (+-INT16_MAX)",
-                NumElements = 4,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Thrust",
-                Description = "Collective thrust, scaled to uint16 (0..UINT16_MAX)",
-                NumElements = 4,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Group",
-                Description = "ID of the quadrotor group (0 - 255, up to 256 groups supported)",
+                Name = "TimeBootMs",
+                Description = "Timestamp (milliseconds since system boot)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Mode",
-                Description = "ID of the flight mode (0 - 255, up to 256 modes supported)",
+                Name = "Q",
+                Description = "Quaternion components, w, x, y, z (1 0 0 0 is the null-rotation)",
+                NumElements = 4,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Rollspeed",
+                Description = "Roll angular speed (rad/s)",
                 NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Pitchspeed",
+                Description = "Pitch angular speed (rad/s)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Yawspeed",
+                Description = "Yaw angular speed (rad/s)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Covariance",
+                Description = "Attitude covariance",
+                NumElements = 9,
             });
 
         }
 
-        private Int16[] mRoll = new Int16[4];
-        private Int16[] mPitch = new Int16[4];
-        private Int16[] mYaw = new Int16[4];
-        private UInt16[] mThrust = new UInt16[4];
-        private byte mGroup;
-        private byte mMode;
+        private UInt32 mTimeBootMs;
+        private float[] mQ = new float[4];
+        private float mRollspeed;
+        private float mPitchspeed;
+        private float mYawspeed;
+        private float[] mCovariance = new float[9];
     }
 
 
@@ -7846,227 +7188,289 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Setpoint for up to four quadrotors in a group / wing
+    /// The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It  is designed as scaled integer message since the resolution of float is not sufficient. NOTE: This message is intended for onboard networks / companion computers and higher-bandwidth links and optimized for accuracy and completeness. Please use the GLOBAL_POSITION_INT message for a minimal subset.
     /// </summary>
-    public class UasSetQuadSwarmLedRollPitchYawThrust: UasMessage
+    public class UasGlobalPositionIntCov: UasMessage
     {
         /// <summary>
-        /// Desired roll angle in radians +-PI (+-INT16_MAX)
+        /// Timestamp (microseconds since UNIX epoch) in UTC. 0 for unknown. Commonly filled by the precision time source of a GPS receiver.
         /// </summary>
-        public Int16[] Roll {
-            get { return mRoll; }
-            set { mRoll = value; NotifyUpdated(); }
+        public UInt64 TimeUtc {
+            get { return mTimeUtc; }
+            set { mTimeUtc = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Desired pitch angle in radians +-PI (+-INT16_MAX)
+        /// Timestamp (milliseconds since system boot)
         /// </summary>
-        public Int16[] Pitch {
-            get { return mPitch; }
-            set { mPitch = value; NotifyUpdated(); }
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Desired yaw angle in radians, scaled to int16 +-PI (+-INT16_MAX)
+        /// Latitude, expressed as degrees * 1E7
         /// </summary>
-        public Int16[] Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
+        public Int32 Lat {
+            get { return mLat; }
+            set { mLat = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Collective thrust, scaled to uint16 (0..UINT16_MAX)
+        /// Longitude, expressed as degrees * 1E7
         /// </summary>
-        public UInt16[] Thrust {
-            get { return mThrust; }
-            set { mThrust = value; NotifyUpdated(); }
+        public Int32 Lon {
+            get { return mLon; }
+            set { mLon = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// ID of the quadrotor group (0 - 255, up to 256 groups supported)
+        /// Altitude in meters, expressed as * 1000 (millimeters), above MSL
         /// </summary>
-        public byte Group {
-            get { return mGroup; }
-            set { mGroup = value; NotifyUpdated(); }
+        public Int32 Alt {
+            get { return mAlt; }
+            set { mAlt = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// ID of the flight mode (0 - 255, up to 256 modes supported)
+        /// Altitude above ground in meters, expressed as * 1000 (millimeters)
         /// </summary>
-        public byte Mode {
-            get { return mMode; }
-            set { mMode = value; NotifyUpdated(); }
+        public Int32 RelativeAlt {
+            get { return mRelativeAlt; }
+            set { mRelativeAlt = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// RGB red channel (0-255)
+        /// Ground X Speed (Latitude), expressed as m/s
         /// </summary>
-        public byte[] LedRed {
-            get { return mLedRed; }
-            set { mLedRed = value; NotifyUpdated(); }
+        public float Vx {
+            get { return mVx; }
+            set { mVx = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// RGB green channel (0-255)
+        /// Ground Y Speed (Longitude), expressed as m/s
         /// </summary>
-        public byte[] LedBlue {
-            get { return mLedBlue; }
-            set { mLedBlue = value; NotifyUpdated(); }
+        public float Vy {
+            get { return mVy; }
+            set { mVy = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// RGB blue channel (0-255)
+        /// Ground Z Speed (Altitude), expressed as m/s
         /// </summary>
-        public byte[] LedGreen {
-            get { return mLedGreen; }
-            set { mLedGreen = value; NotifyUpdated(); }
+        public float Vz {
+            get { return mVz; }
+            set { mVz = value; NotifyUpdated(); }
         }
 
-        public UasSetQuadSwarmLedRollPitchYawThrust()
+        /// <summary>
+        /// Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)
+        /// </summary>
+        public float[] Covariance {
+            get { return mCovariance; }
+            set { mCovariance = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Class id of the estimator this estimate originated from.
+        /// </summary>
+        public byte EstimatorType {
+            get { return mEstimatorType; }
+            set { mEstimatorType = value; NotifyUpdated(); }
+        }
+
+        public UasGlobalPositionIntCov()
         {
             mMessageId = 63;
-            CrcExtra = 130;
+            CrcExtra = 51;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mRoll[0]); 
-            s.Write(mRoll[1]); 
-            s.Write(mRoll[2]); 
-            s.Write(mRoll[3]); 
-            s.Write(mPitch[0]); 
-            s.Write(mPitch[1]); 
-            s.Write(mPitch[2]); 
-            s.Write(mPitch[3]); 
-            s.Write(mYaw[0]); 
-            s.Write(mYaw[1]); 
-            s.Write(mYaw[2]); 
-            s.Write(mYaw[3]); 
-            s.Write(mThrust[0]); 
-            s.Write(mThrust[1]); 
-            s.Write(mThrust[2]); 
-            s.Write(mThrust[3]); 
-            s.Write(mGroup);
-            s.Write(mMode);
-            s.Write(mLedRed[0]); 
-            s.Write(mLedRed[1]); 
-            s.Write(mLedRed[2]); 
-            s.Write(mLedRed[3]); 
-            s.Write(mLedBlue[0]); 
-            s.Write(mLedBlue[1]); 
-            s.Write(mLedBlue[2]); 
-            s.Write(mLedBlue[3]); 
-            s.Write(mLedGreen[0]); 
-            s.Write(mLedGreen[1]); 
-            s.Write(mLedGreen[2]); 
-            s.Write(mLedGreen[3]); 
+            s.Write(mTimeUtc);
+            s.Write(mTimeBootMs);
+            s.Write(mLat);
+            s.Write(mLon);
+            s.Write(mAlt);
+            s.Write(mRelativeAlt);
+            s.Write(mVx);
+            s.Write(mVy);
+            s.Write(mVz);
+            s.Write(mCovariance[0]); 
+            s.Write(mCovariance[1]); 
+            s.Write(mCovariance[2]); 
+            s.Write(mCovariance[3]); 
+            s.Write(mCovariance[4]); 
+            s.Write(mCovariance[5]); 
+            s.Write(mCovariance[6]); 
+            s.Write(mCovariance[7]); 
+            s.Write(mCovariance[8]); 
+            s.Write(mCovariance[9]); 
+            s.Write(mCovariance[10]); 
+            s.Write(mCovariance[11]); 
+            s.Write(mCovariance[12]); 
+            s.Write(mCovariance[13]); 
+            s.Write(mCovariance[14]); 
+            s.Write(mCovariance[15]); 
+            s.Write(mCovariance[16]); 
+            s.Write(mCovariance[17]); 
+            s.Write(mCovariance[18]); 
+            s.Write(mCovariance[19]); 
+            s.Write(mCovariance[20]); 
+            s.Write(mCovariance[21]); 
+            s.Write(mCovariance[22]); 
+            s.Write(mCovariance[23]); 
+            s.Write(mCovariance[24]); 
+            s.Write(mCovariance[25]); 
+            s.Write(mCovariance[26]); 
+            s.Write(mCovariance[27]); 
+            s.Write(mCovariance[28]); 
+            s.Write(mCovariance[29]); 
+            s.Write(mCovariance[30]); 
+            s.Write(mCovariance[31]); 
+            s.Write(mCovariance[32]); 
+            s.Write(mCovariance[33]); 
+            s.Write(mCovariance[34]); 
+            s.Write(mCovariance[35]); 
+            s.Write(mEstimatorType);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mRoll[0] = s.ReadInt16();
-            this.mRoll[1] = s.ReadInt16();
-            this.mRoll[2] = s.ReadInt16();
-            this.mRoll[3] = s.ReadInt16();
-            this.mPitch[0] = s.ReadInt16();
-            this.mPitch[1] = s.ReadInt16();
-            this.mPitch[2] = s.ReadInt16();
-            this.mPitch[3] = s.ReadInt16();
-            this.mYaw[0] = s.ReadInt16();
-            this.mYaw[1] = s.ReadInt16();
-            this.mYaw[2] = s.ReadInt16();
-            this.mYaw[3] = s.ReadInt16();
-            this.mThrust[0] = s.ReadUInt16();
-            this.mThrust[1] = s.ReadUInt16();
-            this.mThrust[2] = s.ReadUInt16();
-            this.mThrust[3] = s.ReadUInt16();
-            this.mGroup = s.ReadByte();
-            this.mMode = s.ReadByte();
-            this.mLedRed[0] = s.ReadByte();
-            this.mLedRed[1] = s.ReadByte();
-            this.mLedRed[2] = s.ReadByte();
-            this.mLedRed[3] = s.ReadByte();
-            this.mLedBlue[0] = s.ReadByte();
-            this.mLedBlue[1] = s.ReadByte();
-            this.mLedBlue[2] = s.ReadByte();
-            this.mLedBlue[3] = s.ReadByte();
-            this.mLedGreen[0] = s.ReadByte();
-            this.mLedGreen[1] = s.ReadByte();
-            this.mLedGreen[2] = s.ReadByte();
-            this.mLedGreen[3] = s.ReadByte();
+            this.mTimeUtc = s.ReadUInt64();
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mLat = s.ReadInt32();
+            this.mLon = s.ReadInt32();
+            this.mAlt = s.ReadInt32();
+            this.mRelativeAlt = s.ReadInt32();
+            this.mVx = s.ReadSingle();
+            this.mVy = s.ReadSingle();
+            this.mVz = s.ReadSingle();
+            this.mCovariance[0] = s.ReadSingle();
+            this.mCovariance[1] = s.ReadSingle();
+            this.mCovariance[2] = s.ReadSingle();
+            this.mCovariance[3] = s.ReadSingle();
+            this.mCovariance[4] = s.ReadSingle();
+            this.mCovariance[5] = s.ReadSingle();
+            this.mCovariance[6] = s.ReadSingle();
+            this.mCovariance[7] = s.ReadSingle();
+            this.mCovariance[8] = s.ReadSingle();
+            this.mCovariance[9] = s.ReadSingle();
+            this.mCovariance[10] = s.ReadSingle();
+            this.mCovariance[11] = s.ReadSingle();
+            this.mCovariance[12] = s.ReadSingle();
+            this.mCovariance[13] = s.ReadSingle();
+            this.mCovariance[14] = s.ReadSingle();
+            this.mCovariance[15] = s.ReadSingle();
+            this.mCovariance[16] = s.ReadSingle();
+            this.mCovariance[17] = s.ReadSingle();
+            this.mCovariance[18] = s.ReadSingle();
+            this.mCovariance[19] = s.ReadSingle();
+            this.mCovariance[20] = s.ReadSingle();
+            this.mCovariance[21] = s.ReadSingle();
+            this.mCovariance[22] = s.ReadSingle();
+            this.mCovariance[23] = s.ReadSingle();
+            this.mCovariance[24] = s.ReadSingle();
+            this.mCovariance[25] = s.ReadSingle();
+            this.mCovariance[26] = s.ReadSingle();
+            this.mCovariance[27] = s.ReadSingle();
+            this.mCovariance[28] = s.ReadSingle();
+            this.mCovariance[29] = s.ReadSingle();
+            this.mCovariance[30] = s.ReadSingle();
+            this.mCovariance[31] = s.ReadSingle();
+            this.mCovariance[32] = s.ReadSingle();
+            this.mCovariance[33] = s.ReadSingle();
+            this.mCovariance[34] = s.ReadSingle();
+            this.mCovariance[35] = s.ReadSingle();
+            this.mEstimatorType = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Setpoint for up to four quadrotors in a group / wing"
+                Description = "The filtered global position (e.g. fused GPS and accelerometers). The position is in GPS-frame (right-handed, Z-up). It  is designed as scaled integer message since the resolution of float is not sufficient. NOTE: This message is intended for onboard networks / companion computers and higher-bandwidth links and optimized for accuracy and completeness. Please use the GLOBAL_POSITION_INT message for a minimal subset."
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Roll",
-                Description = "Desired roll angle in radians +-PI (+-INT16_MAX)",
-                NumElements = 4,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pitch",
-                Description = "Desired pitch angle in radians +-PI (+-INT16_MAX)",
-                NumElements = 4,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Desired yaw angle in radians, scaled to int16 +-PI (+-INT16_MAX)",
-                NumElements = 4,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Thrust",
-                Description = "Collective thrust, scaled to uint16 (0..UINT16_MAX)",
-                NumElements = 4,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Group",
-                Description = "ID of the quadrotor group (0 - 255, up to 256 groups supported)",
+                Name = "TimeUtc",
+                Description = "Timestamp (microseconds since UNIX epoch) in UTC. 0 for unknown. Commonly filled by the precision time source of a GPS receiver.",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Mode",
-                Description = "ID of the flight mode (0 - 255, up to 256 modes supported)",
+                Name = "TimeBootMs",
+                Description = "Timestamp (milliseconds since system boot)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LedRed",
-                Description = "RGB red channel (0-255)",
-                NumElements = 4,
+                Name = "Lat",
+                Description = "Latitude, expressed as degrees * 1E7",
+                NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LedBlue",
-                Description = "RGB green channel (0-255)",
-                NumElements = 4,
+                Name = "Lon",
+                Description = "Longitude, expressed as degrees * 1E7",
+                NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LedGreen",
-                Description = "RGB blue channel (0-255)",
-                NumElements = 4,
+                Name = "Alt",
+                Description = "Altitude in meters, expressed as * 1000 (millimeters), above MSL",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "RelativeAlt",
+                Description = "Altitude above ground in meters, expressed as * 1000 (millimeters)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vx",
+                Description = "Ground X Speed (Latitude), expressed as m/s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vy",
+                Description = "Ground Y Speed (Longitude), expressed as m/s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vz",
+                Description = "Ground Z Speed (Altitude), expressed as m/s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Covariance",
+                Description = "Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)",
+                NumElements = 36,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "EstimatorType",
+                Description = "Class id of the estimator this estimate originated from.",
+                NumElements = 1,
             });
 
         }
 
-        private Int16[] mRoll = new Int16[4];
-        private Int16[] mPitch = new Int16[4];
-        private Int16[] mYaw = new Int16[4];
-        private UInt16[] mThrust = new UInt16[4];
-        private byte mGroup;
-        private byte mMode;
-        private byte[] mLedRed = new byte[4];
-        private byte[] mLedBlue = new byte[4];
-        private byte[] mLedGreen = new byte[4];
+        private UInt64 mTimeUtc;
+        private UInt32 mTimeBootMs;
+        private Int32 mLat;
+        private Int32 mLon;
+        private Int32 mAlt;
+        private Int32 mRelativeAlt;
+        private float mVx;
+        private float mVy;
+        private float mVz;
+        private float[] mCovariance = new float[36];
+        private byte mEstimatorType;
     }
 
 
@@ -8074,185 +7478,662 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Corrects the systems state by adding an error correction term to the position and velocity, and by rotating the attitude by a correction angle.
+    /// The filtered local position (e.g. fused computer vision and accelerometers). Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)
     /// </summary>
-    public class UasStateCorrection: UasMessage
+    public class UasLocalPositionNedCov: UasMessage
     {
         /// <summary>
-        /// x position error
+        /// Timestamp (microseconds since UNIX epoch) in UTC. 0 for unknown. Commonly filled by the precision time source of a GPS receiver.
         /// </summary>
-        public float Xerr {
-            get { return mXerr; }
-            set { mXerr = value; NotifyUpdated(); }
+        public UInt64 TimeUtc {
+            get { return mTimeUtc; }
+            set { mTimeUtc = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// y position error
+        /// Timestamp (milliseconds since system boot)
         /// </summary>
-        public float Yerr {
-            get { return mYerr; }
-            set { mYerr = value; NotifyUpdated(); }
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// z position error
+        /// X Position
         /// </summary>
-        public float Zerr {
-            get { return mZerr; }
-            set { mZerr = value; NotifyUpdated(); }
+        public float X {
+            get { return mX; }
+            set { mX = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// roll error (radians)
+        /// Y Position
         /// </summary>
-        public float Rollerr {
-            get { return mRollerr; }
-            set { mRollerr = value; NotifyUpdated(); }
+        public float Y {
+            get { return mY; }
+            set { mY = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// pitch error (radians)
+        /// Z Position
         /// </summary>
-        public float Pitcherr {
-            get { return mPitcherr; }
-            set { mPitcherr = value; NotifyUpdated(); }
+        public float Z {
+            get { return mZ; }
+            set { mZ = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// yaw error (radians)
+        /// X Speed
         /// </summary>
-        public float Yawerr {
-            get { return mYawerr; }
-            set { mYawerr = value; NotifyUpdated(); }
+        public float Vx {
+            get { return mVx; }
+            set { mVx = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// x velocity
+        /// Y Speed
         /// </summary>
-        public float Vxerr {
-            get { return mVxerr; }
-            set { mVxerr = value; NotifyUpdated(); }
+        public float Vy {
+            get { return mVy; }
+            set { mVy = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// y velocity
+        /// Z Speed
         /// </summary>
-        public float Vyerr {
-            get { return mVyerr; }
-            set { mVyerr = value; NotifyUpdated(); }
+        public float Vz {
+            get { return mVz; }
+            set { mVz = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// z velocity
+        /// Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)
         /// </summary>
-        public float Vzerr {
-            get { return mVzerr; }
-            set { mVzerr = value; NotifyUpdated(); }
+        public float[] Covariance {
+            get { return mCovariance; }
+            set { mCovariance = value; NotifyUpdated(); }
         }
 
-        public UasStateCorrection()
+        /// <summary>
+        /// Class id of the estimator this estimate originated from.
+        /// </summary>
+        public byte EstimatorType {
+            get { return mEstimatorType; }
+            set { mEstimatorType = value; NotifyUpdated(); }
+        }
+
+        public UasLocalPositionNedCov()
         {
             mMessageId = 64;
-            CrcExtra = 130;
+            CrcExtra = 82;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mXerr);
-            s.Write(mYerr);
-            s.Write(mZerr);
-            s.Write(mRollerr);
-            s.Write(mPitcherr);
-            s.Write(mYawerr);
-            s.Write(mVxerr);
-            s.Write(mVyerr);
-            s.Write(mVzerr);
+            s.Write(mTimeUtc);
+            s.Write(mTimeBootMs);
+            s.Write(mX);
+            s.Write(mY);
+            s.Write(mZ);
+            s.Write(mVx);
+            s.Write(mVy);
+            s.Write(mVz);
+            s.Write(mCovariance[0]); 
+            s.Write(mCovariance[1]); 
+            s.Write(mCovariance[2]); 
+            s.Write(mCovariance[3]); 
+            s.Write(mCovariance[4]); 
+            s.Write(mCovariance[5]); 
+            s.Write(mCovariance[6]); 
+            s.Write(mCovariance[7]); 
+            s.Write(mCovariance[8]); 
+            s.Write(mCovariance[9]); 
+            s.Write(mCovariance[10]); 
+            s.Write(mCovariance[11]); 
+            s.Write(mCovariance[12]); 
+            s.Write(mCovariance[13]); 
+            s.Write(mCovariance[14]); 
+            s.Write(mCovariance[15]); 
+            s.Write(mCovariance[16]); 
+            s.Write(mCovariance[17]); 
+            s.Write(mCovariance[18]); 
+            s.Write(mCovariance[19]); 
+            s.Write(mCovariance[20]); 
+            s.Write(mCovariance[21]); 
+            s.Write(mCovariance[22]); 
+            s.Write(mCovariance[23]); 
+            s.Write(mCovariance[24]); 
+            s.Write(mCovariance[25]); 
+            s.Write(mCovariance[26]); 
+            s.Write(mCovariance[27]); 
+            s.Write(mCovariance[28]); 
+            s.Write(mCovariance[29]); 
+            s.Write(mCovariance[30]); 
+            s.Write(mCovariance[31]); 
+            s.Write(mCovariance[32]); 
+            s.Write(mCovariance[33]); 
+            s.Write(mCovariance[34]); 
+            s.Write(mCovariance[35]); 
+            s.Write(mEstimatorType);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mXerr = s.ReadSingle();
-            this.mYerr = s.ReadSingle();
-            this.mZerr = s.ReadSingle();
-            this.mRollerr = s.ReadSingle();
-            this.mPitcherr = s.ReadSingle();
-            this.mYawerr = s.ReadSingle();
-            this.mVxerr = s.ReadSingle();
-            this.mVyerr = s.ReadSingle();
-            this.mVzerr = s.ReadSingle();
+            this.mTimeUtc = s.ReadUInt64();
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mX = s.ReadSingle();
+            this.mY = s.ReadSingle();
+            this.mZ = s.ReadSingle();
+            this.mVx = s.ReadSingle();
+            this.mVy = s.ReadSingle();
+            this.mVz = s.ReadSingle();
+            this.mCovariance[0] = s.ReadSingle();
+            this.mCovariance[1] = s.ReadSingle();
+            this.mCovariance[2] = s.ReadSingle();
+            this.mCovariance[3] = s.ReadSingle();
+            this.mCovariance[4] = s.ReadSingle();
+            this.mCovariance[5] = s.ReadSingle();
+            this.mCovariance[6] = s.ReadSingle();
+            this.mCovariance[7] = s.ReadSingle();
+            this.mCovariance[8] = s.ReadSingle();
+            this.mCovariance[9] = s.ReadSingle();
+            this.mCovariance[10] = s.ReadSingle();
+            this.mCovariance[11] = s.ReadSingle();
+            this.mCovariance[12] = s.ReadSingle();
+            this.mCovariance[13] = s.ReadSingle();
+            this.mCovariance[14] = s.ReadSingle();
+            this.mCovariance[15] = s.ReadSingle();
+            this.mCovariance[16] = s.ReadSingle();
+            this.mCovariance[17] = s.ReadSingle();
+            this.mCovariance[18] = s.ReadSingle();
+            this.mCovariance[19] = s.ReadSingle();
+            this.mCovariance[20] = s.ReadSingle();
+            this.mCovariance[21] = s.ReadSingle();
+            this.mCovariance[22] = s.ReadSingle();
+            this.mCovariance[23] = s.ReadSingle();
+            this.mCovariance[24] = s.ReadSingle();
+            this.mCovariance[25] = s.ReadSingle();
+            this.mCovariance[26] = s.ReadSingle();
+            this.mCovariance[27] = s.ReadSingle();
+            this.mCovariance[28] = s.ReadSingle();
+            this.mCovariance[29] = s.ReadSingle();
+            this.mCovariance[30] = s.ReadSingle();
+            this.mCovariance[31] = s.ReadSingle();
+            this.mCovariance[32] = s.ReadSingle();
+            this.mCovariance[33] = s.ReadSingle();
+            this.mCovariance[34] = s.ReadSingle();
+            this.mCovariance[35] = s.ReadSingle();
+            this.mEstimatorType = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Corrects the systems state by adding an error correction term to the position and velocity, and by rotating the attitude by a correction angle."
+                Description = "The filtered local position (e.g. fused computer vision and accelerometers). Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED / north-east-down convention)"
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Xerr",
-                Description = "x position error",
+                Name = "TimeUtc",
+                Description = "Timestamp (microseconds since UNIX epoch) in UTC. 0 for unknown. Commonly filled by the precision time source of a GPS receiver.",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yerr",
-                Description = "y position error",
+                Name = "TimeBootMs",
+                Description = "Timestamp (milliseconds since system boot)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Zerr",
-                Description = "z position error",
+                Name = "X",
+                Description = "X Position",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Rollerr",
-                Description = "roll error (radians)",
+                Name = "Y",
+                Description = "Y Position",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pitcherr",
-                Description = "pitch error (radians)",
+                Name = "Z",
+                Description = "Z Position",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yawerr",
-                Description = "yaw error (radians)",
+                Name = "Vx",
+                Description = "X Speed",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Vxerr",
-                Description = "x velocity",
+                Name = "Vy",
+                Description = "Y Speed",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Vyerr",
-                Description = "y velocity",
+                Name = "Vz",
+                Description = "Z Speed",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Vzerr",
-                Description = "z velocity",
+                Name = "Covariance",
+                Description = "Covariance matrix (first six entries are the first ROW, next six entries are the second row, etc.)",
+                NumElements = 36,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "EstimatorType",
+                Description = "Class id of the estimator this estimate originated from.",
                 NumElements = 1,
             });
 
         }
 
-        private float mXerr;
-        private float mYerr;
-        private float mZerr;
-        private float mRollerr;
-        private float mPitcherr;
-        private float mYawerr;
-        private float mVxerr;
-        private float mVyerr;
-        private float mVzerr;
+        private UInt64 mTimeUtc;
+        private UInt32 mTimeBootMs;
+        private float mX;
+        private float mY;
+        private float mZ;
+        private float mVx;
+        private float mVy;
+        private float mVz;
+        private float[] mCovariance = new float[36];
+        private byte mEstimatorType;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// The PPM values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.
+    /// </summary>
+    public class UasRcChannels: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (milliseconds since system boot)
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan1Raw {
+            get { return mChan1Raw; }
+            set { mChan1Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan2Raw {
+            get { return mChan2Raw; }
+            set { mChan2Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan3Raw {
+            get { return mChan3Raw; }
+            set { mChan3Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan4Raw {
+            get { return mChan4Raw; }
+            set { mChan4Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan5Raw {
+            get { return mChan5Raw; }
+            set { mChan5Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan6Raw {
+            get { return mChan6Raw; }
+            set { mChan6Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan7Raw {
+            get { return mChan7Raw; }
+            set { mChan7Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan8Raw {
+            get { return mChan8Raw; }
+            set { mChan8Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 9 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan9Raw {
+            get { return mChan9Raw; }
+            set { mChan9Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 10 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan10Raw {
+            get { return mChan10Raw; }
+            set { mChan10Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 11 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan11Raw {
+            get { return mChan11Raw; }
+            set { mChan11Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 12 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan12Raw {
+            get { return mChan12Raw; }
+            set { mChan12Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 13 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan13Raw {
+            get { return mChan13Raw; }
+            set { mChan13Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 14 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan14Raw {
+            get { return mChan14Raw; }
+            set { mChan14Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 15 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan15Raw {
+            get { return mChan15Raw; }
+            set { mChan15Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 16 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan16Raw {
+            get { return mChan16Raw; }
+            set { mChan16Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 17 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan17Raw {
+            get { return mChan17Raw; }
+            set { mChan17Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RC channel 18 value, in microseconds. A value of UINT16_MAX implies the channel is unused.
+        /// </summary>
+        public UInt16 Chan18Raw {
+            get { return mChan18Raw; }
+            set { mChan18Raw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Total number of RC channels being received. This can be larger than 18, indicating that more channels are available but not given in this message. This value should be 0 when no RC channels are available.
+        /// </summary>
+        public byte Chancount {
+            get { return mChancount; }
+            set { mChancount = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.
+        /// </summary>
+        public byte Rssi {
+            get { return mRssi; }
+            set { mRssi = value; NotifyUpdated(); }
+        }
+
+        public UasRcChannels()
+        {
+            mMessageId = 65;
+            CrcExtra = 118;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mChan1Raw);
+            s.Write(mChan2Raw);
+            s.Write(mChan3Raw);
+            s.Write(mChan4Raw);
+            s.Write(mChan5Raw);
+            s.Write(mChan6Raw);
+            s.Write(mChan7Raw);
+            s.Write(mChan8Raw);
+            s.Write(mChan9Raw);
+            s.Write(mChan10Raw);
+            s.Write(mChan11Raw);
+            s.Write(mChan12Raw);
+            s.Write(mChan13Raw);
+            s.Write(mChan14Raw);
+            s.Write(mChan15Raw);
+            s.Write(mChan16Raw);
+            s.Write(mChan17Raw);
+            s.Write(mChan18Raw);
+            s.Write(mChancount);
+            s.Write(mRssi);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mChan1Raw = s.ReadUInt16();
+            this.mChan2Raw = s.ReadUInt16();
+            this.mChan3Raw = s.ReadUInt16();
+            this.mChan4Raw = s.ReadUInt16();
+            this.mChan5Raw = s.ReadUInt16();
+            this.mChan6Raw = s.ReadUInt16();
+            this.mChan7Raw = s.ReadUInt16();
+            this.mChan8Raw = s.ReadUInt16();
+            this.mChan9Raw = s.ReadUInt16();
+            this.mChan10Raw = s.ReadUInt16();
+            this.mChan11Raw = s.ReadUInt16();
+            this.mChan12Raw = s.ReadUInt16();
+            this.mChan13Raw = s.ReadUInt16();
+            this.mChan14Raw = s.ReadUInt16();
+            this.mChan15Raw = s.ReadUInt16();
+            this.mChan16Raw = s.ReadUInt16();
+            this.mChan17Raw = s.ReadUInt16();
+            this.mChan18Raw = s.ReadUInt16();
+            this.mChancount = s.ReadByte();
+            this.mRssi = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "The PPM values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp (milliseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan1Raw",
+                Description = "RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan2Raw",
+                Description = "RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan3Raw",
+                Description = "RC channel 3 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan4Raw",
+                Description = "RC channel 4 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan5Raw",
+                Description = "RC channel 5 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan6Raw",
+                Description = "RC channel 6 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan7Raw",
+                Description = "RC channel 7 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan8Raw",
+                Description = "RC channel 8 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan9Raw",
+                Description = "RC channel 9 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan10Raw",
+                Description = "RC channel 10 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan11Raw",
+                Description = "RC channel 11 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan12Raw",
+                Description = "RC channel 12 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan13Raw",
+                Description = "RC channel 13 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan14Raw",
+                Description = "RC channel 14 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan15Raw",
+                Description = "RC channel 15 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan16Raw",
+                Description = "RC channel 16 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan17Raw",
+                Description = "RC channel 17 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chan18Raw",
+                Description = "RC channel 18 value, in microseconds. A value of UINT16_MAX implies the channel is unused.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Chancount",
+                Description = "Total number of RC channels being received. This can be larger than 18, indicating that more channels are available but not given in this message. This value should be 0 when no RC channels are available.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Rssi",
+                Description = "Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private UInt16 mChan1Raw;
+        private UInt16 mChan2Raw;
+        private UInt16 mChan3Raw;
+        private UInt16 mChan4Raw;
+        private UInt16 mChan5Raw;
+        private UInt16 mChan6Raw;
+        private UInt16 mChan7Raw;
+        private UInt16 mChan8Raw;
+        private UInt16 mChan9Raw;
+        private UInt16 mChan10Raw;
+        private UInt16 mChan11Raw;
+        private UInt16 mChan12Raw;
+        private UInt16 mChan13Raw;
+        private UInt16 mChan14Raw;
+        private UInt16 mChan15Raw;
+        private UInt16 mChan16Raw;
+        private UInt16 mChan17Raw;
+        private UInt16 mChan18Raw;
+        private byte mChancount;
+        private byte mRssi;
     }
 
 
@@ -8262,7 +8143,7 @@ namespace MavLinkNet
     public class UasRequestDataStream: UasMessage
     {
         /// <summary>
-        /// The requested interval between two messages of this type.
+        /// The requested interval between two messages of this type
         /// </summary>
         public UInt16 ReqMessageRate {
             get { return mReqMessageRate; }
@@ -8286,9 +8167,9 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// The ID of the requested data stream. MAV_DATA_STREAM enum.
+        /// The ID of the requested data stream
         /// </summary>
-        public MavDataStream ReqStreamId {
+        public byte ReqStreamId {
             get { return mReqStreamId; }
             set { mReqStreamId = value; NotifyUpdated(); }
         }
@@ -8312,7 +8193,7 @@ namespace MavLinkNet
             s.Write(mReqMessageRate);
             s.Write(mTargetSystem);
             s.Write(mTargetComponent);
-            s.Write((byte)mReqStreamId);
+            s.Write(mReqStreamId);
             s.Write(mStartStop);
         }
 
@@ -8321,7 +8202,7 @@ namespace MavLinkNet
             this.mReqMessageRate = s.ReadUInt16();
             this.mTargetSystem = s.ReadByte();
             this.mTargetComponent = s.ReadByte();
-            this.mReqStreamId = (MavDataStream)s.ReadByte();
+            this.mReqStreamId = s.ReadByte();
             this.mStartStop = s.ReadByte();
         }
 
@@ -8333,7 +8214,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "ReqMessageRate",
-                Description = "The requested interval between two messages of this type.",
+                Description = "The requested interval between two messages of this type",
                 NumElements = 1,
             });
 
@@ -8351,9 +8232,8 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "ReqStreamId",
-                Description = "The ID of the requested data stream. MAV_DATA_STREAM enum.",
+                Description = "The ID of the requested data stream",
                 NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("MavDataStream"),
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
@@ -8367,7 +8247,7 @@ namespace MavLinkNet
         private UInt16 mReqMessageRate;
         private byte mTargetSystem;
         private byte mTargetComponent;
-        private MavDataStream mReqStreamId;
+        private byte mReqStreamId;
         private byte mStartStop;
     }
 
@@ -8378,7 +8258,7 @@ namespace MavLinkNet
     public class UasDataStream: UasMessage
     {
         /// <summary>
-        /// The requested interval between two messages of this type.
+        /// The requested interval between two messages of this type
         /// </summary>
         public UInt16 MessageRate {
             get { return mMessageRate; }
@@ -8386,9 +8266,9 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// The ID of the requested data stream. MAV_DATA_STREAM enum.
+        /// The ID of the requested data stream
         /// </summary>
-        public MavDataStream StreamId {
+        public byte StreamId {
             get { return mStreamId; }
             set { mStreamId = value; NotifyUpdated(); }
         }
@@ -8410,14 +8290,14 @@ namespace MavLinkNet
         internal override void SerializeBody(BinaryWriter s)
         {
             s.Write(mMessageRate);
-            s.Write((byte)mStreamId);
+            s.Write(mStreamId);
             s.Write(mOnOff);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
             this.mMessageRate = s.ReadUInt16();
-            this.mStreamId = (MavDataStream)s.ReadByte();
+            this.mStreamId = s.ReadByte();
             this.mOnOff = s.ReadByte();
         }
 
@@ -8429,15 +8309,14 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "MessageRate",
-                Description = "The requested interval between two messages of this type.",
+                Description = "The requested interval between two messages of this type",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "StreamId",
-                Description = "The ID of the requested data stream. MAV_DATA_STREAM enum.",
+                Description = "The ID of the requested data stream",
                 NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("MavDataStream"),
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
@@ -8449,7 +8328,7 @@ namespace MavLinkNet
         }
 
         private UInt16 mMessageRate;
-        private MavDataStream mStreamId;
+        private byte mStreamId;
         private byte mOnOff;
     }
 
@@ -8796,6 +8675,279 @@ namespace MavLinkNet
 
 
     /// <summary>
+    /// Message encoding a mission item. This message is emitted to announce                  the presence of a mission item and to set a mission item on the system. The mission item can be either in x, y, z meters (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame is Z-down, right handed (NED), global frame is Z-up, right handed (ENU). See alsohttp://qgroundcontrol.org/mavlink/waypoint_protocol.
+    /// </summary>
+    public class UasMissionItemInt: UasMessage
+    {
+        /// <summary>
+        /// PARAM1, see MAV_CMD enum
+        /// </summary>
+        public float Param1 {
+            get { return mParam1; }
+            set { mParam1 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM2, see MAV_CMD enum
+        /// </summary>
+        public float Param2 {
+            get { return mParam2; }
+            set { mParam2 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM3, see MAV_CMD enum
+        /// </summary>
+        public float Param3 {
+            get { return mParam3; }
+            set { mParam3 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM4, see MAV_CMD enum
+        /// </summary>
+        public float Param4 {
+            get { return mParam4; }
+            set { mParam4 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7
+        /// </summary>
+        public Int32 X {
+            get { return mX; }
+            set { mX = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM6 / y position: local: x position in meters * 1e4, global: longitude in degrees *10^7
+        /// </summary>
+        public Int32 Y {
+            get { return mY; }
+            set { mY = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.
+        /// </summary>
+        public float Z {
+            get { return mZ; }
+            set { mZ = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Waypoint ID (sequence number). Starts at zero. Increases monotonically for each waypoint, no gaps in the sequence (0,1,2,3,4).
+        /// </summary>
+        public UInt16 Seq {
+            get { return mSeq; }
+            set { mSeq = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// The scheduled action for the MISSION. see MAV_CMD in common.xml MAVLink specs
+        /// </summary>
+        public MavCmd Command {
+            get { return mCommand; }
+            set { mCommand = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// The coordinate system of the MISSION. see MAV_FRAME in mavlink_types.h
+        /// </summary>
+        public MavFrame Frame {
+            get { return mFrame; }
+            set { mFrame = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// false:0, true:1
+        /// </summary>
+        public byte Current {
+            get { return mCurrent; }
+            set { mCurrent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// autocontinue to next wp
+        /// </summary>
+        public byte Autocontinue {
+            get { return mAutocontinue; }
+            set { mAutocontinue = value; NotifyUpdated(); }
+        }
+
+        public UasMissionItemInt()
+        {
+            mMessageId = 73;
+            CrcExtra = 38;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mParam1);
+            s.Write(mParam2);
+            s.Write(mParam3);
+            s.Write(mParam4);
+            s.Write(mX);
+            s.Write(mY);
+            s.Write(mZ);
+            s.Write(mSeq);
+            s.Write((UInt16)mCommand);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+            s.Write((byte)mFrame);
+            s.Write(mCurrent);
+            s.Write(mAutocontinue);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mParam1 = s.ReadSingle();
+            this.mParam2 = s.ReadSingle();
+            this.mParam3 = s.ReadSingle();
+            this.mParam4 = s.ReadSingle();
+            this.mX = s.ReadInt32();
+            this.mY = s.ReadInt32();
+            this.mZ = s.ReadSingle();
+            this.mSeq = s.ReadUInt16();
+            this.mCommand = (MavCmd)s.ReadUInt16();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+            this.mFrame = (MavFrame)s.ReadByte();
+            this.mCurrent = s.ReadByte();
+            this.mAutocontinue = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Message encoding a mission item. This message is emitted to announce                  the presence of a mission item and to set a mission item on the system. The mission item can be either in x, y, z meters (type: LOCAL) or x:lat, y:lon, z:altitude. Local frame is Z-down, right handed (NED), global frame is Z-up, right handed (ENU). See alsohttp://qgroundcontrol.org/mavlink/waypoint_protocol."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Param1",
+                Description = "PARAM1, see MAV_CMD enum",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Param2",
+                Description = "PARAM2, see MAV_CMD enum",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Param3",
+                Description = "PARAM3, see MAV_CMD enum",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Param4",
+                Description = "PARAM4, see MAV_CMD enum",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "X",
+                Description = "PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Y",
+                Description = "PARAM6 / y position: local: x position in meters * 1e4, global: longitude in degrees *10^7",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Z",
+                Description = "PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Seq",
+                Description = "Waypoint ID (sequence number). Starts at zero. Increases monotonically for each waypoint, no gaps in the sequence (0,1,2,3,4).",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Command",
+                Description = "The scheduled action for the MISSION. see MAV_CMD in common.xml MAVLink specs",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavCmd"),
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Frame",
+                Description = "The coordinate system of the MISSION. see MAV_FRAME in mavlink_types.h",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Current",
+                Description = "false:0, true:1",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Autocontinue",
+                Description = "autocontinue to next wp",
+                NumElements = 1,
+            });
+
+        }
+
+        private float mParam1;
+        private float mParam2;
+        private float mParam3;
+        private float mParam4;
+        private Int32 mX;
+        private Int32 mY;
+        private float mZ;
+        private UInt16 mSeq;
+        private MavCmd mCommand;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+        private MavFrame mFrame;
+        private byte mCurrent;
+        private byte mAutocontinue;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
     /// Metrics typically displayed on a HUD for fixed wing aircraft
     /// </summary>
     public class UasVfrHud: UasMessage
@@ -8924,6 +9076,262 @@ namespace MavLinkNet
         private float mClimb;
         private Int16 mHeading;
         private UInt16 mThrottle;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Message encoding a command with parameters as scaled integers. Scaling depends on the actual command value.
+    /// </summary>
+    public class UasCommandInt: UasMessage
+    {
+        /// <summary>
+        /// PARAM1, see MAV_CMD enum
+        /// </summary>
+        public float Param1 {
+            get { return mParam1; }
+            set { mParam1 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM2, see MAV_CMD enum
+        /// </summary>
+        public float Param2 {
+            get { return mParam2; }
+            set { mParam2 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM3, see MAV_CMD enum
+        /// </summary>
+        public float Param3 {
+            get { return mParam3; }
+            set { mParam3 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM4, see MAV_CMD enum
+        /// </summary>
+        public float Param4 {
+            get { return mParam4; }
+            set { mParam4 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7
+        /// </summary>
+        public Int32 X {
+            get { return mX; }
+            set { mX = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM6 / local: y position in meters * 1e4, global: longitude in degrees * 10^7
+        /// </summary>
+        public Int32 Y {
+            get { return mY; }
+            set { mY = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.
+        /// </summary>
+        public float Z {
+            get { return mZ; }
+            set { mZ = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// The scheduled action for the mission item. see MAV_CMD in common.xml MAVLink specs
+        /// </summary>
+        public MavCmd Command {
+            get { return mCommand; }
+            set { mCommand = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// The coordinate system of the COMMAND. see MAV_FRAME in mavlink_types.h
+        /// </summary>
+        public MavFrame Frame {
+            get { return mFrame; }
+            set { mFrame = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// false:0, true:1
+        /// </summary>
+        public byte Current {
+            get { return mCurrent; }
+            set { mCurrent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// autocontinue to next wp
+        /// </summary>
+        public byte Autocontinue {
+            get { return mAutocontinue; }
+            set { mAutocontinue = value; NotifyUpdated(); }
+        }
+
+        public UasCommandInt()
+        {
+            mMessageId = 75;
+            CrcExtra = 158;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mParam1);
+            s.Write(mParam2);
+            s.Write(mParam3);
+            s.Write(mParam4);
+            s.Write(mX);
+            s.Write(mY);
+            s.Write(mZ);
+            s.Write((UInt16)mCommand);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+            s.Write((byte)mFrame);
+            s.Write(mCurrent);
+            s.Write(mAutocontinue);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mParam1 = s.ReadSingle();
+            this.mParam2 = s.ReadSingle();
+            this.mParam3 = s.ReadSingle();
+            this.mParam4 = s.ReadSingle();
+            this.mX = s.ReadInt32();
+            this.mY = s.ReadInt32();
+            this.mZ = s.ReadSingle();
+            this.mCommand = (MavCmd)s.ReadUInt16();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+            this.mFrame = (MavFrame)s.ReadByte();
+            this.mCurrent = s.ReadByte();
+            this.mAutocontinue = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Message encoding a command with parameters as scaled integers. Scaling depends on the actual command value."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Param1",
+                Description = "PARAM1, see MAV_CMD enum",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Param2",
+                Description = "PARAM2, see MAV_CMD enum",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Param3",
+                Description = "PARAM3, see MAV_CMD enum",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Param4",
+                Description = "PARAM4, see MAV_CMD enum",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "X",
+                Description = "PARAM5 / local: x position in meters * 1e4, global: latitude in degrees * 10^7",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Y",
+                Description = "PARAM6 / local: y position in meters * 1e4, global: longitude in degrees * 10^7",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Z",
+                Description = "PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Command",
+                Description = "The scheduled action for the mission item. see MAV_CMD in common.xml MAVLink specs",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavCmd"),
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Frame",
+                Description = "The coordinate system of the COMMAND. see MAV_FRAME in mavlink_types.h",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Current",
+                Description = "false:0, true:1",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Autocontinue",
+                Description = "autocontinue to next wp",
+                NumElements = 1,
+            });
+
+        }
+
+        private float mParam1;
+        private float mParam2;
+        private float mParam3;
+        private float mParam4;
+        private Int32 mX;
+        private Int32 mY;
+        private float mZ;
+        private MavCmd mCommand;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+        private MavFrame mFrame;
+        private byte mCurrent;
+        private byte mAutocontinue;
     }
 
 
@@ -9221,124 +9629,6 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Setpoint in roll, pitch, yaw rates and thrust currently active on the system.
-    /// </summary>
-    public class UasRollPitchYawRatesThrustSetpoint: UasMessage
-    {
-        /// <summary>
-        /// Timestamp in milliseconds since system boot
-        /// </summary>
-        public UInt32 TimeBootMs {
-            get { return mTimeBootMs; }
-            set { mTimeBootMs = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired roll rate in radians per second
-        /// </summary>
-        public float RollRate {
-            get { return mRollRate; }
-            set { mRollRate = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired pitch rate in radians per second
-        /// </summary>
-        public float PitchRate {
-            get { return mPitchRate; }
-            set { mPitchRate = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Desired yaw rate in radians per second
-        /// </summary>
-        public float YawRate {
-            get { return mYawRate; }
-            set { mYawRate = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Collective thrust, normalized to 0 .. 1
-        /// </summary>
-        public float Thrust {
-            get { return mThrust; }
-            set { mThrust = value; NotifyUpdated(); }
-        }
-
-        public UasRollPitchYawRatesThrustSetpoint()
-        {
-            mMessageId = 80;
-            CrcExtra = 127;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mTimeBootMs);
-            s.Write(mRollRate);
-            s.Write(mPitchRate);
-            s.Write(mYawRate);
-            s.Write(mThrust);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mTimeBootMs = s.ReadUInt32();
-            this.mRollRate = s.ReadSingle();
-            this.mPitchRate = s.ReadSingle();
-            this.mYawRate = s.ReadSingle();
-            this.mThrust = s.ReadSingle();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Setpoint in roll, pitch, yaw rates and thrust currently active on the system."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TimeBootMs",
-                Description = "Timestamp in milliseconds since system boot",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RollRate",
-                Description = "Desired roll rate in radians per second",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "PitchRate",
-                Description = "Desired pitch rate in radians per second",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "YawRate",
-                Description = "Desired yaw rate in radians per second",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Thrust",
-                Description = "Collective thrust, normalized to 0 .. 1",
-                NumElements = 1,
-            });
-
-        }
-
-        private UInt32 mTimeBootMs;
-        private float mRollRate;
-        private float mPitchRate;
-        private float mYawRate;
-        private float mThrust;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
     /// Setpoint in roll, pitch, yaw and thrust from the operator
     /// </summary>
     public class UasManualSetpoint: UasMessage
@@ -9484,6 +9774,1512 @@ namespace MavLinkNet
         private float mThrust;
         private byte mModeSwitch;
         private byte mManualOverrideSwitch;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Set the vehicle attitude and body angular rates.
+    /// </summary>
+    public class UasSetAttitudeTarget: UasMessage
+    {
+        /// <summary>
+        /// Timestamp in milliseconds since system boot
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
+        /// </summary>
+        public float[] Q {
+            get { return mQ; }
+            set { mQ = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Body roll rate in radians per second
+        /// </summary>
+        public float BodyRollRate {
+            get { return mBodyRollRate; }
+            set { mBodyRollRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Body roll rate in radians per second
+        /// </summary>
+        public float BodyPitchRate {
+            get { return mBodyPitchRate; }
+            set { mBodyPitchRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Body roll rate in radians per second
+        /// </summary>
+        public float BodyYawRate {
+            get { return mBodyYawRate; }
+            set { mBodyYawRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
+        /// </summary>
+        public float Thrust {
+            get { return mThrust; }
+            set { mThrust = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 6: reserved, bit 7: throttle, bit 8: attitude
+        /// </summary>
+        public byte TypeMask {
+            get { return mTypeMask; }
+            set { mTypeMask = value; NotifyUpdated(); }
+        }
+
+        public UasSetAttitudeTarget()
+        {
+            mMessageId = 82;
+            CrcExtra = 49;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mQ[0]); 
+            s.Write(mQ[1]); 
+            s.Write(mQ[2]); 
+            s.Write(mQ[3]); 
+            s.Write(mBodyRollRate);
+            s.Write(mBodyPitchRate);
+            s.Write(mBodyYawRate);
+            s.Write(mThrust);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+            s.Write(mTypeMask);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mQ[0] = s.ReadSingle();
+            this.mQ[1] = s.ReadSingle();
+            this.mQ[2] = s.ReadSingle();
+            this.mQ[3] = s.ReadSingle();
+            this.mBodyRollRate = s.ReadSingle();
+            this.mBodyPitchRate = s.ReadSingle();
+            this.mBodyYawRate = s.ReadSingle();
+            this.mThrust = s.ReadSingle();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+            this.mTypeMask = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Set the vehicle attitude and body angular rates."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp in milliseconds since system boot",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Q",
+                Description = "Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)",
+                NumElements = 4,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BodyRollRate",
+                Description = "Body roll rate in radians per second",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BodyPitchRate",
+                Description = "Body roll rate in radians per second",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BodyYawRate",
+                Description = "Body roll rate in radians per second",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Thrust",
+                Description = "Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TypeMask",
+                Description = "Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 6: reserved, bit 7: throttle, bit 8: attitude",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private float[] mQ = new float[4];
+        private float mBodyRollRate;
+        private float mBodyPitchRate;
+        private float mBodyYawRate;
+        private float mThrust;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+        private byte mTypeMask;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Set the vehicle attitude and body angular rates.
+    /// </summary>
+    public class UasAttitudeTarget: UasMessage
+    {
+        /// <summary>
+        /// Timestamp in milliseconds since system boot
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
+        /// </summary>
+        public float[] Q {
+            get { return mQ; }
+            set { mQ = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Body roll rate in radians per second
+        /// </summary>
+        public float BodyRollRate {
+            get { return mBodyRollRate; }
+            set { mBodyRollRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Body roll rate in radians per second
+        /// </summary>
+        public float BodyPitchRate {
+            get { return mBodyPitchRate; }
+            set { mBodyPitchRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Body roll rate in radians per second
+        /// </summary>
+        public float BodyYawRate {
+            get { return mBodyYawRate; }
+            set { mBodyYawRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
+        /// </summary>
+        public float Thrust {
+            get { return mThrust; }
+            set { mThrust = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 7: reserved, bit 8: attitude
+        /// </summary>
+        public byte TypeMask {
+            get { return mTypeMask; }
+            set { mTypeMask = value; NotifyUpdated(); }
+        }
+
+        public UasAttitudeTarget()
+        {
+            mMessageId = 83;
+            CrcExtra = 22;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mQ[0]); 
+            s.Write(mQ[1]); 
+            s.Write(mQ[2]); 
+            s.Write(mQ[3]); 
+            s.Write(mBodyRollRate);
+            s.Write(mBodyPitchRate);
+            s.Write(mBodyYawRate);
+            s.Write(mThrust);
+            s.Write(mTypeMask);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mQ[0] = s.ReadSingle();
+            this.mQ[1] = s.ReadSingle();
+            this.mQ[2] = s.ReadSingle();
+            this.mQ[3] = s.ReadSingle();
+            this.mBodyRollRate = s.ReadSingle();
+            this.mBodyPitchRate = s.ReadSingle();
+            this.mBodyYawRate = s.ReadSingle();
+            this.mThrust = s.ReadSingle();
+            this.mTypeMask = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Set the vehicle attitude and body angular rates."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp in milliseconds since system boot",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Q",
+                Description = "Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)",
+                NumElements = 4,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BodyRollRate",
+                Description = "Body roll rate in radians per second",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BodyPitchRate",
+                Description = "Body roll rate in radians per second",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BodyYawRate",
+                Description = "Body roll rate in radians per second",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Thrust",
+                Description = "Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TypeMask",
+                Description = "Mappings: If any of these bits are set, the corresponding input should be ignored: bit 1: body roll rate, bit 2: body pitch rate, bit 3: body yaw rate. bit 4-bit 7: reserved, bit 8: attitude",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private float[] mQ = new float[4];
+        private float mBodyRollRate;
+        private float mBodyPitchRate;
+        private float mBodyYawRate;
+        private float mThrust;
+        private byte mTypeMask;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Set vehicle position, velocity and acceleration setpoint in local frame.
+    /// </summary>
+    public class UasSetPositionTargetLocalNed: UasMessage
+    {
+        /// <summary>
+        /// Timestamp in milliseconds since system boot
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X Position in NED frame in meters
+        /// </summary>
+        public float X {
+            get { return mX; }
+            set { mX = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y Position in NED frame in meters
+        /// </summary>
+        public float Y {
+            get { return mY; }
+            set { mY = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z Position in NED frame in meters (note, altitude is negative in NED)
+        /// </summary>
+        public float Z {
+            get { return mZ; }
+            set { mZ = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X velocity in NED frame in meter / s
+        /// </summary>
+        public float Vx {
+            get { return mVx; }
+            set { mVx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y velocity in NED frame in meter / s
+        /// </summary>
+        public float Vy {
+            get { return mVy; }
+            set { mVy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z velocity in NED frame in meter / s
+        /// </summary>
+        public float Vz {
+            get { return mVz; }
+            set { mVz = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afx {
+            get { return mAfx; }
+            set { mAfx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afy {
+            get { return mAfy; }
+            set { mAfy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afz {
+            get { return mAfz; }
+            set { mAfz = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// yaw setpoint in rad
+        /// </summary>
+        public float Yaw {
+            get { return mYaw; }
+            set { mYaw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// yaw rate setpoint in rad/s
+        /// </summary>
+        public float YawRate {
+            get { return mYawRate; }
+            set { mYawRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+        /// </summary>
+        public UInt16 TypeMask {
+            get { return mTypeMask; }
+            set { mTypeMask = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
+        /// </summary>
+        public MavFrame CoordinateFrame {
+            get { return mCoordinateFrame; }
+            set { mCoordinateFrame = value; NotifyUpdated(); }
+        }
+
+        public UasSetPositionTargetLocalNed()
+        {
+            mMessageId = 84;
+            CrcExtra = 143;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mX);
+            s.Write(mY);
+            s.Write(mZ);
+            s.Write(mVx);
+            s.Write(mVy);
+            s.Write(mVz);
+            s.Write(mAfx);
+            s.Write(mAfy);
+            s.Write(mAfz);
+            s.Write(mYaw);
+            s.Write(mYawRate);
+            s.Write(mTypeMask);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+            s.Write((byte)mCoordinateFrame);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mX = s.ReadSingle();
+            this.mY = s.ReadSingle();
+            this.mZ = s.ReadSingle();
+            this.mVx = s.ReadSingle();
+            this.mVy = s.ReadSingle();
+            this.mVz = s.ReadSingle();
+            this.mAfx = s.ReadSingle();
+            this.mAfy = s.ReadSingle();
+            this.mAfz = s.ReadSingle();
+            this.mYaw = s.ReadSingle();
+            this.mYawRate = s.ReadSingle();
+            this.mTypeMask = s.ReadUInt16();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+            this.mCoordinateFrame = (MavFrame)s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Set vehicle position, velocity and acceleration setpoint in local frame."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp in milliseconds since system boot",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "X",
+                Description = "X Position in NED frame in meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Y",
+                Description = "Y Position in NED frame in meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Z",
+                Description = "Z Position in NED frame in meters (note, altitude is negative in NED)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vx",
+                Description = "X velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vy",
+                Description = "Y velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vz",
+                Description = "Z velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afx",
+                Description = "X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afy",
+                Description = "Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afz",
+                Description = "Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Yaw",
+                Description = "yaw setpoint in rad",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "YawRate",
+                Description = "yaw rate setpoint in rad/s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TypeMask",
+                Description = "Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CoordinateFrame",
+                Description = "Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private float mX;
+        private float mY;
+        private float mZ;
+        private float mVx;
+        private float mVy;
+        private float mVz;
+        private float mAfx;
+        private float mAfy;
+        private float mAfz;
+        private float mYaw;
+        private float mYawRate;
+        private UInt16 mTypeMask;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+        private MavFrame mCoordinateFrame;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Set vehicle position, velocity and acceleration setpoint in local frame.
+    /// </summary>
+    public class UasPositionTargetLocalNed: UasMessage
+    {
+        /// <summary>
+        /// Timestamp in milliseconds since system boot
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X Position in NED frame in meters
+        /// </summary>
+        public float X {
+            get { return mX; }
+            set { mX = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y Position in NED frame in meters
+        /// </summary>
+        public float Y {
+            get { return mY; }
+            set { mY = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z Position in NED frame in meters (note, altitude is negative in NED)
+        /// </summary>
+        public float Z {
+            get { return mZ; }
+            set { mZ = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X velocity in NED frame in meter / s
+        /// </summary>
+        public float Vx {
+            get { return mVx; }
+            set { mVx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y velocity in NED frame in meter / s
+        /// </summary>
+        public float Vy {
+            get { return mVy; }
+            set { mVy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z velocity in NED frame in meter / s
+        /// </summary>
+        public float Vz {
+            get { return mVz; }
+            set { mVz = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afx {
+            get { return mAfx; }
+            set { mAfx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afy {
+            get { return mAfy; }
+            set { mAfy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afz {
+            get { return mAfz; }
+            set { mAfz = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// yaw setpoint in rad
+        /// </summary>
+        public float Yaw {
+            get { return mYaw; }
+            set { mYaw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// yaw rate setpoint in rad/s
+        /// </summary>
+        public float YawRate {
+            get { return mYawRate; }
+            set { mYawRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+        /// </summary>
+        public UInt16 TypeMask {
+            get { return mTypeMask; }
+            set { mTypeMask = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9
+        /// </summary>
+        public MavFrame CoordinateFrame {
+            get { return mCoordinateFrame; }
+            set { mCoordinateFrame = value; NotifyUpdated(); }
+        }
+
+        public UasPositionTargetLocalNed()
+        {
+            mMessageId = 85;
+            CrcExtra = 140;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mX);
+            s.Write(mY);
+            s.Write(mZ);
+            s.Write(mVx);
+            s.Write(mVy);
+            s.Write(mVz);
+            s.Write(mAfx);
+            s.Write(mAfy);
+            s.Write(mAfz);
+            s.Write(mYaw);
+            s.Write(mYawRate);
+            s.Write(mTypeMask);
+            s.Write((byte)mCoordinateFrame);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mX = s.ReadSingle();
+            this.mY = s.ReadSingle();
+            this.mZ = s.ReadSingle();
+            this.mVx = s.ReadSingle();
+            this.mVy = s.ReadSingle();
+            this.mVz = s.ReadSingle();
+            this.mAfx = s.ReadSingle();
+            this.mAfy = s.ReadSingle();
+            this.mAfz = s.ReadSingle();
+            this.mYaw = s.ReadSingle();
+            this.mYawRate = s.ReadSingle();
+            this.mTypeMask = s.ReadUInt16();
+            this.mCoordinateFrame = (MavFrame)s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Set vehicle position, velocity and acceleration setpoint in local frame."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp in milliseconds since system boot",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "X",
+                Description = "X Position in NED frame in meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Y",
+                Description = "Y Position in NED frame in meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Z",
+                Description = "Z Position in NED frame in meters (note, altitude is negative in NED)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vx",
+                Description = "X velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vy",
+                Description = "Y velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vz",
+                Description = "Z velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afx",
+                Description = "X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afy",
+                Description = "Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afz",
+                Description = "Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Yaw",
+                Description = "yaw setpoint in rad",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "YawRate",
+                Description = "yaw rate setpoint in rad/s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TypeMask",
+                Description = "Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CoordinateFrame",
+                Description = "Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private float mX;
+        private float mY;
+        private float mZ;
+        private float mVx;
+        private float mVy;
+        private float mVz;
+        private float mAfx;
+        private float mAfy;
+        private float mAfz;
+        private float mYaw;
+        private float mYawRate;
+        private UInt16 mTypeMask;
+        private MavFrame mCoordinateFrame;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system.
+    /// </summary>
+    public class UasSetPositionTargetGlobalInt: UasMessage
+    {
+        /// <summary>
+        /// Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X Position in WGS84 frame in 1e7 * meters
+        /// </summary>
+        public Int32 LatInt {
+            get { return mLatInt; }
+            set { mLatInt = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y Position in WGS84 frame in 1e7 * meters
+        /// </summary>
+        public Int32 LonInt {
+            get { return mLonInt; }
+            set { mLonInt = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Altitude in meters in AMSL altitude, not WGS84 if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
+        /// </summary>
+        public float Alt {
+            get { return mAlt; }
+            set { mAlt = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X velocity in NED frame in meter / s
+        /// </summary>
+        public float Vx {
+            get { return mVx; }
+            set { mVx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y velocity in NED frame in meter / s
+        /// </summary>
+        public float Vy {
+            get { return mVy; }
+            set { mVy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z velocity in NED frame in meter / s
+        /// </summary>
+        public float Vz {
+            get { return mVz; }
+            set { mVz = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afx {
+            get { return mAfx; }
+            set { mAfx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afy {
+            get { return mAfy; }
+            set { mAfy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afz {
+            get { return mAfz; }
+            set { mAfz = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// yaw setpoint in rad
+        /// </summary>
+        public float Yaw {
+            get { return mYaw; }
+            set { mYaw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// yaw rate setpoint in rad/s
+        /// </summary>
+        public float YawRate {
+            get { return mYawRate; }
+            set { mYawRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+        /// </summary>
+        public UInt16 TypeMask {
+            get { return mTypeMask; }
+            set { mTypeMask = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11
+        /// </summary>
+        public MavFrame CoordinateFrame {
+            get { return mCoordinateFrame; }
+            set { mCoordinateFrame = value; NotifyUpdated(); }
+        }
+
+        public UasSetPositionTargetGlobalInt()
+        {
+            mMessageId = 86;
+            CrcExtra = 5;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mLatInt);
+            s.Write(mLonInt);
+            s.Write(mAlt);
+            s.Write(mVx);
+            s.Write(mVy);
+            s.Write(mVz);
+            s.Write(mAfx);
+            s.Write(mAfy);
+            s.Write(mAfz);
+            s.Write(mYaw);
+            s.Write(mYawRate);
+            s.Write(mTypeMask);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+            s.Write((byte)mCoordinateFrame);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mLatInt = s.ReadInt32();
+            this.mLonInt = s.ReadInt32();
+            this.mAlt = s.ReadSingle();
+            this.mVx = s.ReadSingle();
+            this.mVy = s.ReadSingle();
+            this.mVz = s.ReadSingle();
+            this.mAfx = s.ReadSingle();
+            this.mAfy = s.ReadSingle();
+            this.mAfz = s.ReadSingle();
+            this.mYaw = s.ReadSingle();
+            this.mYawRate = s.ReadSingle();
+            this.mTypeMask = s.ReadUInt16();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+            this.mCoordinateFrame = (MavFrame)s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "LatInt",
+                Description = "X Position in WGS84 frame in 1e7 * meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "LonInt",
+                Description = "Y Position in WGS84 frame in 1e7 * meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Alt",
+                Description = "Altitude in meters in AMSL altitude, not WGS84 if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vx",
+                Description = "X velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vy",
+                Description = "Y velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vz",
+                Description = "Z velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afx",
+                Description = "X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afy",
+                Description = "Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afz",
+                Description = "Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Yaw",
+                Description = "yaw setpoint in rad",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "YawRate",
+                Description = "yaw rate setpoint in rad/s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TypeMask",
+                Description = "Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CoordinateFrame",
+                Description = "Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private Int32 mLatInt;
+        private Int32 mLonInt;
+        private float mAlt;
+        private float mVx;
+        private float mVy;
+        private float mVz;
+        private float mAfx;
+        private float mAfy;
+        private float mAfz;
+        private float mYaw;
+        private float mYawRate;
+        private UInt16 mTypeMask;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+        private MavFrame mCoordinateFrame;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system.
+    /// </summary>
+    public class UasPositionTargetGlobalInt: UasMessage
+    {
+        /// <summary>
+        /// Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X Position in WGS84 frame in 1e7 * meters
+        /// </summary>
+        public Int32 LatInt {
+            get { return mLatInt; }
+            set { mLatInt = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y Position in WGS84 frame in 1e7 * meters
+        /// </summary>
+        public Int32 LonInt {
+            get { return mLonInt; }
+            set { mLonInt = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Altitude in meters in AMSL altitude, not WGS84 if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT
+        /// </summary>
+        public float Alt {
+            get { return mAlt; }
+            set { mAlt = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X velocity in NED frame in meter / s
+        /// </summary>
+        public float Vx {
+            get { return mVx; }
+            set { mVx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y velocity in NED frame in meter / s
+        /// </summary>
+        public float Vy {
+            get { return mVy; }
+            set { mVy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z velocity in NED frame in meter / s
+        /// </summary>
+        public float Vz {
+            get { return mVz; }
+            set { mVz = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afx {
+            get { return mAfx; }
+            set { mAfx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afy {
+            get { return mAfy; }
+            set { mAfy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N
+        /// </summary>
+        public float Afz {
+            get { return mAfz; }
+            set { mAfz = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// yaw setpoint in rad
+        /// </summary>
+        public float Yaw {
+            get { return mYaw; }
+            set { mYaw = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// yaw rate setpoint in rad/s
+        /// </summary>
+        public float YawRate {
+            get { return mYawRate; }
+            set { mYawRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate
+        /// </summary>
+        public UInt16 TypeMask {
+            get { return mTypeMask; }
+            set { mTypeMask = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11
+        /// </summary>
+        public MavFrame CoordinateFrame {
+            get { return mCoordinateFrame; }
+            set { mCoordinateFrame = value; NotifyUpdated(); }
+        }
+
+        public UasPositionTargetGlobalInt()
+        {
+            mMessageId = 87;
+            CrcExtra = 150;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mLatInt);
+            s.Write(mLonInt);
+            s.Write(mAlt);
+            s.Write(mVx);
+            s.Write(mVy);
+            s.Write(mVz);
+            s.Write(mAfx);
+            s.Write(mAfy);
+            s.Write(mAfz);
+            s.Write(mYaw);
+            s.Write(mYawRate);
+            s.Write(mTypeMask);
+            s.Write((byte)mCoordinateFrame);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mLatInt = s.ReadInt32();
+            this.mLonInt = s.ReadInt32();
+            this.mAlt = s.ReadSingle();
+            this.mVx = s.ReadSingle();
+            this.mVy = s.ReadSingle();
+            this.mVz = s.ReadSingle();
+            this.mAfx = s.ReadSingle();
+            this.mAfy = s.ReadSingle();
+            this.mAfz = s.ReadSingle();
+            this.mYaw = s.ReadSingle();
+            this.mYawRate = s.ReadSingle();
+            this.mTypeMask = s.ReadUInt16();
+            this.mCoordinateFrame = (MavFrame)s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Set vehicle position, velocity and acceleration setpoint in the WGS84 coordinate system."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp in milliseconds since system boot. The rationale for the timestamp in the setpoint is to allow the system to compensate for the transport delay of the setpoint. This allows the system to compensate processing latency.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "LatInt",
+                Description = "X Position in WGS84 frame in 1e7 * meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "LonInt",
+                Description = "Y Position in WGS84 frame in 1e7 * meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Alt",
+                Description = "Altitude in meters in AMSL altitude, not WGS84 if absolute or relative, above terrain if GLOBAL_TERRAIN_ALT_INT",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vx",
+                Description = "X velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vy",
+                Description = "Y velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vz",
+                Description = "Z velocity in NED frame in meter / s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afx",
+                Description = "X acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afy",
+                Description = "Y acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Afz",
+                Description = "Z acceleration or force (if bit 10 of type_mask is set) in NED frame in meter / s^2 or N",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Yaw",
+                Description = "yaw setpoint in rad",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "YawRate",
+                Description = "yaw rate setpoint in rad/s",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TypeMask",
+                Description = "Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CoordinateFrame",
+                Description = "Valid options are: MAV_FRAME_GLOBAL_INT = 5, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT = 6, MAV_FRAME_GLOBAL_TERRAIN_ALT_INT = 11",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavFrame"),
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private Int32 mLatInt;
+        private Int32 mLonInt;
+        private float mAlt;
+        private float mVx;
+        private float mVy;
+        private float mVz;
+        private float mAfx;
+        private float mAfy;
+        private float mAfz;
+        private float mYaw;
+        private float mYawRate;
+        private UInt16 mTypeMask;
+        private MavFrame mCoordinateFrame;
     }
 
 
@@ -11442,9 +13238,9 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Optical flow from an omnidirectional flow sensor (e.g. PX4FLOW with wide angle lens)
+    /// Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse sensor)
     /// </summary>
-    public class UasOmnidirectionalFlow: UasMessage
+    public class UasOpticalFlowRad: UasMessage
     {
         /// <summary>
         /// Timestamp (microseconds, synced to UNIX time or since system boot)
@@ -11455,27 +13251,75 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Front distance in meters. Positive value (including zero): distance known. Negative value: Unknown distance
+        /// Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.
         /// </summary>
-        public float FrontDistanceM {
-            get { return mFrontDistanceM; }
-            set { mFrontDistanceM = value; NotifyUpdated(); }
+        public UInt32 IntegrationTimeUs {
+            get { return mIntegrationTimeUs; }
+            set { mIntegrationTimeUs = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Flow in deci pixels (1 = 0.1 pixel) on left hemisphere
+        /// Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)
         /// </summary>
-        public Int16[] Left {
-            get { return mLeft; }
-            set { mLeft = value; NotifyUpdated(); }
+        public float IntegratedX {
+            get { return mIntegratedX; }
+            set { mIntegratedX = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Flow in deci pixels (1 = 0.1 pixel) on right hemisphere
+        /// Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)
         /// </summary>
-        public Int16[] Right {
-            get { return mRight; }
-            set { mRight = value; NotifyUpdated(); }
+        public float IntegratedY {
+            get { return mIntegratedY; }
+            set { mIntegratedY = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RH rotation around X axis (rad)
+        /// </summary>
+        public float IntegratedXgyro {
+            get { return mIntegratedXgyro; }
+            set { mIntegratedXgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RH rotation around Y axis (rad)
+        /// </summary>
+        public float IntegratedYgyro {
+            get { return mIntegratedYgyro; }
+            set { mIntegratedYgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RH rotation around Z axis (rad)
+        /// </summary>
+        public float IntegratedZgyro {
+            get { return mIntegratedZgyro; }
+            set { mIntegratedZgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Time in microseconds since the distance was sampled.
+        /// </summary>
+        public UInt32 TimeDeltaDistanceUs {
+            get { return mTimeDeltaDistanceUs; }
+            set { mTimeDeltaDistanceUs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.
+        /// </summary>
+        public float Distance {
+            get { return mDistance; }
+            set { mDistance = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Temperature * 100 in centi-degrees Celsius
+        /// </summary>
+        public Int16 Temperature {
+            get { return mTemperature; }
+            set { mTemperature = value; NotifyUpdated(); }
         }
 
         /// <summary>
@@ -11487,43 +13331,31 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Optical flow quality / confidence. 0: bad, 255: maximum quality
+        /// Optical flow quality / confidence. 0: no valid flow, 255: maximum quality
         /// </summary>
         public byte Quality {
             get { return mQuality; }
             set { mQuality = value; NotifyUpdated(); }
         }
 
-        public UasOmnidirectionalFlow()
+        public UasOpticalFlowRad()
         {
             mMessageId = 106;
-            CrcExtra = 211;
+            CrcExtra = 138;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
             s.Write(mTimeUsec);
-            s.Write(mFrontDistanceM);
-            s.Write(mLeft[0]); 
-            s.Write(mLeft[1]); 
-            s.Write(mLeft[2]); 
-            s.Write(mLeft[3]); 
-            s.Write(mLeft[4]); 
-            s.Write(mLeft[5]); 
-            s.Write(mLeft[6]); 
-            s.Write(mLeft[7]); 
-            s.Write(mLeft[8]); 
-            s.Write(mLeft[9]); 
-            s.Write(mRight[0]); 
-            s.Write(mRight[1]); 
-            s.Write(mRight[2]); 
-            s.Write(mRight[3]); 
-            s.Write(mRight[4]); 
-            s.Write(mRight[5]); 
-            s.Write(mRight[6]); 
-            s.Write(mRight[7]); 
-            s.Write(mRight[8]); 
-            s.Write(mRight[9]); 
+            s.Write(mIntegrationTimeUs);
+            s.Write(mIntegratedX);
+            s.Write(mIntegratedY);
+            s.Write(mIntegratedXgyro);
+            s.Write(mIntegratedYgyro);
+            s.Write(mIntegratedZgyro);
+            s.Write(mTimeDeltaDistanceUs);
+            s.Write(mDistance);
+            s.Write(mTemperature);
             s.Write(mSensorId);
             s.Write(mQuality);
         }
@@ -11531,27 +13363,15 @@ namespace MavLinkNet
         internal override void DeserializeBody(BinaryReader s)
         {
             this.mTimeUsec = s.ReadUInt64();
-            this.mFrontDistanceM = s.ReadSingle();
-            this.mLeft[0] = s.ReadInt16();
-            this.mLeft[1] = s.ReadInt16();
-            this.mLeft[2] = s.ReadInt16();
-            this.mLeft[3] = s.ReadInt16();
-            this.mLeft[4] = s.ReadInt16();
-            this.mLeft[5] = s.ReadInt16();
-            this.mLeft[6] = s.ReadInt16();
-            this.mLeft[7] = s.ReadInt16();
-            this.mLeft[8] = s.ReadInt16();
-            this.mLeft[9] = s.ReadInt16();
-            this.mRight[0] = s.ReadInt16();
-            this.mRight[1] = s.ReadInt16();
-            this.mRight[2] = s.ReadInt16();
-            this.mRight[3] = s.ReadInt16();
-            this.mRight[4] = s.ReadInt16();
-            this.mRight[5] = s.ReadInt16();
-            this.mRight[6] = s.ReadInt16();
-            this.mRight[7] = s.ReadInt16();
-            this.mRight[8] = s.ReadInt16();
-            this.mRight[9] = s.ReadInt16();
+            this.mIntegrationTimeUs = s.ReadUInt32();
+            this.mIntegratedX = s.ReadSingle();
+            this.mIntegratedY = s.ReadSingle();
+            this.mIntegratedXgyro = s.ReadSingle();
+            this.mIntegratedYgyro = s.ReadSingle();
+            this.mIntegratedZgyro = s.ReadSingle();
+            this.mTimeDeltaDistanceUs = s.ReadUInt32();
+            this.mDistance = s.ReadSingle();
+            this.mTemperature = s.ReadInt16();
             this.mSensorId = s.ReadByte();
             this.mQuality = s.ReadByte();
         }
@@ -11559,7 +13379,7 @@ namespace MavLinkNet
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Optical flow from an omnidirectional flow sensor (e.g. PX4FLOW with wide angle lens)"
+                Description = "Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse sensor)"
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
@@ -11569,21 +13389,57 @@ namespace MavLinkNet
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "FrontDistanceM",
-                Description = "Front distance in meters. Positive value (including zero): distance known. Negative value: Unknown distance",
+                Name = "IntegrationTimeUs",
+                Description = "Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Left",
-                Description = "Flow in deci pixels (1 = 0.1 pixel) on left hemisphere",
-                NumElements = 10,
+                Name = "IntegratedX",
+                Description = "Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)",
+                NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Right",
-                Description = "Flow in deci pixels (1 = 0.1 pixel) on right hemisphere",
-                NumElements = 10,
+                Name = "IntegratedY",
+                Description = "Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "IntegratedXgyro",
+                Description = "RH rotation around X axis (rad)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "IntegratedYgyro",
+                Description = "RH rotation around Y axis (rad)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "IntegratedZgyro",
+                Description = "RH rotation around Z axis (rad)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeDeltaDistanceUs",
+                Description = "Time in microseconds since the distance was sampled.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Distance",
+                Description = "Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Temperature",
+                Description = "Temperature * 100 in centi-degrees Celsius",
+                NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
@@ -11594,16 +13450,22 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Quality",
-                Description = "Optical flow quality / confidence. 0: bad, 255: maximum quality",
+                Description = "Optical flow quality / confidence. 0: no valid flow, 255: maximum quality",
                 NumElements = 1,
             });
 
         }
 
         private UInt64 mTimeUsec;
-        private float mFrontDistanceM;
-        private Int16[] mLeft = new Int16[10];
-        private Int16[] mRight = new Int16[10];
+        private UInt32 mIntegrationTimeUs;
+        private float mIntegratedX;
+        private float mIntegratedY;
+        private float mIntegratedXgyro;
+        private float mIntegratedYgyro;
+        private float mIntegratedZgyro;
+        private UInt32 mTimeDeltaDistanceUs;
+        private float mDistance;
+        private Int16 mTemperature;
         private byte mSensorId;
         private byte mQuality;
     }
@@ -11906,7 +13768,7 @@ namespace MavLinkNet
     public class UasSimState: UasMessage
     {
         /// <summary>
-        /// True attitude quaternion component 1
+        /// True attitude quaternion component 1, w (1 in null-rotation)
         /// </summary>
         public float Q1 {
             get { return mQ1; }
@@ -11914,7 +13776,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// True attitude quaternion component 2
+        /// True attitude quaternion component 2, x (0 in null-rotation)
         /// </summary>
         public float Q2 {
             get { return mQ2; }
@@ -11922,7 +13784,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// True attitude quaternion component 3
+        /// True attitude quaternion component 3, y (0 in null-rotation)
         /// </summary>
         public float Q3 {
             get { return mQ3; }
@@ -11930,7 +13792,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// True attitude quaternion component 4
+        /// True attitude quaternion component 4, z (0 in null-rotation)
         /// </summary>
         public float Q4 {
             get { return mQ4; }
@@ -12137,25 +13999,25 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Q1",
-                Description = "True attitude quaternion component 1",
+                Description = "True attitude quaternion component 1, w (1 in null-rotation)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Q2",
-                Description = "True attitude quaternion component 2",
+                Description = "True attitude quaternion component 2, x (0 in null-rotation)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Q3",
-                Description = "True attitude quaternion component 3",
+                Description = "True attitude quaternion component 3, y (0 in null-rotation)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Q4",
-                Description = "True attitude quaternion component 4",
+                Description = "True attitude quaternion component 4, z (0 in null-rotation)",
                 NumElements = 1,
             });
 
@@ -12291,12 +14153,12 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Status generated by radio
+    /// Status generated by radio and injected into MAVLink stream.
     /// </summary>
     public class UasRadioStatus: UasMessage
     {
         /// <summary>
-        /// receive errors
+        /// Receive errors
         /// </summary>
         public UInt16 Rxerrors {
             get { return mRxerrors; }
@@ -12304,7 +14166,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// count of error corrected packets
+        /// Count of error corrected packets
         /// </summary>
         public UInt16 Fixed {
             get { return mFixed; }
@@ -12312,7 +14174,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// local signal strength
+        /// Local signal strength
         /// </summary>
         public byte Rssi {
             get { return mRssi; }
@@ -12320,7 +14182,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// remote signal strength
+        /// Remote signal strength
         /// </summary>
         public byte Remrssi {
             get { return mRemrssi; }
@@ -12328,7 +14190,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// how full the tx buffer is as a percentage
+        /// Remaining free buffer space in percent.
         /// </summary>
         public byte Txbuf {
             get { return mTxbuf; }
@@ -12336,7 +14198,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// background noise level
+        /// Background noise level
         /// </summary>
         public byte Noise {
             get { return mNoise; }
@@ -12344,7 +14206,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// remote background noise level
+        /// Remote background noise level
         /// </summary>
         public byte Remnoise {
             get { return mRemnoise; }
@@ -12382,48 +14244,48 @@ namespace MavLinkNet
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Status generated by radio"
+                Description = "Status generated by radio and injected into MAVLink stream."
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Rxerrors",
-                Description = "receive errors",
+                Description = "Receive errors",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Fixed",
-                Description = "count of error corrected packets",
+                Description = "Count of error corrected packets",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Rssi",
-                Description = "local signal strength",
+                Description = "Local signal strength",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Remrssi",
-                Description = "remote signal strength",
+                Description = "Remote signal strength",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Txbuf",
-                Description = "how full the tx buffer is as a percentage",
+                Description = "Remaining free buffer space in percent.",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Noise",
-                Description = "background noise level",
+                Description = "Background noise level",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Remnoise",
-                Description = "remote background noise level",
+                Description = "Remote background noise level",
                 NumElements = 1,
             });
 
@@ -12443,595 +14305,600 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Begin file transfer
+    /// File transfer message
     /// </summary>
-    public class UasFileTransferStart: UasMessage
+    public class UasFileTransferProtocol: UasMessage
     {
         /// <summary>
-        /// Unique transfer ID
+        /// Network ID (0 for broadcast)
         /// </summary>
-        public UInt64 TransferUid {
-            get { return mTransferUid; }
-            set { mTransferUid = value; NotifyUpdated(); }
+        public byte TargetNetwork {
+            get { return mTargetNetwork; }
+            set { mTargetNetwork = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// File size in bytes
+        /// System ID (0 for broadcast)
         /// </summary>
-        public UInt32 FileSize {
-            get { return mFileSize; }
-            set { mFileSize = value; NotifyUpdated(); }
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Destination path
+        /// Component ID (0 for broadcast)
         /// </summary>
-        public char[] DestPath {
-            get { return mDestPath; }
-            set { mDestPath = value; NotifyUpdated(); }
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Transfer direction: 0: from requester, 1: to requester
+        /// Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification.
         /// </summary>
-        public byte Direction {
-            get { return mDirection; }
-            set { mDirection = value; NotifyUpdated(); }
+        public byte[] Payload {
+            get { return mPayload; }
+            set { mPayload = value; NotifyUpdated(); }
         }
 
-        /// <summary>
-        /// RESERVED
-        /// </summary>
-        public byte Flags {
-            get { return mFlags; }
-            set { mFlags = value; NotifyUpdated(); }
-        }
-
-        public UasFileTransferStart()
+        public UasFileTransferProtocol()
         {
             mMessageId = 110;
-            CrcExtra = 235;
+            CrcExtra = 84;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mTransferUid);
-            s.Write(mFileSize);
-            s.Write(mDestPath[0]); 
-            s.Write(mDestPath[1]); 
-            s.Write(mDestPath[2]); 
-            s.Write(mDestPath[3]); 
-            s.Write(mDestPath[4]); 
-            s.Write(mDestPath[5]); 
-            s.Write(mDestPath[6]); 
-            s.Write(mDestPath[7]); 
-            s.Write(mDestPath[8]); 
-            s.Write(mDestPath[9]); 
-            s.Write(mDestPath[10]); 
-            s.Write(mDestPath[11]); 
-            s.Write(mDestPath[12]); 
-            s.Write(mDestPath[13]); 
-            s.Write(mDestPath[14]); 
-            s.Write(mDestPath[15]); 
-            s.Write(mDestPath[16]); 
-            s.Write(mDestPath[17]); 
-            s.Write(mDestPath[18]); 
-            s.Write(mDestPath[19]); 
-            s.Write(mDestPath[20]); 
-            s.Write(mDestPath[21]); 
-            s.Write(mDestPath[22]); 
-            s.Write(mDestPath[23]); 
-            s.Write(mDestPath[24]); 
-            s.Write(mDestPath[25]); 
-            s.Write(mDestPath[26]); 
-            s.Write(mDestPath[27]); 
-            s.Write(mDestPath[28]); 
-            s.Write(mDestPath[29]); 
-            s.Write(mDestPath[30]); 
-            s.Write(mDestPath[31]); 
-            s.Write(mDestPath[32]); 
-            s.Write(mDestPath[33]); 
-            s.Write(mDestPath[34]); 
-            s.Write(mDestPath[35]); 
-            s.Write(mDestPath[36]); 
-            s.Write(mDestPath[37]); 
-            s.Write(mDestPath[38]); 
-            s.Write(mDestPath[39]); 
-            s.Write(mDestPath[40]); 
-            s.Write(mDestPath[41]); 
-            s.Write(mDestPath[42]); 
-            s.Write(mDestPath[43]); 
-            s.Write(mDestPath[44]); 
-            s.Write(mDestPath[45]); 
-            s.Write(mDestPath[46]); 
-            s.Write(mDestPath[47]); 
-            s.Write(mDestPath[48]); 
-            s.Write(mDestPath[49]); 
-            s.Write(mDestPath[50]); 
-            s.Write(mDestPath[51]); 
-            s.Write(mDestPath[52]); 
-            s.Write(mDestPath[53]); 
-            s.Write(mDestPath[54]); 
-            s.Write(mDestPath[55]); 
-            s.Write(mDestPath[56]); 
-            s.Write(mDestPath[57]); 
-            s.Write(mDestPath[58]); 
-            s.Write(mDestPath[59]); 
-            s.Write(mDestPath[60]); 
-            s.Write(mDestPath[61]); 
-            s.Write(mDestPath[62]); 
-            s.Write(mDestPath[63]); 
-            s.Write(mDestPath[64]); 
-            s.Write(mDestPath[65]); 
-            s.Write(mDestPath[66]); 
-            s.Write(mDestPath[67]); 
-            s.Write(mDestPath[68]); 
-            s.Write(mDestPath[69]); 
-            s.Write(mDestPath[70]); 
-            s.Write(mDestPath[71]); 
-            s.Write(mDestPath[72]); 
-            s.Write(mDestPath[73]); 
-            s.Write(mDestPath[74]); 
-            s.Write(mDestPath[75]); 
-            s.Write(mDestPath[76]); 
-            s.Write(mDestPath[77]); 
-            s.Write(mDestPath[78]); 
-            s.Write(mDestPath[79]); 
-            s.Write(mDestPath[80]); 
-            s.Write(mDestPath[81]); 
-            s.Write(mDestPath[82]); 
-            s.Write(mDestPath[83]); 
-            s.Write(mDestPath[84]); 
-            s.Write(mDestPath[85]); 
-            s.Write(mDestPath[86]); 
-            s.Write(mDestPath[87]); 
-            s.Write(mDestPath[88]); 
-            s.Write(mDestPath[89]); 
-            s.Write(mDestPath[90]); 
-            s.Write(mDestPath[91]); 
-            s.Write(mDestPath[92]); 
-            s.Write(mDestPath[93]); 
-            s.Write(mDestPath[94]); 
-            s.Write(mDestPath[95]); 
-            s.Write(mDestPath[96]); 
-            s.Write(mDestPath[97]); 
-            s.Write(mDestPath[98]); 
-            s.Write(mDestPath[99]); 
-            s.Write(mDestPath[100]); 
-            s.Write(mDestPath[101]); 
-            s.Write(mDestPath[102]); 
-            s.Write(mDestPath[103]); 
-            s.Write(mDestPath[104]); 
-            s.Write(mDestPath[105]); 
-            s.Write(mDestPath[106]); 
-            s.Write(mDestPath[107]); 
-            s.Write(mDestPath[108]); 
-            s.Write(mDestPath[109]); 
-            s.Write(mDestPath[110]); 
-            s.Write(mDestPath[111]); 
-            s.Write(mDestPath[112]); 
-            s.Write(mDestPath[113]); 
-            s.Write(mDestPath[114]); 
-            s.Write(mDestPath[115]); 
-            s.Write(mDestPath[116]); 
-            s.Write(mDestPath[117]); 
-            s.Write(mDestPath[118]); 
-            s.Write(mDestPath[119]); 
-            s.Write(mDestPath[120]); 
-            s.Write(mDestPath[121]); 
-            s.Write(mDestPath[122]); 
-            s.Write(mDestPath[123]); 
-            s.Write(mDestPath[124]); 
-            s.Write(mDestPath[125]); 
-            s.Write(mDestPath[126]); 
-            s.Write(mDestPath[127]); 
-            s.Write(mDestPath[128]); 
-            s.Write(mDestPath[129]); 
-            s.Write(mDestPath[130]); 
-            s.Write(mDestPath[131]); 
-            s.Write(mDestPath[132]); 
-            s.Write(mDestPath[133]); 
-            s.Write(mDestPath[134]); 
-            s.Write(mDestPath[135]); 
-            s.Write(mDestPath[136]); 
-            s.Write(mDestPath[137]); 
-            s.Write(mDestPath[138]); 
-            s.Write(mDestPath[139]); 
-            s.Write(mDestPath[140]); 
-            s.Write(mDestPath[141]); 
-            s.Write(mDestPath[142]); 
-            s.Write(mDestPath[143]); 
-            s.Write(mDestPath[144]); 
-            s.Write(mDestPath[145]); 
-            s.Write(mDestPath[146]); 
-            s.Write(mDestPath[147]); 
-            s.Write(mDestPath[148]); 
-            s.Write(mDestPath[149]); 
-            s.Write(mDestPath[150]); 
-            s.Write(mDestPath[151]); 
-            s.Write(mDestPath[152]); 
-            s.Write(mDestPath[153]); 
-            s.Write(mDestPath[154]); 
-            s.Write(mDestPath[155]); 
-            s.Write(mDestPath[156]); 
-            s.Write(mDestPath[157]); 
-            s.Write(mDestPath[158]); 
-            s.Write(mDestPath[159]); 
-            s.Write(mDestPath[160]); 
-            s.Write(mDestPath[161]); 
-            s.Write(mDestPath[162]); 
-            s.Write(mDestPath[163]); 
-            s.Write(mDestPath[164]); 
-            s.Write(mDestPath[165]); 
-            s.Write(mDestPath[166]); 
-            s.Write(mDestPath[167]); 
-            s.Write(mDestPath[168]); 
-            s.Write(mDestPath[169]); 
-            s.Write(mDestPath[170]); 
-            s.Write(mDestPath[171]); 
-            s.Write(mDestPath[172]); 
-            s.Write(mDestPath[173]); 
-            s.Write(mDestPath[174]); 
-            s.Write(mDestPath[175]); 
-            s.Write(mDestPath[176]); 
-            s.Write(mDestPath[177]); 
-            s.Write(mDestPath[178]); 
-            s.Write(mDestPath[179]); 
-            s.Write(mDestPath[180]); 
-            s.Write(mDestPath[181]); 
-            s.Write(mDestPath[182]); 
-            s.Write(mDestPath[183]); 
-            s.Write(mDestPath[184]); 
-            s.Write(mDestPath[185]); 
-            s.Write(mDestPath[186]); 
-            s.Write(mDestPath[187]); 
-            s.Write(mDestPath[188]); 
-            s.Write(mDestPath[189]); 
-            s.Write(mDestPath[190]); 
-            s.Write(mDestPath[191]); 
-            s.Write(mDestPath[192]); 
-            s.Write(mDestPath[193]); 
-            s.Write(mDestPath[194]); 
-            s.Write(mDestPath[195]); 
-            s.Write(mDestPath[196]); 
-            s.Write(mDestPath[197]); 
-            s.Write(mDestPath[198]); 
-            s.Write(mDestPath[199]); 
-            s.Write(mDestPath[200]); 
-            s.Write(mDestPath[201]); 
-            s.Write(mDestPath[202]); 
-            s.Write(mDestPath[203]); 
-            s.Write(mDestPath[204]); 
-            s.Write(mDestPath[205]); 
-            s.Write(mDestPath[206]); 
-            s.Write(mDestPath[207]); 
-            s.Write(mDestPath[208]); 
-            s.Write(mDestPath[209]); 
-            s.Write(mDestPath[210]); 
-            s.Write(mDestPath[211]); 
-            s.Write(mDestPath[212]); 
-            s.Write(mDestPath[213]); 
-            s.Write(mDestPath[214]); 
-            s.Write(mDestPath[215]); 
-            s.Write(mDestPath[216]); 
-            s.Write(mDestPath[217]); 
-            s.Write(mDestPath[218]); 
-            s.Write(mDestPath[219]); 
-            s.Write(mDestPath[220]); 
-            s.Write(mDestPath[221]); 
-            s.Write(mDestPath[222]); 
-            s.Write(mDestPath[223]); 
-            s.Write(mDestPath[224]); 
-            s.Write(mDestPath[225]); 
-            s.Write(mDestPath[226]); 
-            s.Write(mDestPath[227]); 
-            s.Write(mDestPath[228]); 
-            s.Write(mDestPath[229]); 
-            s.Write(mDestPath[230]); 
-            s.Write(mDestPath[231]); 
-            s.Write(mDestPath[232]); 
-            s.Write(mDestPath[233]); 
-            s.Write(mDestPath[234]); 
-            s.Write(mDestPath[235]); 
-            s.Write(mDestPath[236]); 
-            s.Write(mDestPath[237]); 
-            s.Write(mDestPath[238]); 
-            s.Write(mDestPath[239]); 
-            s.Write(mDirection);
-            s.Write(mFlags);
+            s.Write(mTargetNetwork);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+            s.Write(mPayload[0]); 
+            s.Write(mPayload[1]); 
+            s.Write(mPayload[2]); 
+            s.Write(mPayload[3]); 
+            s.Write(mPayload[4]); 
+            s.Write(mPayload[5]); 
+            s.Write(mPayload[6]); 
+            s.Write(mPayload[7]); 
+            s.Write(mPayload[8]); 
+            s.Write(mPayload[9]); 
+            s.Write(mPayload[10]); 
+            s.Write(mPayload[11]); 
+            s.Write(mPayload[12]); 
+            s.Write(mPayload[13]); 
+            s.Write(mPayload[14]); 
+            s.Write(mPayload[15]); 
+            s.Write(mPayload[16]); 
+            s.Write(mPayload[17]); 
+            s.Write(mPayload[18]); 
+            s.Write(mPayload[19]); 
+            s.Write(mPayload[20]); 
+            s.Write(mPayload[21]); 
+            s.Write(mPayload[22]); 
+            s.Write(mPayload[23]); 
+            s.Write(mPayload[24]); 
+            s.Write(mPayload[25]); 
+            s.Write(mPayload[26]); 
+            s.Write(mPayload[27]); 
+            s.Write(mPayload[28]); 
+            s.Write(mPayload[29]); 
+            s.Write(mPayload[30]); 
+            s.Write(mPayload[31]); 
+            s.Write(mPayload[32]); 
+            s.Write(mPayload[33]); 
+            s.Write(mPayload[34]); 
+            s.Write(mPayload[35]); 
+            s.Write(mPayload[36]); 
+            s.Write(mPayload[37]); 
+            s.Write(mPayload[38]); 
+            s.Write(mPayload[39]); 
+            s.Write(mPayload[40]); 
+            s.Write(mPayload[41]); 
+            s.Write(mPayload[42]); 
+            s.Write(mPayload[43]); 
+            s.Write(mPayload[44]); 
+            s.Write(mPayload[45]); 
+            s.Write(mPayload[46]); 
+            s.Write(mPayload[47]); 
+            s.Write(mPayload[48]); 
+            s.Write(mPayload[49]); 
+            s.Write(mPayload[50]); 
+            s.Write(mPayload[51]); 
+            s.Write(mPayload[52]); 
+            s.Write(mPayload[53]); 
+            s.Write(mPayload[54]); 
+            s.Write(mPayload[55]); 
+            s.Write(mPayload[56]); 
+            s.Write(mPayload[57]); 
+            s.Write(mPayload[58]); 
+            s.Write(mPayload[59]); 
+            s.Write(mPayload[60]); 
+            s.Write(mPayload[61]); 
+            s.Write(mPayload[62]); 
+            s.Write(mPayload[63]); 
+            s.Write(mPayload[64]); 
+            s.Write(mPayload[65]); 
+            s.Write(mPayload[66]); 
+            s.Write(mPayload[67]); 
+            s.Write(mPayload[68]); 
+            s.Write(mPayload[69]); 
+            s.Write(mPayload[70]); 
+            s.Write(mPayload[71]); 
+            s.Write(mPayload[72]); 
+            s.Write(mPayload[73]); 
+            s.Write(mPayload[74]); 
+            s.Write(mPayload[75]); 
+            s.Write(mPayload[76]); 
+            s.Write(mPayload[77]); 
+            s.Write(mPayload[78]); 
+            s.Write(mPayload[79]); 
+            s.Write(mPayload[80]); 
+            s.Write(mPayload[81]); 
+            s.Write(mPayload[82]); 
+            s.Write(mPayload[83]); 
+            s.Write(mPayload[84]); 
+            s.Write(mPayload[85]); 
+            s.Write(mPayload[86]); 
+            s.Write(mPayload[87]); 
+            s.Write(mPayload[88]); 
+            s.Write(mPayload[89]); 
+            s.Write(mPayload[90]); 
+            s.Write(mPayload[91]); 
+            s.Write(mPayload[92]); 
+            s.Write(mPayload[93]); 
+            s.Write(mPayload[94]); 
+            s.Write(mPayload[95]); 
+            s.Write(mPayload[96]); 
+            s.Write(mPayload[97]); 
+            s.Write(mPayload[98]); 
+            s.Write(mPayload[99]); 
+            s.Write(mPayload[100]); 
+            s.Write(mPayload[101]); 
+            s.Write(mPayload[102]); 
+            s.Write(mPayload[103]); 
+            s.Write(mPayload[104]); 
+            s.Write(mPayload[105]); 
+            s.Write(mPayload[106]); 
+            s.Write(mPayload[107]); 
+            s.Write(mPayload[108]); 
+            s.Write(mPayload[109]); 
+            s.Write(mPayload[110]); 
+            s.Write(mPayload[111]); 
+            s.Write(mPayload[112]); 
+            s.Write(mPayload[113]); 
+            s.Write(mPayload[114]); 
+            s.Write(mPayload[115]); 
+            s.Write(mPayload[116]); 
+            s.Write(mPayload[117]); 
+            s.Write(mPayload[118]); 
+            s.Write(mPayload[119]); 
+            s.Write(mPayload[120]); 
+            s.Write(mPayload[121]); 
+            s.Write(mPayload[122]); 
+            s.Write(mPayload[123]); 
+            s.Write(mPayload[124]); 
+            s.Write(mPayload[125]); 
+            s.Write(mPayload[126]); 
+            s.Write(mPayload[127]); 
+            s.Write(mPayload[128]); 
+            s.Write(mPayload[129]); 
+            s.Write(mPayload[130]); 
+            s.Write(mPayload[131]); 
+            s.Write(mPayload[132]); 
+            s.Write(mPayload[133]); 
+            s.Write(mPayload[134]); 
+            s.Write(mPayload[135]); 
+            s.Write(mPayload[136]); 
+            s.Write(mPayload[137]); 
+            s.Write(mPayload[138]); 
+            s.Write(mPayload[139]); 
+            s.Write(mPayload[140]); 
+            s.Write(mPayload[141]); 
+            s.Write(mPayload[142]); 
+            s.Write(mPayload[143]); 
+            s.Write(mPayload[144]); 
+            s.Write(mPayload[145]); 
+            s.Write(mPayload[146]); 
+            s.Write(mPayload[147]); 
+            s.Write(mPayload[148]); 
+            s.Write(mPayload[149]); 
+            s.Write(mPayload[150]); 
+            s.Write(mPayload[151]); 
+            s.Write(mPayload[152]); 
+            s.Write(mPayload[153]); 
+            s.Write(mPayload[154]); 
+            s.Write(mPayload[155]); 
+            s.Write(mPayload[156]); 
+            s.Write(mPayload[157]); 
+            s.Write(mPayload[158]); 
+            s.Write(mPayload[159]); 
+            s.Write(mPayload[160]); 
+            s.Write(mPayload[161]); 
+            s.Write(mPayload[162]); 
+            s.Write(mPayload[163]); 
+            s.Write(mPayload[164]); 
+            s.Write(mPayload[165]); 
+            s.Write(mPayload[166]); 
+            s.Write(mPayload[167]); 
+            s.Write(mPayload[168]); 
+            s.Write(mPayload[169]); 
+            s.Write(mPayload[170]); 
+            s.Write(mPayload[171]); 
+            s.Write(mPayload[172]); 
+            s.Write(mPayload[173]); 
+            s.Write(mPayload[174]); 
+            s.Write(mPayload[175]); 
+            s.Write(mPayload[176]); 
+            s.Write(mPayload[177]); 
+            s.Write(mPayload[178]); 
+            s.Write(mPayload[179]); 
+            s.Write(mPayload[180]); 
+            s.Write(mPayload[181]); 
+            s.Write(mPayload[182]); 
+            s.Write(mPayload[183]); 
+            s.Write(mPayload[184]); 
+            s.Write(mPayload[185]); 
+            s.Write(mPayload[186]); 
+            s.Write(mPayload[187]); 
+            s.Write(mPayload[188]); 
+            s.Write(mPayload[189]); 
+            s.Write(mPayload[190]); 
+            s.Write(mPayload[191]); 
+            s.Write(mPayload[192]); 
+            s.Write(mPayload[193]); 
+            s.Write(mPayload[194]); 
+            s.Write(mPayload[195]); 
+            s.Write(mPayload[196]); 
+            s.Write(mPayload[197]); 
+            s.Write(mPayload[198]); 
+            s.Write(mPayload[199]); 
+            s.Write(mPayload[200]); 
+            s.Write(mPayload[201]); 
+            s.Write(mPayload[202]); 
+            s.Write(mPayload[203]); 
+            s.Write(mPayload[204]); 
+            s.Write(mPayload[205]); 
+            s.Write(mPayload[206]); 
+            s.Write(mPayload[207]); 
+            s.Write(mPayload[208]); 
+            s.Write(mPayload[209]); 
+            s.Write(mPayload[210]); 
+            s.Write(mPayload[211]); 
+            s.Write(mPayload[212]); 
+            s.Write(mPayload[213]); 
+            s.Write(mPayload[214]); 
+            s.Write(mPayload[215]); 
+            s.Write(mPayload[216]); 
+            s.Write(mPayload[217]); 
+            s.Write(mPayload[218]); 
+            s.Write(mPayload[219]); 
+            s.Write(mPayload[220]); 
+            s.Write(mPayload[221]); 
+            s.Write(mPayload[222]); 
+            s.Write(mPayload[223]); 
+            s.Write(mPayload[224]); 
+            s.Write(mPayload[225]); 
+            s.Write(mPayload[226]); 
+            s.Write(mPayload[227]); 
+            s.Write(mPayload[228]); 
+            s.Write(mPayload[229]); 
+            s.Write(mPayload[230]); 
+            s.Write(mPayload[231]); 
+            s.Write(mPayload[232]); 
+            s.Write(mPayload[233]); 
+            s.Write(mPayload[234]); 
+            s.Write(mPayload[235]); 
+            s.Write(mPayload[236]); 
+            s.Write(mPayload[237]); 
+            s.Write(mPayload[238]); 
+            s.Write(mPayload[239]); 
+            s.Write(mPayload[240]); 
+            s.Write(mPayload[241]); 
+            s.Write(mPayload[242]); 
+            s.Write(mPayload[243]); 
+            s.Write(mPayload[244]); 
+            s.Write(mPayload[245]); 
+            s.Write(mPayload[246]); 
+            s.Write(mPayload[247]); 
+            s.Write(mPayload[248]); 
+            s.Write(mPayload[249]); 
+            s.Write(mPayload[250]); 
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mTransferUid = s.ReadUInt64();
-            this.mFileSize = s.ReadUInt32();
-            this.mDestPath[0] = s.ReadChar();
-            this.mDestPath[1] = s.ReadChar();
-            this.mDestPath[2] = s.ReadChar();
-            this.mDestPath[3] = s.ReadChar();
-            this.mDestPath[4] = s.ReadChar();
-            this.mDestPath[5] = s.ReadChar();
-            this.mDestPath[6] = s.ReadChar();
-            this.mDestPath[7] = s.ReadChar();
-            this.mDestPath[8] = s.ReadChar();
-            this.mDestPath[9] = s.ReadChar();
-            this.mDestPath[10] = s.ReadChar();
-            this.mDestPath[11] = s.ReadChar();
-            this.mDestPath[12] = s.ReadChar();
-            this.mDestPath[13] = s.ReadChar();
-            this.mDestPath[14] = s.ReadChar();
-            this.mDestPath[15] = s.ReadChar();
-            this.mDestPath[16] = s.ReadChar();
-            this.mDestPath[17] = s.ReadChar();
-            this.mDestPath[18] = s.ReadChar();
-            this.mDestPath[19] = s.ReadChar();
-            this.mDestPath[20] = s.ReadChar();
-            this.mDestPath[21] = s.ReadChar();
-            this.mDestPath[22] = s.ReadChar();
-            this.mDestPath[23] = s.ReadChar();
-            this.mDestPath[24] = s.ReadChar();
-            this.mDestPath[25] = s.ReadChar();
-            this.mDestPath[26] = s.ReadChar();
-            this.mDestPath[27] = s.ReadChar();
-            this.mDestPath[28] = s.ReadChar();
-            this.mDestPath[29] = s.ReadChar();
-            this.mDestPath[30] = s.ReadChar();
-            this.mDestPath[31] = s.ReadChar();
-            this.mDestPath[32] = s.ReadChar();
-            this.mDestPath[33] = s.ReadChar();
-            this.mDestPath[34] = s.ReadChar();
-            this.mDestPath[35] = s.ReadChar();
-            this.mDestPath[36] = s.ReadChar();
-            this.mDestPath[37] = s.ReadChar();
-            this.mDestPath[38] = s.ReadChar();
-            this.mDestPath[39] = s.ReadChar();
-            this.mDestPath[40] = s.ReadChar();
-            this.mDestPath[41] = s.ReadChar();
-            this.mDestPath[42] = s.ReadChar();
-            this.mDestPath[43] = s.ReadChar();
-            this.mDestPath[44] = s.ReadChar();
-            this.mDestPath[45] = s.ReadChar();
-            this.mDestPath[46] = s.ReadChar();
-            this.mDestPath[47] = s.ReadChar();
-            this.mDestPath[48] = s.ReadChar();
-            this.mDestPath[49] = s.ReadChar();
-            this.mDestPath[50] = s.ReadChar();
-            this.mDestPath[51] = s.ReadChar();
-            this.mDestPath[52] = s.ReadChar();
-            this.mDestPath[53] = s.ReadChar();
-            this.mDestPath[54] = s.ReadChar();
-            this.mDestPath[55] = s.ReadChar();
-            this.mDestPath[56] = s.ReadChar();
-            this.mDestPath[57] = s.ReadChar();
-            this.mDestPath[58] = s.ReadChar();
-            this.mDestPath[59] = s.ReadChar();
-            this.mDestPath[60] = s.ReadChar();
-            this.mDestPath[61] = s.ReadChar();
-            this.mDestPath[62] = s.ReadChar();
-            this.mDestPath[63] = s.ReadChar();
-            this.mDestPath[64] = s.ReadChar();
-            this.mDestPath[65] = s.ReadChar();
-            this.mDestPath[66] = s.ReadChar();
-            this.mDestPath[67] = s.ReadChar();
-            this.mDestPath[68] = s.ReadChar();
-            this.mDestPath[69] = s.ReadChar();
-            this.mDestPath[70] = s.ReadChar();
-            this.mDestPath[71] = s.ReadChar();
-            this.mDestPath[72] = s.ReadChar();
-            this.mDestPath[73] = s.ReadChar();
-            this.mDestPath[74] = s.ReadChar();
-            this.mDestPath[75] = s.ReadChar();
-            this.mDestPath[76] = s.ReadChar();
-            this.mDestPath[77] = s.ReadChar();
-            this.mDestPath[78] = s.ReadChar();
-            this.mDestPath[79] = s.ReadChar();
-            this.mDestPath[80] = s.ReadChar();
-            this.mDestPath[81] = s.ReadChar();
-            this.mDestPath[82] = s.ReadChar();
-            this.mDestPath[83] = s.ReadChar();
-            this.mDestPath[84] = s.ReadChar();
-            this.mDestPath[85] = s.ReadChar();
-            this.mDestPath[86] = s.ReadChar();
-            this.mDestPath[87] = s.ReadChar();
-            this.mDestPath[88] = s.ReadChar();
-            this.mDestPath[89] = s.ReadChar();
-            this.mDestPath[90] = s.ReadChar();
-            this.mDestPath[91] = s.ReadChar();
-            this.mDestPath[92] = s.ReadChar();
-            this.mDestPath[93] = s.ReadChar();
-            this.mDestPath[94] = s.ReadChar();
-            this.mDestPath[95] = s.ReadChar();
-            this.mDestPath[96] = s.ReadChar();
-            this.mDestPath[97] = s.ReadChar();
-            this.mDestPath[98] = s.ReadChar();
-            this.mDestPath[99] = s.ReadChar();
-            this.mDestPath[100] = s.ReadChar();
-            this.mDestPath[101] = s.ReadChar();
-            this.mDestPath[102] = s.ReadChar();
-            this.mDestPath[103] = s.ReadChar();
-            this.mDestPath[104] = s.ReadChar();
-            this.mDestPath[105] = s.ReadChar();
-            this.mDestPath[106] = s.ReadChar();
-            this.mDestPath[107] = s.ReadChar();
-            this.mDestPath[108] = s.ReadChar();
-            this.mDestPath[109] = s.ReadChar();
-            this.mDestPath[110] = s.ReadChar();
-            this.mDestPath[111] = s.ReadChar();
-            this.mDestPath[112] = s.ReadChar();
-            this.mDestPath[113] = s.ReadChar();
-            this.mDestPath[114] = s.ReadChar();
-            this.mDestPath[115] = s.ReadChar();
-            this.mDestPath[116] = s.ReadChar();
-            this.mDestPath[117] = s.ReadChar();
-            this.mDestPath[118] = s.ReadChar();
-            this.mDestPath[119] = s.ReadChar();
-            this.mDestPath[120] = s.ReadChar();
-            this.mDestPath[121] = s.ReadChar();
-            this.mDestPath[122] = s.ReadChar();
-            this.mDestPath[123] = s.ReadChar();
-            this.mDestPath[124] = s.ReadChar();
-            this.mDestPath[125] = s.ReadChar();
-            this.mDestPath[126] = s.ReadChar();
-            this.mDestPath[127] = s.ReadChar();
-            this.mDestPath[128] = s.ReadChar();
-            this.mDestPath[129] = s.ReadChar();
-            this.mDestPath[130] = s.ReadChar();
-            this.mDestPath[131] = s.ReadChar();
-            this.mDestPath[132] = s.ReadChar();
-            this.mDestPath[133] = s.ReadChar();
-            this.mDestPath[134] = s.ReadChar();
-            this.mDestPath[135] = s.ReadChar();
-            this.mDestPath[136] = s.ReadChar();
-            this.mDestPath[137] = s.ReadChar();
-            this.mDestPath[138] = s.ReadChar();
-            this.mDestPath[139] = s.ReadChar();
-            this.mDestPath[140] = s.ReadChar();
-            this.mDestPath[141] = s.ReadChar();
-            this.mDestPath[142] = s.ReadChar();
-            this.mDestPath[143] = s.ReadChar();
-            this.mDestPath[144] = s.ReadChar();
-            this.mDestPath[145] = s.ReadChar();
-            this.mDestPath[146] = s.ReadChar();
-            this.mDestPath[147] = s.ReadChar();
-            this.mDestPath[148] = s.ReadChar();
-            this.mDestPath[149] = s.ReadChar();
-            this.mDestPath[150] = s.ReadChar();
-            this.mDestPath[151] = s.ReadChar();
-            this.mDestPath[152] = s.ReadChar();
-            this.mDestPath[153] = s.ReadChar();
-            this.mDestPath[154] = s.ReadChar();
-            this.mDestPath[155] = s.ReadChar();
-            this.mDestPath[156] = s.ReadChar();
-            this.mDestPath[157] = s.ReadChar();
-            this.mDestPath[158] = s.ReadChar();
-            this.mDestPath[159] = s.ReadChar();
-            this.mDestPath[160] = s.ReadChar();
-            this.mDestPath[161] = s.ReadChar();
-            this.mDestPath[162] = s.ReadChar();
-            this.mDestPath[163] = s.ReadChar();
-            this.mDestPath[164] = s.ReadChar();
-            this.mDestPath[165] = s.ReadChar();
-            this.mDestPath[166] = s.ReadChar();
-            this.mDestPath[167] = s.ReadChar();
-            this.mDestPath[168] = s.ReadChar();
-            this.mDestPath[169] = s.ReadChar();
-            this.mDestPath[170] = s.ReadChar();
-            this.mDestPath[171] = s.ReadChar();
-            this.mDestPath[172] = s.ReadChar();
-            this.mDestPath[173] = s.ReadChar();
-            this.mDestPath[174] = s.ReadChar();
-            this.mDestPath[175] = s.ReadChar();
-            this.mDestPath[176] = s.ReadChar();
-            this.mDestPath[177] = s.ReadChar();
-            this.mDestPath[178] = s.ReadChar();
-            this.mDestPath[179] = s.ReadChar();
-            this.mDestPath[180] = s.ReadChar();
-            this.mDestPath[181] = s.ReadChar();
-            this.mDestPath[182] = s.ReadChar();
-            this.mDestPath[183] = s.ReadChar();
-            this.mDestPath[184] = s.ReadChar();
-            this.mDestPath[185] = s.ReadChar();
-            this.mDestPath[186] = s.ReadChar();
-            this.mDestPath[187] = s.ReadChar();
-            this.mDestPath[188] = s.ReadChar();
-            this.mDestPath[189] = s.ReadChar();
-            this.mDestPath[190] = s.ReadChar();
-            this.mDestPath[191] = s.ReadChar();
-            this.mDestPath[192] = s.ReadChar();
-            this.mDestPath[193] = s.ReadChar();
-            this.mDestPath[194] = s.ReadChar();
-            this.mDestPath[195] = s.ReadChar();
-            this.mDestPath[196] = s.ReadChar();
-            this.mDestPath[197] = s.ReadChar();
-            this.mDestPath[198] = s.ReadChar();
-            this.mDestPath[199] = s.ReadChar();
-            this.mDestPath[200] = s.ReadChar();
-            this.mDestPath[201] = s.ReadChar();
-            this.mDestPath[202] = s.ReadChar();
-            this.mDestPath[203] = s.ReadChar();
-            this.mDestPath[204] = s.ReadChar();
-            this.mDestPath[205] = s.ReadChar();
-            this.mDestPath[206] = s.ReadChar();
-            this.mDestPath[207] = s.ReadChar();
-            this.mDestPath[208] = s.ReadChar();
-            this.mDestPath[209] = s.ReadChar();
-            this.mDestPath[210] = s.ReadChar();
-            this.mDestPath[211] = s.ReadChar();
-            this.mDestPath[212] = s.ReadChar();
-            this.mDestPath[213] = s.ReadChar();
-            this.mDestPath[214] = s.ReadChar();
-            this.mDestPath[215] = s.ReadChar();
-            this.mDestPath[216] = s.ReadChar();
-            this.mDestPath[217] = s.ReadChar();
-            this.mDestPath[218] = s.ReadChar();
-            this.mDestPath[219] = s.ReadChar();
-            this.mDestPath[220] = s.ReadChar();
-            this.mDestPath[221] = s.ReadChar();
-            this.mDestPath[222] = s.ReadChar();
-            this.mDestPath[223] = s.ReadChar();
-            this.mDestPath[224] = s.ReadChar();
-            this.mDestPath[225] = s.ReadChar();
-            this.mDestPath[226] = s.ReadChar();
-            this.mDestPath[227] = s.ReadChar();
-            this.mDestPath[228] = s.ReadChar();
-            this.mDestPath[229] = s.ReadChar();
-            this.mDestPath[230] = s.ReadChar();
-            this.mDestPath[231] = s.ReadChar();
-            this.mDestPath[232] = s.ReadChar();
-            this.mDestPath[233] = s.ReadChar();
-            this.mDestPath[234] = s.ReadChar();
-            this.mDestPath[235] = s.ReadChar();
-            this.mDestPath[236] = s.ReadChar();
-            this.mDestPath[237] = s.ReadChar();
-            this.mDestPath[238] = s.ReadChar();
-            this.mDestPath[239] = s.ReadChar();
-            this.mDirection = s.ReadByte();
-            this.mFlags = s.ReadByte();
+            this.mTargetNetwork = s.ReadByte();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+            this.mPayload[0] = s.ReadByte();
+            this.mPayload[1] = s.ReadByte();
+            this.mPayload[2] = s.ReadByte();
+            this.mPayload[3] = s.ReadByte();
+            this.mPayload[4] = s.ReadByte();
+            this.mPayload[5] = s.ReadByte();
+            this.mPayload[6] = s.ReadByte();
+            this.mPayload[7] = s.ReadByte();
+            this.mPayload[8] = s.ReadByte();
+            this.mPayload[9] = s.ReadByte();
+            this.mPayload[10] = s.ReadByte();
+            this.mPayload[11] = s.ReadByte();
+            this.mPayload[12] = s.ReadByte();
+            this.mPayload[13] = s.ReadByte();
+            this.mPayload[14] = s.ReadByte();
+            this.mPayload[15] = s.ReadByte();
+            this.mPayload[16] = s.ReadByte();
+            this.mPayload[17] = s.ReadByte();
+            this.mPayload[18] = s.ReadByte();
+            this.mPayload[19] = s.ReadByte();
+            this.mPayload[20] = s.ReadByte();
+            this.mPayload[21] = s.ReadByte();
+            this.mPayload[22] = s.ReadByte();
+            this.mPayload[23] = s.ReadByte();
+            this.mPayload[24] = s.ReadByte();
+            this.mPayload[25] = s.ReadByte();
+            this.mPayload[26] = s.ReadByte();
+            this.mPayload[27] = s.ReadByte();
+            this.mPayload[28] = s.ReadByte();
+            this.mPayload[29] = s.ReadByte();
+            this.mPayload[30] = s.ReadByte();
+            this.mPayload[31] = s.ReadByte();
+            this.mPayload[32] = s.ReadByte();
+            this.mPayload[33] = s.ReadByte();
+            this.mPayload[34] = s.ReadByte();
+            this.mPayload[35] = s.ReadByte();
+            this.mPayload[36] = s.ReadByte();
+            this.mPayload[37] = s.ReadByte();
+            this.mPayload[38] = s.ReadByte();
+            this.mPayload[39] = s.ReadByte();
+            this.mPayload[40] = s.ReadByte();
+            this.mPayload[41] = s.ReadByte();
+            this.mPayload[42] = s.ReadByte();
+            this.mPayload[43] = s.ReadByte();
+            this.mPayload[44] = s.ReadByte();
+            this.mPayload[45] = s.ReadByte();
+            this.mPayload[46] = s.ReadByte();
+            this.mPayload[47] = s.ReadByte();
+            this.mPayload[48] = s.ReadByte();
+            this.mPayload[49] = s.ReadByte();
+            this.mPayload[50] = s.ReadByte();
+            this.mPayload[51] = s.ReadByte();
+            this.mPayload[52] = s.ReadByte();
+            this.mPayload[53] = s.ReadByte();
+            this.mPayload[54] = s.ReadByte();
+            this.mPayload[55] = s.ReadByte();
+            this.mPayload[56] = s.ReadByte();
+            this.mPayload[57] = s.ReadByte();
+            this.mPayload[58] = s.ReadByte();
+            this.mPayload[59] = s.ReadByte();
+            this.mPayload[60] = s.ReadByte();
+            this.mPayload[61] = s.ReadByte();
+            this.mPayload[62] = s.ReadByte();
+            this.mPayload[63] = s.ReadByte();
+            this.mPayload[64] = s.ReadByte();
+            this.mPayload[65] = s.ReadByte();
+            this.mPayload[66] = s.ReadByte();
+            this.mPayload[67] = s.ReadByte();
+            this.mPayload[68] = s.ReadByte();
+            this.mPayload[69] = s.ReadByte();
+            this.mPayload[70] = s.ReadByte();
+            this.mPayload[71] = s.ReadByte();
+            this.mPayload[72] = s.ReadByte();
+            this.mPayload[73] = s.ReadByte();
+            this.mPayload[74] = s.ReadByte();
+            this.mPayload[75] = s.ReadByte();
+            this.mPayload[76] = s.ReadByte();
+            this.mPayload[77] = s.ReadByte();
+            this.mPayload[78] = s.ReadByte();
+            this.mPayload[79] = s.ReadByte();
+            this.mPayload[80] = s.ReadByte();
+            this.mPayload[81] = s.ReadByte();
+            this.mPayload[82] = s.ReadByte();
+            this.mPayload[83] = s.ReadByte();
+            this.mPayload[84] = s.ReadByte();
+            this.mPayload[85] = s.ReadByte();
+            this.mPayload[86] = s.ReadByte();
+            this.mPayload[87] = s.ReadByte();
+            this.mPayload[88] = s.ReadByte();
+            this.mPayload[89] = s.ReadByte();
+            this.mPayload[90] = s.ReadByte();
+            this.mPayload[91] = s.ReadByte();
+            this.mPayload[92] = s.ReadByte();
+            this.mPayload[93] = s.ReadByte();
+            this.mPayload[94] = s.ReadByte();
+            this.mPayload[95] = s.ReadByte();
+            this.mPayload[96] = s.ReadByte();
+            this.mPayload[97] = s.ReadByte();
+            this.mPayload[98] = s.ReadByte();
+            this.mPayload[99] = s.ReadByte();
+            this.mPayload[100] = s.ReadByte();
+            this.mPayload[101] = s.ReadByte();
+            this.mPayload[102] = s.ReadByte();
+            this.mPayload[103] = s.ReadByte();
+            this.mPayload[104] = s.ReadByte();
+            this.mPayload[105] = s.ReadByte();
+            this.mPayload[106] = s.ReadByte();
+            this.mPayload[107] = s.ReadByte();
+            this.mPayload[108] = s.ReadByte();
+            this.mPayload[109] = s.ReadByte();
+            this.mPayload[110] = s.ReadByte();
+            this.mPayload[111] = s.ReadByte();
+            this.mPayload[112] = s.ReadByte();
+            this.mPayload[113] = s.ReadByte();
+            this.mPayload[114] = s.ReadByte();
+            this.mPayload[115] = s.ReadByte();
+            this.mPayload[116] = s.ReadByte();
+            this.mPayload[117] = s.ReadByte();
+            this.mPayload[118] = s.ReadByte();
+            this.mPayload[119] = s.ReadByte();
+            this.mPayload[120] = s.ReadByte();
+            this.mPayload[121] = s.ReadByte();
+            this.mPayload[122] = s.ReadByte();
+            this.mPayload[123] = s.ReadByte();
+            this.mPayload[124] = s.ReadByte();
+            this.mPayload[125] = s.ReadByte();
+            this.mPayload[126] = s.ReadByte();
+            this.mPayload[127] = s.ReadByte();
+            this.mPayload[128] = s.ReadByte();
+            this.mPayload[129] = s.ReadByte();
+            this.mPayload[130] = s.ReadByte();
+            this.mPayload[131] = s.ReadByte();
+            this.mPayload[132] = s.ReadByte();
+            this.mPayload[133] = s.ReadByte();
+            this.mPayload[134] = s.ReadByte();
+            this.mPayload[135] = s.ReadByte();
+            this.mPayload[136] = s.ReadByte();
+            this.mPayload[137] = s.ReadByte();
+            this.mPayload[138] = s.ReadByte();
+            this.mPayload[139] = s.ReadByte();
+            this.mPayload[140] = s.ReadByte();
+            this.mPayload[141] = s.ReadByte();
+            this.mPayload[142] = s.ReadByte();
+            this.mPayload[143] = s.ReadByte();
+            this.mPayload[144] = s.ReadByte();
+            this.mPayload[145] = s.ReadByte();
+            this.mPayload[146] = s.ReadByte();
+            this.mPayload[147] = s.ReadByte();
+            this.mPayload[148] = s.ReadByte();
+            this.mPayload[149] = s.ReadByte();
+            this.mPayload[150] = s.ReadByte();
+            this.mPayload[151] = s.ReadByte();
+            this.mPayload[152] = s.ReadByte();
+            this.mPayload[153] = s.ReadByte();
+            this.mPayload[154] = s.ReadByte();
+            this.mPayload[155] = s.ReadByte();
+            this.mPayload[156] = s.ReadByte();
+            this.mPayload[157] = s.ReadByte();
+            this.mPayload[158] = s.ReadByte();
+            this.mPayload[159] = s.ReadByte();
+            this.mPayload[160] = s.ReadByte();
+            this.mPayload[161] = s.ReadByte();
+            this.mPayload[162] = s.ReadByte();
+            this.mPayload[163] = s.ReadByte();
+            this.mPayload[164] = s.ReadByte();
+            this.mPayload[165] = s.ReadByte();
+            this.mPayload[166] = s.ReadByte();
+            this.mPayload[167] = s.ReadByte();
+            this.mPayload[168] = s.ReadByte();
+            this.mPayload[169] = s.ReadByte();
+            this.mPayload[170] = s.ReadByte();
+            this.mPayload[171] = s.ReadByte();
+            this.mPayload[172] = s.ReadByte();
+            this.mPayload[173] = s.ReadByte();
+            this.mPayload[174] = s.ReadByte();
+            this.mPayload[175] = s.ReadByte();
+            this.mPayload[176] = s.ReadByte();
+            this.mPayload[177] = s.ReadByte();
+            this.mPayload[178] = s.ReadByte();
+            this.mPayload[179] = s.ReadByte();
+            this.mPayload[180] = s.ReadByte();
+            this.mPayload[181] = s.ReadByte();
+            this.mPayload[182] = s.ReadByte();
+            this.mPayload[183] = s.ReadByte();
+            this.mPayload[184] = s.ReadByte();
+            this.mPayload[185] = s.ReadByte();
+            this.mPayload[186] = s.ReadByte();
+            this.mPayload[187] = s.ReadByte();
+            this.mPayload[188] = s.ReadByte();
+            this.mPayload[189] = s.ReadByte();
+            this.mPayload[190] = s.ReadByte();
+            this.mPayload[191] = s.ReadByte();
+            this.mPayload[192] = s.ReadByte();
+            this.mPayload[193] = s.ReadByte();
+            this.mPayload[194] = s.ReadByte();
+            this.mPayload[195] = s.ReadByte();
+            this.mPayload[196] = s.ReadByte();
+            this.mPayload[197] = s.ReadByte();
+            this.mPayload[198] = s.ReadByte();
+            this.mPayload[199] = s.ReadByte();
+            this.mPayload[200] = s.ReadByte();
+            this.mPayload[201] = s.ReadByte();
+            this.mPayload[202] = s.ReadByte();
+            this.mPayload[203] = s.ReadByte();
+            this.mPayload[204] = s.ReadByte();
+            this.mPayload[205] = s.ReadByte();
+            this.mPayload[206] = s.ReadByte();
+            this.mPayload[207] = s.ReadByte();
+            this.mPayload[208] = s.ReadByte();
+            this.mPayload[209] = s.ReadByte();
+            this.mPayload[210] = s.ReadByte();
+            this.mPayload[211] = s.ReadByte();
+            this.mPayload[212] = s.ReadByte();
+            this.mPayload[213] = s.ReadByte();
+            this.mPayload[214] = s.ReadByte();
+            this.mPayload[215] = s.ReadByte();
+            this.mPayload[216] = s.ReadByte();
+            this.mPayload[217] = s.ReadByte();
+            this.mPayload[218] = s.ReadByte();
+            this.mPayload[219] = s.ReadByte();
+            this.mPayload[220] = s.ReadByte();
+            this.mPayload[221] = s.ReadByte();
+            this.mPayload[222] = s.ReadByte();
+            this.mPayload[223] = s.ReadByte();
+            this.mPayload[224] = s.ReadByte();
+            this.mPayload[225] = s.ReadByte();
+            this.mPayload[226] = s.ReadByte();
+            this.mPayload[227] = s.ReadByte();
+            this.mPayload[228] = s.ReadByte();
+            this.mPayload[229] = s.ReadByte();
+            this.mPayload[230] = s.ReadByte();
+            this.mPayload[231] = s.ReadByte();
+            this.mPayload[232] = s.ReadByte();
+            this.mPayload[233] = s.ReadByte();
+            this.mPayload[234] = s.ReadByte();
+            this.mPayload[235] = s.ReadByte();
+            this.mPayload[236] = s.ReadByte();
+            this.mPayload[237] = s.ReadByte();
+            this.mPayload[238] = s.ReadByte();
+            this.mPayload[239] = s.ReadByte();
+            this.mPayload[240] = s.ReadByte();
+            this.mPayload[241] = s.ReadByte();
+            this.mPayload[242] = s.ReadByte();
+            this.mPayload[243] = s.ReadByte();
+            this.mPayload[244] = s.ReadByte();
+            this.mPayload[245] = s.ReadByte();
+            this.mPayload[246] = s.ReadByte();
+            this.mPayload[247] = s.ReadByte();
+            this.mPayload[248] = s.ReadByte();
+            this.mPayload[249] = s.ReadByte();
+            this.mPayload[250] = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Begin file transfer"
+                Description = "File transfer message"
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TransferUid",
-                Description = "Unique transfer ID",
+                Name = "TargetNetwork",
+                Description = "Network ID (0 for broadcast)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "FileSize",
-                Description = "File size in bytes",
+                Name = "TargetSystem",
+                Description = "System ID (0 for broadcast)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "DestPath",
-                Description = "Destination path",
-                NumElements = 240,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Direction",
-                Description = "Transfer direction: 0: from requester, 1: to requester",
+                Name = "TargetComponent",
+                Description = "Component ID (0 for broadcast)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Flags",
-                Description = "RESERVED",
-                NumElements = 1,
+                Name = "Payload",
+                Description = "Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification.",
+                NumElements = 251,
             });
 
         }
 
-        private UInt64 mTransferUid;
-        private UInt32 mFileSize;
-        private char[] mDestPath = new char[240];
-        private byte mDirection;
-        private byte mFlags;
+        private byte mTargetNetwork;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+        private byte[] mPayload = new byte[251];
     }
 
 
@@ -13039,628 +14906,66 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Get directory listing
+    /// Time synchronization message.
     /// </summary>
-    public class UasFileTransferDirList: UasMessage
+    public class UasTimesync: UasMessage
     {
         /// <summary>
-        /// Unique transfer ID
+        /// Time sync timestamp 1
         /// </summary>
-        public UInt64 TransferUid {
-            get { return mTransferUid; }
-            set { mTransferUid = value; NotifyUpdated(); }
+        public Int64 Tc1 {
+            get { return mTc1; }
+            set { mTc1 = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Directory path to list
+        /// Time sync timestamp 2
         /// </summary>
-        public char[] DirPath {
-            get { return mDirPath; }
-            set { mDirPath = value; NotifyUpdated(); }
+        public Int64 Ts1 {
+            get { return mTs1; }
+            set { mTs1 = value; NotifyUpdated(); }
         }
 
-        /// <summary>
-        /// RESERVED
-        /// </summary>
-        public byte Flags {
-            get { return mFlags; }
-            set { mFlags = value; NotifyUpdated(); }
-        }
-
-        public UasFileTransferDirList()
+        public UasTimesync()
         {
             mMessageId = 111;
-            CrcExtra = 93;
+            CrcExtra = 34;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mTransferUid);
-            s.Write(mDirPath[0]); 
-            s.Write(mDirPath[1]); 
-            s.Write(mDirPath[2]); 
-            s.Write(mDirPath[3]); 
-            s.Write(mDirPath[4]); 
-            s.Write(mDirPath[5]); 
-            s.Write(mDirPath[6]); 
-            s.Write(mDirPath[7]); 
-            s.Write(mDirPath[8]); 
-            s.Write(mDirPath[9]); 
-            s.Write(mDirPath[10]); 
-            s.Write(mDirPath[11]); 
-            s.Write(mDirPath[12]); 
-            s.Write(mDirPath[13]); 
-            s.Write(mDirPath[14]); 
-            s.Write(mDirPath[15]); 
-            s.Write(mDirPath[16]); 
-            s.Write(mDirPath[17]); 
-            s.Write(mDirPath[18]); 
-            s.Write(mDirPath[19]); 
-            s.Write(mDirPath[20]); 
-            s.Write(mDirPath[21]); 
-            s.Write(mDirPath[22]); 
-            s.Write(mDirPath[23]); 
-            s.Write(mDirPath[24]); 
-            s.Write(mDirPath[25]); 
-            s.Write(mDirPath[26]); 
-            s.Write(mDirPath[27]); 
-            s.Write(mDirPath[28]); 
-            s.Write(mDirPath[29]); 
-            s.Write(mDirPath[30]); 
-            s.Write(mDirPath[31]); 
-            s.Write(mDirPath[32]); 
-            s.Write(mDirPath[33]); 
-            s.Write(mDirPath[34]); 
-            s.Write(mDirPath[35]); 
-            s.Write(mDirPath[36]); 
-            s.Write(mDirPath[37]); 
-            s.Write(mDirPath[38]); 
-            s.Write(mDirPath[39]); 
-            s.Write(mDirPath[40]); 
-            s.Write(mDirPath[41]); 
-            s.Write(mDirPath[42]); 
-            s.Write(mDirPath[43]); 
-            s.Write(mDirPath[44]); 
-            s.Write(mDirPath[45]); 
-            s.Write(mDirPath[46]); 
-            s.Write(mDirPath[47]); 
-            s.Write(mDirPath[48]); 
-            s.Write(mDirPath[49]); 
-            s.Write(mDirPath[50]); 
-            s.Write(mDirPath[51]); 
-            s.Write(mDirPath[52]); 
-            s.Write(mDirPath[53]); 
-            s.Write(mDirPath[54]); 
-            s.Write(mDirPath[55]); 
-            s.Write(mDirPath[56]); 
-            s.Write(mDirPath[57]); 
-            s.Write(mDirPath[58]); 
-            s.Write(mDirPath[59]); 
-            s.Write(mDirPath[60]); 
-            s.Write(mDirPath[61]); 
-            s.Write(mDirPath[62]); 
-            s.Write(mDirPath[63]); 
-            s.Write(mDirPath[64]); 
-            s.Write(mDirPath[65]); 
-            s.Write(mDirPath[66]); 
-            s.Write(mDirPath[67]); 
-            s.Write(mDirPath[68]); 
-            s.Write(mDirPath[69]); 
-            s.Write(mDirPath[70]); 
-            s.Write(mDirPath[71]); 
-            s.Write(mDirPath[72]); 
-            s.Write(mDirPath[73]); 
-            s.Write(mDirPath[74]); 
-            s.Write(mDirPath[75]); 
-            s.Write(mDirPath[76]); 
-            s.Write(mDirPath[77]); 
-            s.Write(mDirPath[78]); 
-            s.Write(mDirPath[79]); 
-            s.Write(mDirPath[80]); 
-            s.Write(mDirPath[81]); 
-            s.Write(mDirPath[82]); 
-            s.Write(mDirPath[83]); 
-            s.Write(mDirPath[84]); 
-            s.Write(mDirPath[85]); 
-            s.Write(mDirPath[86]); 
-            s.Write(mDirPath[87]); 
-            s.Write(mDirPath[88]); 
-            s.Write(mDirPath[89]); 
-            s.Write(mDirPath[90]); 
-            s.Write(mDirPath[91]); 
-            s.Write(mDirPath[92]); 
-            s.Write(mDirPath[93]); 
-            s.Write(mDirPath[94]); 
-            s.Write(mDirPath[95]); 
-            s.Write(mDirPath[96]); 
-            s.Write(mDirPath[97]); 
-            s.Write(mDirPath[98]); 
-            s.Write(mDirPath[99]); 
-            s.Write(mDirPath[100]); 
-            s.Write(mDirPath[101]); 
-            s.Write(mDirPath[102]); 
-            s.Write(mDirPath[103]); 
-            s.Write(mDirPath[104]); 
-            s.Write(mDirPath[105]); 
-            s.Write(mDirPath[106]); 
-            s.Write(mDirPath[107]); 
-            s.Write(mDirPath[108]); 
-            s.Write(mDirPath[109]); 
-            s.Write(mDirPath[110]); 
-            s.Write(mDirPath[111]); 
-            s.Write(mDirPath[112]); 
-            s.Write(mDirPath[113]); 
-            s.Write(mDirPath[114]); 
-            s.Write(mDirPath[115]); 
-            s.Write(mDirPath[116]); 
-            s.Write(mDirPath[117]); 
-            s.Write(mDirPath[118]); 
-            s.Write(mDirPath[119]); 
-            s.Write(mDirPath[120]); 
-            s.Write(mDirPath[121]); 
-            s.Write(mDirPath[122]); 
-            s.Write(mDirPath[123]); 
-            s.Write(mDirPath[124]); 
-            s.Write(mDirPath[125]); 
-            s.Write(mDirPath[126]); 
-            s.Write(mDirPath[127]); 
-            s.Write(mDirPath[128]); 
-            s.Write(mDirPath[129]); 
-            s.Write(mDirPath[130]); 
-            s.Write(mDirPath[131]); 
-            s.Write(mDirPath[132]); 
-            s.Write(mDirPath[133]); 
-            s.Write(mDirPath[134]); 
-            s.Write(mDirPath[135]); 
-            s.Write(mDirPath[136]); 
-            s.Write(mDirPath[137]); 
-            s.Write(mDirPath[138]); 
-            s.Write(mDirPath[139]); 
-            s.Write(mDirPath[140]); 
-            s.Write(mDirPath[141]); 
-            s.Write(mDirPath[142]); 
-            s.Write(mDirPath[143]); 
-            s.Write(mDirPath[144]); 
-            s.Write(mDirPath[145]); 
-            s.Write(mDirPath[146]); 
-            s.Write(mDirPath[147]); 
-            s.Write(mDirPath[148]); 
-            s.Write(mDirPath[149]); 
-            s.Write(mDirPath[150]); 
-            s.Write(mDirPath[151]); 
-            s.Write(mDirPath[152]); 
-            s.Write(mDirPath[153]); 
-            s.Write(mDirPath[154]); 
-            s.Write(mDirPath[155]); 
-            s.Write(mDirPath[156]); 
-            s.Write(mDirPath[157]); 
-            s.Write(mDirPath[158]); 
-            s.Write(mDirPath[159]); 
-            s.Write(mDirPath[160]); 
-            s.Write(mDirPath[161]); 
-            s.Write(mDirPath[162]); 
-            s.Write(mDirPath[163]); 
-            s.Write(mDirPath[164]); 
-            s.Write(mDirPath[165]); 
-            s.Write(mDirPath[166]); 
-            s.Write(mDirPath[167]); 
-            s.Write(mDirPath[168]); 
-            s.Write(mDirPath[169]); 
-            s.Write(mDirPath[170]); 
-            s.Write(mDirPath[171]); 
-            s.Write(mDirPath[172]); 
-            s.Write(mDirPath[173]); 
-            s.Write(mDirPath[174]); 
-            s.Write(mDirPath[175]); 
-            s.Write(mDirPath[176]); 
-            s.Write(mDirPath[177]); 
-            s.Write(mDirPath[178]); 
-            s.Write(mDirPath[179]); 
-            s.Write(mDirPath[180]); 
-            s.Write(mDirPath[181]); 
-            s.Write(mDirPath[182]); 
-            s.Write(mDirPath[183]); 
-            s.Write(mDirPath[184]); 
-            s.Write(mDirPath[185]); 
-            s.Write(mDirPath[186]); 
-            s.Write(mDirPath[187]); 
-            s.Write(mDirPath[188]); 
-            s.Write(mDirPath[189]); 
-            s.Write(mDirPath[190]); 
-            s.Write(mDirPath[191]); 
-            s.Write(mDirPath[192]); 
-            s.Write(mDirPath[193]); 
-            s.Write(mDirPath[194]); 
-            s.Write(mDirPath[195]); 
-            s.Write(mDirPath[196]); 
-            s.Write(mDirPath[197]); 
-            s.Write(mDirPath[198]); 
-            s.Write(mDirPath[199]); 
-            s.Write(mDirPath[200]); 
-            s.Write(mDirPath[201]); 
-            s.Write(mDirPath[202]); 
-            s.Write(mDirPath[203]); 
-            s.Write(mDirPath[204]); 
-            s.Write(mDirPath[205]); 
-            s.Write(mDirPath[206]); 
-            s.Write(mDirPath[207]); 
-            s.Write(mDirPath[208]); 
-            s.Write(mDirPath[209]); 
-            s.Write(mDirPath[210]); 
-            s.Write(mDirPath[211]); 
-            s.Write(mDirPath[212]); 
-            s.Write(mDirPath[213]); 
-            s.Write(mDirPath[214]); 
-            s.Write(mDirPath[215]); 
-            s.Write(mDirPath[216]); 
-            s.Write(mDirPath[217]); 
-            s.Write(mDirPath[218]); 
-            s.Write(mDirPath[219]); 
-            s.Write(mDirPath[220]); 
-            s.Write(mDirPath[221]); 
-            s.Write(mDirPath[222]); 
-            s.Write(mDirPath[223]); 
-            s.Write(mDirPath[224]); 
-            s.Write(mDirPath[225]); 
-            s.Write(mDirPath[226]); 
-            s.Write(mDirPath[227]); 
-            s.Write(mDirPath[228]); 
-            s.Write(mDirPath[229]); 
-            s.Write(mDirPath[230]); 
-            s.Write(mDirPath[231]); 
-            s.Write(mDirPath[232]); 
-            s.Write(mDirPath[233]); 
-            s.Write(mDirPath[234]); 
-            s.Write(mDirPath[235]); 
-            s.Write(mDirPath[236]); 
-            s.Write(mDirPath[237]); 
-            s.Write(mDirPath[238]); 
-            s.Write(mDirPath[239]); 
-            s.Write(mFlags);
+            s.Write(mTc1);
+            s.Write(mTs1);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mTransferUid = s.ReadUInt64();
-            this.mDirPath[0] = s.ReadChar();
-            this.mDirPath[1] = s.ReadChar();
-            this.mDirPath[2] = s.ReadChar();
-            this.mDirPath[3] = s.ReadChar();
-            this.mDirPath[4] = s.ReadChar();
-            this.mDirPath[5] = s.ReadChar();
-            this.mDirPath[6] = s.ReadChar();
-            this.mDirPath[7] = s.ReadChar();
-            this.mDirPath[8] = s.ReadChar();
-            this.mDirPath[9] = s.ReadChar();
-            this.mDirPath[10] = s.ReadChar();
-            this.mDirPath[11] = s.ReadChar();
-            this.mDirPath[12] = s.ReadChar();
-            this.mDirPath[13] = s.ReadChar();
-            this.mDirPath[14] = s.ReadChar();
-            this.mDirPath[15] = s.ReadChar();
-            this.mDirPath[16] = s.ReadChar();
-            this.mDirPath[17] = s.ReadChar();
-            this.mDirPath[18] = s.ReadChar();
-            this.mDirPath[19] = s.ReadChar();
-            this.mDirPath[20] = s.ReadChar();
-            this.mDirPath[21] = s.ReadChar();
-            this.mDirPath[22] = s.ReadChar();
-            this.mDirPath[23] = s.ReadChar();
-            this.mDirPath[24] = s.ReadChar();
-            this.mDirPath[25] = s.ReadChar();
-            this.mDirPath[26] = s.ReadChar();
-            this.mDirPath[27] = s.ReadChar();
-            this.mDirPath[28] = s.ReadChar();
-            this.mDirPath[29] = s.ReadChar();
-            this.mDirPath[30] = s.ReadChar();
-            this.mDirPath[31] = s.ReadChar();
-            this.mDirPath[32] = s.ReadChar();
-            this.mDirPath[33] = s.ReadChar();
-            this.mDirPath[34] = s.ReadChar();
-            this.mDirPath[35] = s.ReadChar();
-            this.mDirPath[36] = s.ReadChar();
-            this.mDirPath[37] = s.ReadChar();
-            this.mDirPath[38] = s.ReadChar();
-            this.mDirPath[39] = s.ReadChar();
-            this.mDirPath[40] = s.ReadChar();
-            this.mDirPath[41] = s.ReadChar();
-            this.mDirPath[42] = s.ReadChar();
-            this.mDirPath[43] = s.ReadChar();
-            this.mDirPath[44] = s.ReadChar();
-            this.mDirPath[45] = s.ReadChar();
-            this.mDirPath[46] = s.ReadChar();
-            this.mDirPath[47] = s.ReadChar();
-            this.mDirPath[48] = s.ReadChar();
-            this.mDirPath[49] = s.ReadChar();
-            this.mDirPath[50] = s.ReadChar();
-            this.mDirPath[51] = s.ReadChar();
-            this.mDirPath[52] = s.ReadChar();
-            this.mDirPath[53] = s.ReadChar();
-            this.mDirPath[54] = s.ReadChar();
-            this.mDirPath[55] = s.ReadChar();
-            this.mDirPath[56] = s.ReadChar();
-            this.mDirPath[57] = s.ReadChar();
-            this.mDirPath[58] = s.ReadChar();
-            this.mDirPath[59] = s.ReadChar();
-            this.mDirPath[60] = s.ReadChar();
-            this.mDirPath[61] = s.ReadChar();
-            this.mDirPath[62] = s.ReadChar();
-            this.mDirPath[63] = s.ReadChar();
-            this.mDirPath[64] = s.ReadChar();
-            this.mDirPath[65] = s.ReadChar();
-            this.mDirPath[66] = s.ReadChar();
-            this.mDirPath[67] = s.ReadChar();
-            this.mDirPath[68] = s.ReadChar();
-            this.mDirPath[69] = s.ReadChar();
-            this.mDirPath[70] = s.ReadChar();
-            this.mDirPath[71] = s.ReadChar();
-            this.mDirPath[72] = s.ReadChar();
-            this.mDirPath[73] = s.ReadChar();
-            this.mDirPath[74] = s.ReadChar();
-            this.mDirPath[75] = s.ReadChar();
-            this.mDirPath[76] = s.ReadChar();
-            this.mDirPath[77] = s.ReadChar();
-            this.mDirPath[78] = s.ReadChar();
-            this.mDirPath[79] = s.ReadChar();
-            this.mDirPath[80] = s.ReadChar();
-            this.mDirPath[81] = s.ReadChar();
-            this.mDirPath[82] = s.ReadChar();
-            this.mDirPath[83] = s.ReadChar();
-            this.mDirPath[84] = s.ReadChar();
-            this.mDirPath[85] = s.ReadChar();
-            this.mDirPath[86] = s.ReadChar();
-            this.mDirPath[87] = s.ReadChar();
-            this.mDirPath[88] = s.ReadChar();
-            this.mDirPath[89] = s.ReadChar();
-            this.mDirPath[90] = s.ReadChar();
-            this.mDirPath[91] = s.ReadChar();
-            this.mDirPath[92] = s.ReadChar();
-            this.mDirPath[93] = s.ReadChar();
-            this.mDirPath[94] = s.ReadChar();
-            this.mDirPath[95] = s.ReadChar();
-            this.mDirPath[96] = s.ReadChar();
-            this.mDirPath[97] = s.ReadChar();
-            this.mDirPath[98] = s.ReadChar();
-            this.mDirPath[99] = s.ReadChar();
-            this.mDirPath[100] = s.ReadChar();
-            this.mDirPath[101] = s.ReadChar();
-            this.mDirPath[102] = s.ReadChar();
-            this.mDirPath[103] = s.ReadChar();
-            this.mDirPath[104] = s.ReadChar();
-            this.mDirPath[105] = s.ReadChar();
-            this.mDirPath[106] = s.ReadChar();
-            this.mDirPath[107] = s.ReadChar();
-            this.mDirPath[108] = s.ReadChar();
-            this.mDirPath[109] = s.ReadChar();
-            this.mDirPath[110] = s.ReadChar();
-            this.mDirPath[111] = s.ReadChar();
-            this.mDirPath[112] = s.ReadChar();
-            this.mDirPath[113] = s.ReadChar();
-            this.mDirPath[114] = s.ReadChar();
-            this.mDirPath[115] = s.ReadChar();
-            this.mDirPath[116] = s.ReadChar();
-            this.mDirPath[117] = s.ReadChar();
-            this.mDirPath[118] = s.ReadChar();
-            this.mDirPath[119] = s.ReadChar();
-            this.mDirPath[120] = s.ReadChar();
-            this.mDirPath[121] = s.ReadChar();
-            this.mDirPath[122] = s.ReadChar();
-            this.mDirPath[123] = s.ReadChar();
-            this.mDirPath[124] = s.ReadChar();
-            this.mDirPath[125] = s.ReadChar();
-            this.mDirPath[126] = s.ReadChar();
-            this.mDirPath[127] = s.ReadChar();
-            this.mDirPath[128] = s.ReadChar();
-            this.mDirPath[129] = s.ReadChar();
-            this.mDirPath[130] = s.ReadChar();
-            this.mDirPath[131] = s.ReadChar();
-            this.mDirPath[132] = s.ReadChar();
-            this.mDirPath[133] = s.ReadChar();
-            this.mDirPath[134] = s.ReadChar();
-            this.mDirPath[135] = s.ReadChar();
-            this.mDirPath[136] = s.ReadChar();
-            this.mDirPath[137] = s.ReadChar();
-            this.mDirPath[138] = s.ReadChar();
-            this.mDirPath[139] = s.ReadChar();
-            this.mDirPath[140] = s.ReadChar();
-            this.mDirPath[141] = s.ReadChar();
-            this.mDirPath[142] = s.ReadChar();
-            this.mDirPath[143] = s.ReadChar();
-            this.mDirPath[144] = s.ReadChar();
-            this.mDirPath[145] = s.ReadChar();
-            this.mDirPath[146] = s.ReadChar();
-            this.mDirPath[147] = s.ReadChar();
-            this.mDirPath[148] = s.ReadChar();
-            this.mDirPath[149] = s.ReadChar();
-            this.mDirPath[150] = s.ReadChar();
-            this.mDirPath[151] = s.ReadChar();
-            this.mDirPath[152] = s.ReadChar();
-            this.mDirPath[153] = s.ReadChar();
-            this.mDirPath[154] = s.ReadChar();
-            this.mDirPath[155] = s.ReadChar();
-            this.mDirPath[156] = s.ReadChar();
-            this.mDirPath[157] = s.ReadChar();
-            this.mDirPath[158] = s.ReadChar();
-            this.mDirPath[159] = s.ReadChar();
-            this.mDirPath[160] = s.ReadChar();
-            this.mDirPath[161] = s.ReadChar();
-            this.mDirPath[162] = s.ReadChar();
-            this.mDirPath[163] = s.ReadChar();
-            this.mDirPath[164] = s.ReadChar();
-            this.mDirPath[165] = s.ReadChar();
-            this.mDirPath[166] = s.ReadChar();
-            this.mDirPath[167] = s.ReadChar();
-            this.mDirPath[168] = s.ReadChar();
-            this.mDirPath[169] = s.ReadChar();
-            this.mDirPath[170] = s.ReadChar();
-            this.mDirPath[171] = s.ReadChar();
-            this.mDirPath[172] = s.ReadChar();
-            this.mDirPath[173] = s.ReadChar();
-            this.mDirPath[174] = s.ReadChar();
-            this.mDirPath[175] = s.ReadChar();
-            this.mDirPath[176] = s.ReadChar();
-            this.mDirPath[177] = s.ReadChar();
-            this.mDirPath[178] = s.ReadChar();
-            this.mDirPath[179] = s.ReadChar();
-            this.mDirPath[180] = s.ReadChar();
-            this.mDirPath[181] = s.ReadChar();
-            this.mDirPath[182] = s.ReadChar();
-            this.mDirPath[183] = s.ReadChar();
-            this.mDirPath[184] = s.ReadChar();
-            this.mDirPath[185] = s.ReadChar();
-            this.mDirPath[186] = s.ReadChar();
-            this.mDirPath[187] = s.ReadChar();
-            this.mDirPath[188] = s.ReadChar();
-            this.mDirPath[189] = s.ReadChar();
-            this.mDirPath[190] = s.ReadChar();
-            this.mDirPath[191] = s.ReadChar();
-            this.mDirPath[192] = s.ReadChar();
-            this.mDirPath[193] = s.ReadChar();
-            this.mDirPath[194] = s.ReadChar();
-            this.mDirPath[195] = s.ReadChar();
-            this.mDirPath[196] = s.ReadChar();
-            this.mDirPath[197] = s.ReadChar();
-            this.mDirPath[198] = s.ReadChar();
-            this.mDirPath[199] = s.ReadChar();
-            this.mDirPath[200] = s.ReadChar();
-            this.mDirPath[201] = s.ReadChar();
-            this.mDirPath[202] = s.ReadChar();
-            this.mDirPath[203] = s.ReadChar();
-            this.mDirPath[204] = s.ReadChar();
-            this.mDirPath[205] = s.ReadChar();
-            this.mDirPath[206] = s.ReadChar();
-            this.mDirPath[207] = s.ReadChar();
-            this.mDirPath[208] = s.ReadChar();
-            this.mDirPath[209] = s.ReadChar();
-            this.mDirPath[210] = s.ReadChar();
-            this.mDirPath[211] = s.ReadChar();
-            this.mDirPath[212] = s.ReadChar();
-            this.mDirPath[213] = s.ReadChar();
-            this.mDirPath[214] = s.ReadChar();
-            this.mDirPath[215] = s.ReadChar();
-            this.mDirPath[216] = s.ReadChar();
-            this.mDirPath[217] = s.ReadChar();
-            this.mDirPath[218] = s.ReadChar();
-            this.mDirPath[219] = s.ReadChar();
-            this.mDirPath[220] = s.ReadChar();
-            this.mDirPath[221] = s.ReadChar();
-            this.mDirPath[222] = s.ReadChar();
-            this.mDirPath[223] = s.ReadChar();
-            this.mDirPath[224] = s.ReadChar();
-            this.mDirPath[225] = s.ReadChar();
-            this.mDirPath[226] = s.ReadChar();
-            this.mDirPath[227] = s.ReadChar();
-            this.mDirPath[228] = s.ReadChar();
-            this.mDirPath[229] = s.ReadChar();
-            this.mDirPath[230] = s.ReadChar();
-            this.mDirPath[231] = s.ReadChar();
-            this.mDirPath[232] = s.ReadChar();
-            this.mDirPath[233] = s.ReadChar();
-            this.mDirPath[234] = s.ReadChar();
-            this.mDirPath[235] = s.ReadChar();
-            this.mDirPath[236] = s.ReadChar();
-            this.mDirPath[237] = s.ReadChar();
-            this.mDirPath[238] = s.ReadChar();
-            this.mDirPath[239] = s.ReadChar();
-            this.mFlags = s.ReadByte();
+            this.mTc1 = s.ReadInt64();
+            this.mTs1 = s.ReadInt64();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Get directory listing"
+                Description = "Time synchronization message."
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TransferUid",
-                Description = "Unique transfer ID",
+                Name = "Tc1",
+                Description = "Time sync timestamp 1",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "DirPath",
-                Description = "Directory path to list",
-                NumElements = 240,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Flags",
-                Description = "RESERVED",
+                Name = "Ts1",
+                Description = "Time sync timestamp 2",
                 NumElements = 1,
             });
 
         }
 
-        private UInt64 mTransferUid;
-        private char[] mDirPath = new char[240];
-        private byte mFlags;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// File transfer result
-    /// </summary>
-    public class UasFileTransferRes: UasMessage
-    {
-        /// <summary>
-        /// Unique transfer ID
-        /// </summary>
-        public UInt64 TransferUid {
-            get { return mTransferUid; }
-            set { mTransferUid = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// 0: OK, 1: not permitted, 2: bad path / file name, 3: no space left on device
-        /// </summary>
-        public byte Result {
-            get { return mResult; }
-            set { mResult = value; NotifyUpdated(); }
-        }
-
-        public UasFileTransferRes()
-        {
-            mMessageId = 112;
-            CrcExtra = 124;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mTransferUid);
-            s.Write(mResult);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mTransferUid = s.ReadUInt64();
-            this.mResult = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "File transfer result"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TransferUid",
-                Description = "Unique transfer ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Result",
-                Description = "0: OK, 1: not permitted, 2: bad path / file name, 3: no space left on device",
-                NumElements = 1,
-            });
-
-        }
-
-        private UInt64 mTransferUid;
-        private byte mResult;
+        private Int64 mTc1;
+        private Int64 mTs1;
     }
 
 
@@ -13697,7 +15002,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Altitude (WGS84), in meters * 1000 (positive for up)
+        /// Altitude (AMSL, not WGS84), in meters * 1000 (positive for up)
         /// </summary>
         public Int32 Alt {
             get { return mAlt; }
@@ -13842,7 +15147,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Alt",
-                Description = "Altitude (WGS84), in meters * 1000 (positive for up)",
+                Description = "Altitude (AMSL, not WGS84), in meters * 1000 (positive for up)",
                 NumElements = 1,
             });
 
@@ -13922,12 +15227,12 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Simulated optical flow from a flow sensor (e.g. optical mouse sensor)
+    /// Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical mouse sensor)
     /// </summary>
     public class UasHilOpticalFlow: UasMessage
     {
         /// <summary>
-        /// Timestamp (UNIX)
+        /// Timestamp (microseconds, synced to UNIX time or since system boot)
         /// </summary>
         public UInt64 TimeUsec {
             get { return mTimeUsec; }
@@ -13935,43 +15240,75 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Flow in meters in x-sensor direction, angular-speed compensated
+        /// Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.
         /// </summary>
-        public float FlowCompMX {
-            get { return mFlowCompMX; }
-            set { mFlowCompMX = value; NotifyUpdated(); }
+        public UInt32 IntegrationTimeUs {
+            get { return mIntegrationTimeUs; }
+            set { mIntegrationTimeUs = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Flow in meters in y-sensor direction, angular-speed compensated
+        /// Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)
         /// </summary>
-        public float FlowCompMY {
-            get { return mFlowCompMY; }
-            set { mFlowCompMY = value; NotifyUpdated(); }
+        public float IntegratedX {
+            get { return mIntegratedX; }
+            set { mIntegratedX = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Ground distance in meters. Positive value: distance known. Negative value: Unknown distance
+        /// Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)
         /// </summary>
-        public float GroundDistance {
-            get { return mGroundDistance; }
-            set { mGroundDistance = value; NotifyUpdated(); }
+        public float IntegratedY {
+            get { return mIntegratedY; }
+            set { mIntegratedY = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Flow in pixels in x-sensor direction
+        /// RH rotation around X axis (rad)
         /// </summary>
-        public Int16 FlowX {
-            get { return mFlowX; }
-            set { mFlowX = value; NotifyUpdated(); }
+        public float IntegratedXgyro {
+            get { return mIntegratedXgyro; }
+            set { mIntegratedXgyro = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Flow in pixels in y-sensor direction
+        /// RH rotation around Y axis (rad)
         /// </summary>
-        public Int16 FlowY {
-            get { return mFlowY; }
-            set { mFlowY = value; NotifyUpdated(); }
+        public float IntegratedYgyro {
+            get { return mIntegratedYgyro; }
+            set { mIntegratedYgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RH rotation around Z axis (rad)
+        /// </summary>
+        public float IntegratedZgyro {
+            get { return mIntegratedZgyro; }
+            set { mIntegratedZgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Time in microseconds since the distance was sampled.
+        /// </summary>
+        public UInt32 TimeDeltaDistanceUs {
+            get { return mTimeDeltaDistanceUs; }
+            set { mTimeDeltaDistanceUs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.
+        /// </summary>
+        public float Distance {
+            get { return mDistance; }
+            set { mDistance = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Temperature * 100 in centi-degrees Celsius
+        /// </summary>
+        public Int16 Temperature {
+            get { return mTemperature; }
+            set { mTemperature = value; NotifyUpdated(); }
         }
 
         /// <summary>
@@ -13983,7 +15320,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Optical flow quality / confidence. 0: bad, 255: maximum quality
+        /// Optical flow quality / confidence. 0: no valid flow, 255: maximum quality
         /// </summary>
         public byte Quality {
             get { return mQuality; }
@@ -13993,17 +15330,21 @@ namespace MavLinkNet
         public UasHilOpticalFlow()
         {
             mMessageId = 114;
-            CrcExtra = 119;
+            CrcExtra = 237;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
             s.Write(mTimeUsec);
-            s.Write(mFlowCompMX);
-            s.Write(mFlowCompMY);
-            s.Write(mGroundDistance);
-            s.Write(mFlowX);
-            s.Write(mFlowY);
+            s.Write(mIntegrationTimeUs);
+            s.Write(mIntegratedX);
+            s.Write(mIntegratedY);
+            s.Write(mIntegratedXgyro);
+            s.Write(mIntegratedYgyro);
+            s.Write(mIntegratedZgyro);
+            s.Write(mTimeDeltaDistanceUs);
+            s.Write(mDistance);
+            s.Write(mTemperature);
             s.Write(mSensorId);
             s.Write(mQuality);
         }
@@ -14011,11 +15352,15 @@ namespace MavLinkNet
         internal override void DeserializeBody(BinaryReader s)
         {
             this.mTimeUsec = s.ReadUInt64();
-            this.mFlowCompMX = s.ReadSingle();
-            this.mFlowCompMY = s.ReadSingle();
-            this.mGroundDistance = s.ReadSingle();
-            this.mFlowX = s.ReadInt16();
-            this.mFlowY = s.ReadInt16();
+            this.mIntegrationTimeUs = s.ReadUInt32();
+            this.mIntegratedX = s.ReadSingle();
+            this.mIntegratedY = s.ReadSingle();
+            this.mIntegratedXgyro = s.ReadSingle();
+            this.mIntegratedYgyro = s.ReadSingle();
+            this.mIntegratedZgyro = s.ReadSingle();
+            this.mTimeDeltaDistanceUs = s.ReadUInt32();
+            this.mDistance = s.ReadSingle();
+            this.mTemperature = s.ReadInt16();
             this.mSensorId = s.ReadByte();
             this.mQuality = s.ReadByte();
         }
@@ -14023,42 +15368,66 @@ namespace MavLinkNet
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Simulated optical flow from a flow sensor (e.g. optical mouse sensor)"
+                Description = "Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical mouse sensor)"
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "TimeUsec",
-                Description = "Timestamp (UNIX)",
+                Description = "Timestamp (microseconds, synced to UNIX time or since system boot)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "FlowCompMX",
-                Description = "Flow in meters in x-sensor direction, angular-speed compensated",
+                Name = "IntegrationTimeUs",
+                Description = "Integration time in microseconds. Divide integrated_x and integrated_y by the integration time to obtain average flow. The integration time also indicates the.",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "FlowCompMY",
-                Description = "Flow in meters in y-sensor direction, angular-speed compensated",
+                Name = "IntegratedX",
+                Description = "Flow in radians around X axis (Sensor RH rotation about the X axis induces a positive flow. Sensor linear motion along the positive Y axis induces a negative flow.)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "GroundDistance",
-                Description = "Ground distance in meters. Positive value: distance known. Negative value: Unknown distance",
+                Name = "IntegratedY",
+                Description = "Flow in radians around Y axis (Sensor RH rotation about the Y axis induces a positive flow. Sensor linear motion along the positive X axis induces a positive flow.)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "FlowX",
-                Description = "Flow in pixels in x-sensor direction",
+                Name = "IntegratedXgyro",
+                Description = "RH rotation around X axis (rad)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "FlowY",
-                Description = "Flow in pixels in y-sensor direction",
+                Name = "IntegratedYgyro",
+                Description = "RH rotation around Y axis (rad)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "IntegratedZgyro",
+                Description = "RH rotation around Z axis (rad)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeDeltaDistanceUs",
+                Description = "Time in microseconds since the distance was sampled.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Distance",
+                Description = "Distance to the center of the flow field in meters. Positive value (including zero): distance known. Negative value: Unknown distance.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Temperature",
+                Description = "Temperature * 100 in centi-degrees Celsius",
                 NumElements = 1,
             });
 
@@ -14070,18 +15439,22 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Quality",
-                Description = "Optical flow quality / confidence. 0: bad, 255: maximum quality",
+                Description = "Optical flow quality / confidence. 0: no valid flow, 255: maximum quality",
                 NumElements = 1,
             });
 
         }
 
         private UInt64 mTimeUsec;
-        private float mFlowCompMX;
-        private float mFlowCompMY;
-        private float mGroundDistance;
-        private Int16 mFlowX;
-        private Int16 mFlowY;
+        private UInt32 mIntegrationTimeUs;
+        private float mIntegratedX;
+        private float mIntegratedY;
+        private float mIntegratedXgyro;
+        private float mIntegratedYgyro;
+        private float mIntegratedZgyro;
+        private UInt32 mTimeDeltaDistanceUs;
+        private float mDistance;
+        private Int16 mTemperature;
         private byte mSensorId;
         private byte mQuality;
     }
@@ -14104,7 +15477,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Vehicle attitude expressed as normalized quaternion
+        /// Vehicle attitude expressed as normalized quaternion in w, x, y, z order (with 1 0 0 0 being the null-rotation)
         /// </summary>
         public float[] AttitudeQuaternion {
             get { return mAttitudeQuaternion; }
@@ -14289,7 +15662,7 @@ namespace MavLinkNet
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "AttitudeQuaternion",
-                Description = "Vehicle attitude expressed as normalized quaternion",
+                Description = "Vehicle attitude expressed as normalized quaternion in w, x, y, z order (with 1 0 0 0 being the null-rotation)",
                 NumElements = 4,
             });
 
@@ -14402,7 +15775,4394 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Transmitte battery informations for a accu pack.
+    /// The RAW IMU readings for secondary 9DOF sensor setup. This message should contain the scaled values to the described units
+    /// </summary>
+    public class UasScaledImu2: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (milliseconds since system boot)
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X acceleration (mg)
+        /// </summary>
+        public Int16 Xacc {
+            get { return mXacc; }
+            set { mXacc = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y acceleration (mg)
+        /// </summary>
+        public Int16 Yacc {
+            get { return mYacc; }
+            set { mYacc = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z acceleration (mg)
+        /// </summary>
+        public Int16 Zacc {
+            get { return mZacc; }
+            set { mZacc = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Angular speed around X axis (millirad /sec)
+        /// </summary>
+        public Int16 Xgyro {
+            get { return mXgyro; }
+            set { mXgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Angular speed around Y axis (millirad /sec)
+        /// </summary>
+        public Int16 Ygyro {
+            get { return mYgyro; }
+            set { mYgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Angular speed around Z axis (millirad /sec)
+        /// </summary>
+        public Int16 Zgyro {
+            get { return mZgyro; }
+            set { mZgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X Magnetic field (milli tesla)
+        /// </summary>
+        public Int16 Xmag {
+            get { return mXmag; }
+            set { mXmag = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y Magnetic field (milli tesla)
+        /// </summary>
+        public Int16 Ymag {
+            get { return mYmag; }
+            set { mYmag = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z Magnetic field (milli tesla)
+        /// </summary>
+        public Int16 Zmag {
+            get { return mZmag; }
+            set { mZmag = value; NotifyUpdated(); }
+        }
+
+        public UasScaledImu2()
+        {
+            mMessageId = 116;
+            CrcExtra = 76;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mXacc);
+            s.Write(mYacc);
+            s.Write(mZacc);
+            s.Write(mXgyro);
+            s.Write(mYgyro);
+            s.Write(mZgyro);
+            s.Write(mXmag);
+            s.Write(mYmag);
+            s.Write(mZmag);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mXacc = s.ReadInt16();
+            this.mYacc = s.ReadInt16();
+            this.mZacc = s.ReadInt16();
+            this.mXgyro = s.ReadInt16();
+            this.mYgyro = s.ReadInt16();
+            this.mZgyro = s.ReadInt16();
+            this.mXmag = s.ReadInt16();
+            this.mYmag = s.ReadInt16();
+            this.mZmag = s.ReadInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "The RAW IMU readings for secondary 9DOF sensor setup. This message should contain the scaled values to the described units"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp (milliseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Xacc",
+                Description = "X acceleration (mg)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Yacc",
+                Description = "Y acceleration (mg)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Zacc",
+                Description = "Z acceleration (mg)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Xgyro",
+                Description = "Angular speed around X axis (millirad /sec)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Ygyro",
+                Description = "Angular speed around Y axis (millirad /sec)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Zgyro",
+                Description = "Angular speed around Z axis (millirad /sec)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Xmag",
+                Description = "X Magnetic field (milli tesla)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Ymag",
+                Description = "Y Magnetic field (milli tesla)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Zmag",
+                Description = "Z Magnetic field (milli tesla)",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private Int16 mXacc;
+        private Int16 mYacc;
+        private Int16 mZacc;
+        private Int16 mXgyro;
+        private Int16 mYgyro;
+        private Int16 mZgyro;
+        private Int16 mXmag;
+        private Int16 mYmag;
+        private Int16 mZmag;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Request a list of available logs. On some systems calling this may stop on-board logging until LOG_REQUEST_END is called.
+    /// </summary>
+    public class UasLogRequestList: UasMessage
+    {
+        /// <summary>
+        /// First log id (0 for first available)
+        /// </summary>
+        public UInt16 Start {
+            get { return mStart; }
+            set { mStart = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Last log id (0xffff for last available)
+        /// </summary>
+        public UInt16 End {
+            get { return mEnd; }
+            set { mEnd = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        public UasLogRequestList()
+        {
+            mMessageId = 117;
+            CrcExtra = 128;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mStart);
+            s.Write(mEnd);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mStart = s.ReadUInt16();
+            this.mEnd = s.ReadUInt16();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Request a list of available logs. On some systems calling this may stop on-board logging until LOG_REQUEST_END is called."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Start",
+                Description = "First log id (0 for first available)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "End",
+                Description = "Last log id (0xffff for last available)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt16 mStart;
+        private UInt16 mEnd;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Reply to LOG_REQUEST_LIST
+    /// </summary>
+    public class UasLogEntry: UasMessage
+    {
+        /// <summary>
+        /// UTC timestamp of log in seconds since 1970, or 0 if not available
+        /// </summary>
+        public UInt32 TimeUtc {
+            get { return mTimeUtc; }
+            set { mTimeUtc = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Size of the log (may be approximate) in bytes
+        /// </summary>
+        public UInt32 Size {
+            get { return mSize; }
+            set { mSize = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Log id
+        /// </summary>
+        public UInt16 Id {
+            get { return mId; }
+            set { mId = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Total number of logs
+        /// </summary>
+        public UInt16 NumLogs {
+            get { return mNumLogs; }
+            set { mNumLogs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// High log number
+        /// </summary>
+        public UInt16 LastLogNum {
+            get { return mLastLogNum; }
+            set { mLastLogNum = value; NotifyUpdated(); }
+        }
+
+        public UasLogEntry()
+        {
+            mMessageId = 118;
+            CrcExtra = 56;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUtc);
+            s.Write(mSize);
+            s.Write(mId);
+            s.Write(mNumLogs);
+            s.Write(mLastLogNum);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUtc = s.ReadUInt32();
+            this.mSize = s.ReadUInt32();
+            this.mId = s.ReadUInt16();
+            this.mNumLogs = s.ReadUInt16();
+            this.mLastLogNum = s.ReadUInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Reply to LOG_REQUEST_LIST"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUtc",
+                Description = "UTC timestamp of log in seconds since 1970, or 0 if not available",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Size",
+                Description = "Size of the log (may be approximate) in bytes",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Id",
+                Description = "Log id",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "NumLogs",
+                Description = "Total number of logs",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "LastLogNum",
+                Description = "High log number",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeUtc;
+        private UInt32 mSize;
+        private UInt16 mId;
+        private UInt16 mNumLogs;
+        private UInt16 mLastLogNum;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Request a chunk of a log
+    /// </summary>
+    public class UasLogRequestData: UasMessage
+    {
+        /// <summary>
+        /// Offset into the log
+        /// </summary>
+        public UInt32 Ofs {
+            get { return mOfs; }
+            set { mOfs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Number of bytes
+        /// </summary>
+        public UInt32 Count {
+            get { return mCount; }
+            set { mCount = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Log id (from LOG_ENTRY reply)
+        /// </summary>
+        public UInt16 Id {
+            get { return mId; }
+            set { mId = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        public UasLogRequestData()
+        {
+            mMessageId = 119;
+            CrcExtra = 116;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mOfs);
+            s.Write(mCount);
+            s.Write(mId);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mOfs = s.ReadUInt32();
+            this.mCount = s.ReadUInt32();
+            this.mId = s.ReadUInt16();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Request a chunk of a log"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Ofs",
+                Description = "Offset into the log",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Count",
+                Description = "Number of bytes",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Id",
+                Description = "Log id (from LOG_ENTRY reply)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mOfs;
+        private UInt32 mCount;
+        private UInt16 mId;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Reply to LOG_REQUEST_DATA
+    /// </summary>
+    public class UasLogData: UasMessage
+    {
+        /// <summary>
+        /// Offset into the log
+        /// </summary>
+        public UInt32 Ofs {
+            get { return mOfs; }
+            set { mOfs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Log id (from LOG_ENTRY reply)
+        /// </summary>
+        public UInt16 Id {
+            get { return mId; }
+            set { mId = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Number of bytes (zero for end of log)
+        /// </summary>
+        public byte Count {
+            get { return mCount; }
+            set { mCount = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// log data
+        /// </summary>
+        public byte[] Data {
+            get { return mData; }
+            set { mData = value; NotifyUpdated(); }
+        }
+
+        public UasLogData()
+        {
+            mMessageId = 120;
+            CrcExtra = 134;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mOfs);
+            s.Write(mId);
+            s.Write(mCount);
+            s.Write(mData[0]); 
+            s.Write(mData[1]); 
+            s.Write(mData[2]); 
+            s.Write(mData[3]); 
+            s.Write(mData[4]); 
+            s.Write(mData[5]); 
+            s.Write(mData[6]); 
+            s.Write(mData[7]); 
+            s.Write(mData[8]); 
+            s.Write(mData[9]); 
+            s.Write(mData[10]); 
+            s.Write(mData[11]); 
+            s.Write(mData[12]); 
+            s.Write(mData[13]); 
+            s.Write(mData[14]); 
+            s.Write(mData[15]); 
+            s.Write(mData[16]); 
+            s.Write(mData[17]); 
+            s.Write(mData[18]); 
+            s.Write(mData[19]); 
+            s.Write(mData[20]); 
+            s.Write(mData[21]); 
+            s.Write(mData[22]); 
+            s.Write(mData[23]); 
+            s.Write(mData[24]); 
+            s.Write(mData[25]); 
+            s.Write(mData[26]); 
+            s.Write(mData[27]); 
+            s.Write(mData[28]); 
+            s.Write(mData[29]); 
+            s.Write(mData[30]); 
+            s.Write(mData[31]); 
+            s.Write(mData[32]); 
+            s.Write(mData[33]); 
+            s.Write(mData[34]); 
+            s.Write(mData[35]); 
+            s.Write(mData[36]); 
+            s.Write(mData[37]); 
+            s.Write(mData[38]); 
+            s.Write(mData[39]); 
+            s.Write(mData[40]); 
+            s.Write(mData[41]); 
+            s.Write(mData[42]); 
+            s.Write(mData[43]); 
+            s.Write(mData[44]); 
+            s.Write(mData[45]); 
+            s.Write(mData[46]); 
+            s.Write(mData[47]); 
+            s.Write(mData[48]); 
+            s.Write(mData[49]); 
+            s.Write(mData[50]); 
+            s.Write(mData[51]); 
+            s.Write(mData[52]); 
+            s.Write(mData[53]); 
+            s.Write(mData[54]); 
+            s.Write(mData[55]); 
+            s.Write(mData[56]); 
+            s.Write(mData[57]); 
+            s.Write(mData[58]); 
+            s.Write(mData[59]); 
+            s.Write(mData[60]); 
+            s.Write(mData[61]); 
+            s.Write(mData[62]); 
+            s.Write(mData[63]); 
+            s.Write(mData[64]); 
+            s.Write(mData[65]); 
+            s.Write(mData[66]); 
+            s.Write(mData[67]); 
+            s.Write(mData[68]); 
+            s.Write(mData[69]); 
+            s.Write(mData[70]); 
+            s.Write(mData[71]); 
+            s.Write(mData[72]); 
+            s.Write(mData[73]); 
+            s.Write(mData[74]); 
+            s.Write(mData[75]); 
+            s.Write(mData[76]); 
+            s.Write(mData[77]); 
+            s.Write(mData[78]); 
+            s.Write(mData[79]); 
+            s.Write(mData[80]); 
+            s.Write(mData[81]); 
+            s.Write(mData[82]); 
+            s.Write(mData[83]); 
+            s.Write(mData[84]); 
+            s.Write(mData[85]); 
+            s.Write(mData[86]); 
+            s.Write(mData[87]); 
+            s.Write(mData[88]); 
+            s.Write(mData[89]); 
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mOfs = s.ReadUInt32();
+            this.mId = s.ReadUInt16();
+            this.mCount = s.ReadByte();
+            this.mData[0] = s.ReadByte();
+            this.mData[1] = s.ReadByte();
+            this.mData[2] = s.ReadByte();
+            this.mData[3] = s.ReadByte();
+            this.mData[4] = s.ReadByte();
+            this.mData[5] = s.ReadByte();
+            this.mData[6] = s.ReadByte();
+            this.mData[7] = s.ReadByte();
+            this.mData[8] = s.ReadByte();
+            this.mData[9] = s.ReadByte();
+            this.mData[10] = s.ReadByte();
+            this.mData[11] = s.ReadByte();
+            this.mData[12] = s.ReadByte();
+            this.mData[13] = s.ReadByte();
+            this.mData[14] = s.ReadByte();
+            this.mData[15] = s.ReadByte();
+            this.mData[16] = s.ReadByte();
+            this.mData[17] = s.ReadByte();
+            this.mData[18] = s.ReadByte();
+            this.mData[19] = s.ReadByte();
+            this.mData[20] = s.ReadByte();
+            this.mData[21] = s.ReadByte();
+            this.mData[22] = s.ReadByte();
+            this.mData[23] = s.ReadByte();
+            this.mData[24] = s.ReadByte();
+            this.mData[25] = s.ReadByte();
+            this.mData[26] = s.ReadByte();
+            this.mData[27] = s.ReadByte();
+            this.mData[28] = s.ReadByte();
+            this.mData[29] = s.ReadByte();
+            this.mData[30] = s.ReadByte();
+            this.mData[31] = s.ReadByte();
+            this.mData[32] = s.ReadByte();
+            this.mData[33] = s.ReadByte();
+            this.mData[34] = s.ReadByte();
+            this.mData[35] = s.ReadByte();
+            this.mData[36] = s.ReadByte();
+            this.mData[37] = s.ReadByte();
+            this.mData[38] = s.ReadByte();
+            this.mData[39] = s.ReadByte();
+            this.mData[40] = s.ReadByte();
+            this.mData[41] = s.ReadByte();
+            this.mData[42] = s.ReadByte();
+            this.mData[43] = s.ReadByte();
+            this.mData[44] = s.ReadByte();
+            this.mData[45] = s.ReadByte();
+            this.mData[46] = s.ReadByte();
+            this.mData[47] = s.ReadByte();
+            this.mData[48] = s.ReadByte();
+            this.mData[49] = s.ReadByte();
+            this.mData[50] = s.ReadByte();
+            this.mData[51] = s.ReadByte();
+            this.mData[52] = s.ReadByte();
+            this.mData[53] = s.ReadByte();
+            this.mData[54] = s.ReadByte();
+            this.mData[55] = s.ReadByte();
+            this.mData[56] = s.ReadByte();
+            this.mData[57] = s.ReadByte();
+            this.mData[58] = s.ReadByte();
+            this.mData[59] = s.ReadByte();
+            this.mData[60] = s.ReadByte();
+            this.mData[61] = s.ReadByte();
+            this.mData[62] = s.ReadByte();
+            this.mData[63] = s.ReadByte();
+            this.mData[64] = s.ReadByte();
+            this.mData[65] = s.ReadByte();
+            this.mData[66] = s.ReadByte();
+            this.mData[67] = s.ReadByte();
+            this.mData[68] = s.ReadByte();
+            this.mData[69] = s.ReadByte();
+            this.mData[70] = s.ReadByte();
+            this.mData[71] = s.ReadByte();
+            this.mData[72] = s.ReadByte();
+            this.mData[73] = s.ReadByte();
+            this.mData[74] = s.ReadByte();
+            this.mData[75] = s.ReadByte();
+            this.mData[76] = s.ReadByte();
+            this.mData[77] = s.ReadByte();
+            this.mData[78] = s.ReadByte();
+            this.mData[79] = s.ReadByte();
+            this.mData[80] = s.ReadByte();
+            this.mData[81] = s.ReadByte();
+            this.mData[82] = s.ReadByte();
+            this.mData[83] = s.ReadByte();
+            this.mData[84] = s.ReadByte();
+            this.mData[85] = s.ReadByte();
+            this.mData[86] = s.ReadByte();
+            this.mData[87] = s.ReadByte();
+            this.mData[88] = s.ReadByte();
+            this.mData[89] = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Reply to LOG_REQUEST_DATA"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Ofs",
+                Description = "Offset into the log",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Id",
+                Description = "Log id (from LOG_ENTRY reply)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Count",
+                Description = "Number of bytes (zero for end of log)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Data",
+                Description = "log data",
+                NumElements = 90,
+            });
+
+        }
+
+        private UInt32 mOfs;
+        private UInt16 mId;
+        private byte mCount;
+        private byte[] mData = new byte[90];
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Erase all logs
+    /// </summary>
+    public class UasLogErase: UasMessage
+    {
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        public UasLogErase()
+        {
+            mMessageId = 121;
+            CrcExtra = 237;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Erase all logs"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+        }
+
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Stop log transfer and resume normal logging
+    /// </summary>
+    public class UasLogRequestEnd: UasMessage
+    {
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        public UasLogRequestEnd()
+        {
+            mMessageId = 122;
+            CrcExtra = 203;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Stop log transfer and resume normal logging"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+        }
+
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// data for injecting into the onboard GPS (used for DGPS)
+    /// </summary>
+    public class UasGpsInjectData: UasMessage
+    {
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// data length
+        /// </summary>
+        public byte Len {
+            get { return mLen; }
+            set { mLen = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// raw data (110 is enough for 12 satellites of RTCMv2)
+        /// </summary>
+        public byte[] Data {
+            get { return mData; }
+            set { mData = value; NotifyUpdated(); }
+        }
+
+        public UasGpsInjectData()
+        {
+            mMessageId = 123;
+            CrcExtra = 250;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+            s.Write(mLen);
+            s.Write(mData[0]); 
+            s.Write(mData[1]); 
+            s.Write(mData[2]); 
+            s.Write(mData[3]); 
+            s.Write(mData[4]); 
+            s.Write(mData[5]); 
+            s.Write(mData[6]); 
+            s.Write(mData[7]); 
+            s.Write(mData[8]); 
+            s.Write(mData[9]); 
+            s.Write(mData[10]); 
+            s.Write(mData[11]); 
+            s.Write(mData[12]); 
+            s.Write(mData[13]); 
+            s.Write(mData[14]); 
+            s.Write(mData[15]); 
+            s.Write(mData[16]); 
+            s.Write(mData[17]); 
+            s.Write(mData[18]); 
+            s.Write(mData[19]); 
+            s.Write(mData[20]); 
+            s.Write(mData[21]); 
+            s.Write(mData[22]); 
+            s.Write(mData[23]); 
+            s.Write(mData[24]); 
+            s.Write(mData[25]); 
+            s.Write(mData[26]); 
+            s.Write(mData[27]); 
+            s.Write(mData[28]); 
+            s.Write(mData[29]); 
+            s.Write(mData[30]); 
+            s.Write(mData[31]); 
+            s.Write(mData[32]); 
+            s.Write(mData[33]); 
+            s.Write(mData[34]); 
+            s.Write(mData[35]); 
+            s.Write(mData[36]); 
+            s.Write(mData[37]); 
+            s.Write(mData[38]); 
+            s.Write(mData[39]); 
+            s.Write(mData[40]); 
+            s.Write(mData[41]); 
+            s.Write(mData[42]); 
+            s.Write(mData[43]); 
+            s.Write(mData[44]); 
+            s.Write(mData[45]); 
+            s.Write(mData[46]); 
+            s.Write(mData[47]); 
+            s.Write(mData[48]); 
+            s.Write(mData[49]); 
+            s.Write(mData[50]); 
+            s.Write(mData[51]); 
+            s.Write(mData[52]); 
+            s.Write(mData[53]); 
+            s.Write(mData[54]); 
+            s.Write(mData[55]); 
+            s.Write(mData[56]); 
+            s.Write(mData[57]); 
+            s.Write(mData[58]); 
+            s.Write(mData[59]); 
+            s.Write(mData[60]); 
+            s.Write(mData[61]); 
+            s.Write(mData[62]); 
+            s.Write(mData[63]); 
+            s.Write(mData[64]); 
+            s.Write(mData[65]); 
+            s.Write(mData[66]); 
+            s.Write(mData[67]); 
+            s.Write(mData[68]); 
+            s.Write(mData[69]); 
+            s.Write(mData[70]); 
+            s.Write(mData[71]); 
+            s.Write(mData[72]); 
+            s.Write(mData[73]); 
+            s.Write(mData[74]); 
+            s.Write(mData[75]); 
+            s.Write(mData[76]); 
+            s.Write(mData[77]); 
+            s.Write(mData[78]); 
+            s.Write(mData[79]); 
+            s.Write(mData[80]); 
+            s.Write(mData[81]); 
+            s.Write(mData[82]); 
+            s.Write(mData[83]); 
+            s.Write(mData[84]); 
+            s.Write(mData[85]); 
+            s.Write(mData[86]); 
+            s.Write(mData[87]); 
+            s.Write(mData[88]); 
+            s.Write(mData[89]); 
+            s.Write(mData[90]); 
+            s.Write(mData[91]); 
+            s.Write(mData[92]); 
+            s.Write(mData[93]); 
+            s.Write(mData[94]); 
+            s.Write(mData[95]); 
+            s.Write(mData[96]); 
+            s.Write(mData[97]); 
+            s.Write(mData[98]); 
+            s.Write(mData[99]); 
+            s.Write(mData[100]); 
+            s.Write(mData[101]); 
+            s.Write(mData[102]); 
+            s.Write(mData[103]); 
+            s.Write(mData[104]); 
+            s.Write(mData[105]); 
+            s.Write(mData[106]); 
+            s.Write(mData[107]); 
+            s.Write(mData[108]); 
+            s.Write(mData[109]); 
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+            this.mLen = s.ReadByte();
+            this.mData[0] = s.ReadByte();
+            this.mData[1] = s.ReadByte();
+            this.mData[2] = s.ReadByte();
+            this.mData[3] = s.ReadByte();
+            this.mData[4] = s.ReadByte();
+            this.mData[5] = s.ReadByte();
+            this.mData[6] = s.ReadByte();
+            this.mData[7] = s.ReadByte();
+            this.mData[8] = s.ReadByte();
+            this.mData[9] = s.ReadByte();
+            this.mData[10] = s.ReadByte();
+            this.mData[11] = s.ReadByte();
+            this.mData[12] = s.ReadByte();
+            this.mData[13] = s.ReadByte();
+            this.mData[14] = s.ReadByte();
+            this.mData[15] = s.ReadByte();
+            this.mData[16] = s.ReadByte();
+            this.mData[17] = s.ReadByte();
+            this.mData[18] = s.ReadByte();
+            this.mData[19] = s.ReadByte();
+            this.mData[20] = s.ReadByte();
+            this.mData[21] = s.ReadByte();
+            this.mData[22] = s.ReadByte();
+            this.mData[23] = s.ReadByte();
+            this.mData[24] = s.ReadByte();
+            this.mData[25] = s.ReadByte();
+            this.mData[26] = s.ReadByte();
+            this.mData[27] = s.ReadByte();
+            this.mData[28] = s.ReadByte();
+            this.mData[29] = s.ReadByte();
+            this.mData[30] = s.ReadByte();
+            this.mData[31] = s.ReadByte();
+            this.mData[32] = s.ReadByte();
+            this.mData[33] = s.ReadByte();
+            this.mData[34] = s.ReadByte();
+            this.mData[35] = s.ReadByte();
+            this.mData[36] = s.ReadByte();
+            this.mData[37] = s.ReadByte();
+            this.mData[38] = s.ReadByte();
+            this.mData[39] = s.ReadByte();
+            this.mData[40] = s.ReadByte();
+            this.mData[41] = s.ReadByte();
+            this.mData[42] = s.ReadByte();
+            this.mData[43] = s.ReadByte();
+            this.mData[44] = s.ReadByte();
+            this.mData[45] = s.ReadByte();
+            this.mData[46] = s.ReadByte();
+            this.mData[47] = s.ReadByte();
+            this.mData[48] = s.ReadByte();
+            this.mData[49] = s.ReadByte();
+            this.mData[50] = s.ReadByte();
+            this.mData[51] = s.ReadByte();
+            this.mData[52] = s.ReadByte();
+            this.mData[53] = s.ReadByte();
+            this.mData[54] = s.ReadByte();
+            this.mData[55] = s.ReadByte();
+            this.mData[56] = s.ReadByte();
+            this.mData[57] = s.ReadByte();
+            this.mData[58] = s.ReadByte();
+            this.mData[59] = s.ReadByte();
+            this.mData[60] = s.ReadByte();
+            this.mData[61] = s.ReadByte();
+            this.mData[62] = s.ReadByte();
+            this.mData[63] = s.ReadByte();
+            this.mData[64] = s.ReadByte();
+            this.mData[65] = s.ReadByte();
+            this.mData[66] = s.ReadByte();
+            this.mData[67] = s.ReadByte();
+            this.mData[68] = s.ReadByte();
+            this.mData[69] = s.ReadByte();
+            this.mData[70] = s.ReadByte();
+            this.mData[71] = s.ReadByte();
+            this.mData[72] = s.ReadByte();
+            this.mData[73] = s.ReadByte();
+            this.mData[74] = s.ReadByte();
+            this.mData[75] = s.ReadByte();
+            this.mData[76] = s.ReadByte();
+            this.mData[77] = s.ReadByte();
+            this.mData[78] = s.ReadByte();
+            this.mData[79] = s.ReadByte();
+            this.mData[80] = s.ReadByte();
+            this.mData[81] = s.ReadByte();
+            this.mData[82] = s.ReadByte();
+            this.mData[83] = s.ReadByte();
+            this.mData[84] = s.ReadByte();
+            this.mData[85] = s.ReadByte();
+            this.mData[86] = s.ReadByte();
+            this.mData[87] = s.ReadByte();
+            this.mData[88] = s.ReadByte();
+            this.mData[89] = s.ReadByte();
+            this.mData[90] = s.ReadByte();
+            this.mData[91] = s.ReadByte();
+            this.mData[92] = s.ReadByte();
+            this.mData[93] = s.ReadByte();
+            this.mData[94] = s.ReadByte();
+            this.mData[95] = s.ReadByte();
+            this.mData[96] = s.ReadByte();
+            this.mData[97] = s.ReadByte();
+            this.mData[98] = s.ReadByte();
+            this.mData[99] = s.ReadByte();
+            this.mData[100] = s.ReadByte();
+            this.mData[101] = s.ReadByte();
+            this.mData[102] = s.ReadByte();
+            this.mData[103] = s.ReadByte();
+            this.mData[104] = s.ReadByte();
+            this.mData[105] = s.ReadByte();
+            this.mData[106] = s.ReadByte();
+            this.mData[107] = s.ReadByte();
+            this.mData[108] = s.ReadByte();
+            this.mData[109] = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "data for injecting into the onboard GPS (used for DGPS)"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Len",
+                Description = "data length",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Data",
+                Description = "raw data (110 is enough for 12 satellites of RTCMv2)",
+                NumElements = 110,
+            });
+
+        }
+
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+        private byte mLen;
+        private byte[] mData = new byte[110];
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Second GPS data. Coordinate frame is right-handed, Z-axis up (GPS frame).
+    /// </summary>
+    public class UasGps2Raw: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+        /// </summary>
+        public UInt64 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Latitude (WGS84), in degrees * 1E7
+        /// </summary>
+        public Int32 Lat {
+            get { return mLat; }
+            set { mLat = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Longitude (WGS84), in degrees * 1E7
+        /// </summary>
+        public Int32 Lon {
+            get { return mLon; }
+            set { mLon = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Altitude (AMSL, not WGS84), in meters * 1000 (positive for up)
+        /// </summary>
+        public Int32 Alt {
+            get { return mAlt; }
+            set { mAlt = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Age of DGPS info
+        /// </summary>
+        public UInt32 DgpsAge {
+            get { return mDgpsAge; }
+            set { mDgpsAge = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
+        /// </summary>
+        public UInt16 Eph {
+            get { return mEph; }
+            set { mEph = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: UINT16_MAX
+        /// </summary>
+        public UInt16 Epv {
+            get { return mEpv; }
+            set { mEpv = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX
+        /// </summary>
+        public UInt16 Vel {
+            get { return mVel; }
+            set { mVel = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Course over ground (NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX
+        /// </summary>
+        public UInt16 Cog {
+            get { return mCog; }
+            set { mCog = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// 0-1: no fix, 2: 2D fix, 3: 3D fix, 4: DGPS fix, 5: RTK Fix. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.
+        /// </summary>
+        public byte FixType {
+            get { return mFixType; }
+            set { mFixType = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Number of satellites visible. If unknown, set to 255
+        /// </summary>
+        public byte SatellitesVisible {
+            get { return mSatellitesVisible; }
+            set { mSatellitesVisible = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Number of DGPS satellites
+        /// </summary>
+        public byte DgpsNumch {
+            get { return mDgpsNumch; }
+            set { mDgpsNumch = value; NotifyUpdated(); }
+        }
+
+        public UasGps2Raw()
+        {
+            mMessageId = 124;
+            CrcExtra = 87;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mLat);
+            s.Write(mLon);
+            s.Write(mAlt);
+            s.Write(mDgpsAge);
+            s.Write(mEph);
+            s.Write(mEpv);
+            s.Write(mVel);
+            s.Write(mCog);
+            s.Write(mFixType);
+            s.Write(mSatellitesVisible);
+            s.Write(mDgpsNumch);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt64();
+            this.mLat = s.ReadInt32();
+            this.mLon = s.ReadInt32();
+            this.mAlt = s.ReadInt32();
+            this.mDgpsAge = s.ReadUInt32();
+            this.mEph = s.ReadUInt16();
+            this.mEpv = s.ReadUInt16();
+            this.mVel = s.ReadUInt16();
+            this.mCog = s.ReadUInt16();
+            this.mFixType = s.ReadByte();
+            this.mSatellitesVisible = s.ReadByte();
+            this.mDgpsNumch = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Second GPS data. Coordinate frame is right-handed, Z-axis up (GPS frame)."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (microseconds since UNIX epoch or microseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lat",
+                Description = "Latitude (WGS84), in degrees * 1E7",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lon",
+                Description = "Longitude (WGS84), in degrees * 1E7",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Alt",
+                Description = "Altitude (AMSL, not WGS84), in meters * 1000 (positive for up)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "DgpsAge",
+                Description = "Age of DGPS info",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Eph",
+                Description = "GPS HDOP horizontal dilution of position in cm (m*100). If unknown, set to: UINT16_MAX",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Epv",
+                Description = "GPS VDOP vertical dilution of position in cm (m*100). If unknown, set to: UINT16_MAX",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vel",
+                Description = "GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Cog",
+                Description = "Course over ground (NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "FixType",
+                Description = "0-1: no fix, 2: 2D fix, 3: 3D fix, 4: DGPS fix, 5: RTK Fix. Some applications will not use the value of this field unless it is at least two, so always correctly fill in the fix.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "SatellitesVisible",
+                Description = "Number of satellites visible. If unknown, set to 255",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "DgpsNumch",
+                Description = "Number of DGPS satellites",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mTimeUsec;
+        private Int32 mLat;
+        private Int32 mLon;
+        private Int32 mAlt;
+        private UInt32 mDgpsAge;
+        private UInt16 mEph;
+        private UInt16 mEpv;
+        private UInt16 mVel;
+        private UInt16 mCog;
+        private byte mFixType;
+        private byte mSatellitesVisible;
+        private byte mDgpsNumch;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Power supply status
+    /// </summary>
+    public class UasPowerStatus: UasMessage
+    {
+        /// <summary>
+        /// 5V rail voltage in millivolts
+        /// </summary>
+        public UInt16 Vcc {
+            get { return mVcc; }
+            set { mVcc = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// servo rail voltage in millivolts
+        /// </summary>
+        public UInt16 Vservo {
+            get { return mVservo; }
+            set { mVservo = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// power supply status flags (see MAV_POWER_STATUS enum)
+        /// </summary>
+        public MavPowerStatus Flags {
+            get { return mFlags; }
+            set { mFlags = value; NotifyUpdated(); }
+        }
+
+        public UasPowerStatus()
+        {
+            mMessageId = 125;
+            CrcExtra = 203;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mVcc);
+            s.Write(mVservo);
+            s.Write((UInt16)mFlags);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mVcc = s.ReadUInt16();
+            this.mVservo = s.ReadUInt16();
+            this.mFlags = (MavPowerStatus)s.ReadUInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Power supply status"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vcc",
+                Description = "5V rail voltage in millivolts",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vservo",
+                Description = "servo rail voltage in millivolts",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Flags",
+                Description = "power supply status flags (see MAV_POWER_STATUS enum)",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavPowerStatus"),
+            });
+
+        }
+
+        private UInt16 mVcc;
+        private UInt16 mVservo;
+        private MavPowerStatus mFlags;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Control a serial port. This can be used for raw access to an onboard serial peripheral such as a GPS or telemetry radio. It is designed to make it possible to update the devices firmware via MAVLink messages or change the devices settings. A message with zero bytes can be used to change just the baudrate.
+    /// </summary>
+    public class UasSerialControl: UasMessage
+    {
+        /// <summary>
+        /// Baudrate of transfer. Zero means no change.
+        /// </summary>
+        public UInt32 Baudrate {
+            get { return mBaudrate; }
+            set { mBaudrate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Timeout for reply data in milliseconds
+        /// </summary>
+        public UInt16 Timeout {
+            get { return mTimeout; }
+            set { mTimeout = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// See SERIAL_CONTROL_DEV enum
+        /// </summary>
+        public SerialControlDev Device {
+            get { return mDevice; }
+            set { mDevice = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// See SERIAL_CONTROL_FLAG enum
+        /// </summary>
+        public SerialControlFlag Flags {
+            get { return mFlags; }
+            set { mFlags = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// how many bytes in this transfer
+        /// </summary>
+        public byte Count {
+            get { return mCount; }
+            set { mCount = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// serial data
+        /// </summary>
+        public byte[] Data {
+            get { return mData; }
+            set { mData = value; NotifyUpdated(); }
+        }
+
+        public UasSerialControl()
+        {
+            mMessageId = 126;
+            CrcExtra = 220;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mBaudrate);
+            s.Write(mTimeout);
+            s.Write((byte)mDevice);
+            s.Write((byte)mFlags);
+            s.Write(mCount);
+            s.Write(mData[0]); 
+            s.Write(mData[1]); 
+            s.Write(mData[2]); 
+            s.Write(mData[3]); 
+            s.Write(mData[4]); 
+            s.Write(mData[5]); 
+            s.Write(mData[6]); 
+            s.Write(mData[7]); 
+            s.Write(mData[8]); 
+            s.Write(mData[9]); 
+            s.Write(mData[10]); 
+            s.Write(mData[11]); 
+            s.Write(mData[12]); 
+            s.Write(mData[13]); 
+            s.Write(mData[14]); 
+            s.Write(mData[15]); 
+            s.Write(mData[16]); 
+            s.Write(mData[17]); 
+            s.Write(mData[18]); 
+            s.Write(mData[19]); 
+            s.Write(mData[20]); 
+            s.Write(mData[21]); 
+            s.Write(mData[22]); 
+            s.Write(mData[23]); 
+            s.Write(mData[24]); 
+            s.Write(mData[25]); 
+            s.Write(mData[26]); 
+            s.Write(mData[27]); 
+            s.Write(mData[28]); 
+            s.Write(mData[29]); 
+            s.Write(mData[30]); 
+            s.Write(mData[31]); 
+            s.Write(mData[32]); 
+            s.Write(mData[33]); 
+            s.Write(mData[34]); 
+            s.Write(mData[35]); 
+            s.Write(mData[36]); 
+            s.Write(mData[37]); 
+            s.Write(mData[38]); 
+            s.Write(mData[39]); 
+            s.Write(mData[40]); 
+            s.Write(mData[41]); 
+            s.Write(mData[42]); 
+            s.Write(mData[43]); 
+            s.Write(mData[44]); 
+            s.Write(mData[45]); 
+            s.Write(mData[46]); 
+            s.Write(mData[47]); 
+            s.Write(mData[48]); 
+            s.Write(mData[49]); 
+            s.Write(mData[50]); 
+            s.Write(mData[51]); 
+            s.Write(mData[52]); 
+            s.Write(mData[53]); 
+            s.Write(mData[54]); 
+            s.Write(mData[55]); 
+            s.Write(mData[56]); 
+            s.Write(mData[57]); 
+            s.Write(mData[58]); 
+            s.Write(mData[59]); 
+            s.Write(mData[60]); 
+            s.Write(mData[61]); 
+            s.Write(mData[62]); 
+            s.Write(mData[63]); 
+            s.Write(mData[64]); 
+            s.Write(mData[65]); 
+            s.Write(mData[66]); 
+            s.Write(mData[67]); 
+            s.Write(mData[68]); 
+            s.Write(mData[69]); 
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mBaudrate = s.ReadUInt32();
+            this.mTimeout = s.ReadUInt16();
+            this.mDevice = (SerialControlDev)s.ReadByte();
+            this.mFlags = (SerialControlFlag)s.ReadByte();
+            this.mCount = s.ReadByte();
+            this.mData[0] = s.ReadByte();
+            this.mData[1] = s.ReadByte();
+            this.mData[2] = s.ReadByte();
+            this.mData[3] = s.ReadByte();
+            this.mData[4] = s.ReadByte();
+            this.mData[5] = s.ReadByte();
+            this.mData[6] = s.ReadByte();
+            this.mData[7] = s.ReadByte();
+            this.mData[8] = s.ReadByte();
+            this.mData[9] = s.ReadByte();
+            this.mData[10] = s.ReadByte();
+            this.mData[11] = s.ReadByte();
+            this.mData[12] = s.ReadByte();
+            this.mData[13] = s.ReadByte();
+            this.mData[14] = s.ReadByte();
+            this.mData[15] = s.ReadByte();
+            this.mData[16] = s.ReadByte();
+            this.mData[17] = s.ReadByte();
+            this.mData[18] = s.ReadByte();
+            this.mData[19] = s.ReadByte();
+            this.mData[20] = s.ReadByte();
+            this.mData[21] = s.ReadByte();
+            this.mData[22] = s.ReadByte();
+            this.mData[23] = s.ReadByte();
+            this.mData[24] = s.ReadByte();
+            this.mData[25] = s.ReadByte();
+            this.mData[26] = s.ReadByte();
+            this.mData[27] = s.ReadByte();
+            this.mData[28] = s.ReadByte();
+            this.mData[29] = s.ReadByte();
+            this.mData[30] = s.ReadByte();
+            this.mData[31] = s.ReadByte();
+            this.mData[32] = s.ReadByte();
+            this.mData[33] = s.ReadByte();
+            this.mData[34] = s.ReadByte();
+            this.mData[35] = s.ReadByte();
+            this.mData[36] = s.ReadByte();
+            this.mData[37] = s.ReadByte();
+            this.mData[38] = s.ReadByte();
+            this.mData[39] = s.ReadByte();
+            this.mData[40] = s.ReadByte();
+            this.mData[41] = s.ReadByte();
+            this.mData[42] = s.ReadByte();
+            this.mData[43] = s.ReadByte();
+            this.mData[44] = s.ReadByte();
+            this.mData[45] = s.ReadByte();
+            this.mData[46] = s.ReadByte();
+            this.mData[47] = s.ReadByte();
+            this.mData[48] = s.ReadByte();
+            this.mData[49] = s.ReadByte();
+            this.mData[50] = s.ReadByte();
+            this.mData[51] = s.ReadByte();
+            this.mData[52] = s.ReadByte();
+            this.mData[53] = s.ReadByte();
+            this.mData[54] = s.ReadByte();
+            this.mData[55] = s.ReadByte();
+            this.mData[56] = s.ReadByte();
+            this.mData[57] = s.ReadByte();
+            this.mData[58] = s.ReadByte();
+            this.mData[59] = s.ReadByte();
+            this.mData[60] = s.ReadByte();
+            this.mData[61] = s.ReadByte();
+            this.mData[62] = s.ReadByte();
+            this.mData[63] = s.ReadByte();
+            this.mData[64] = s.ReadByte();
+            this.mData[65] = s.ReadByte();
+            this.mData[66] = s.ReadByte();
+            this.mData[67] = s.ReadByte();
+            this.mData[68] = s.ReadByte();
+            this.mData[69] = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Control a serial port. This can be used for raw access to an onboard serial peripheral such as a GPS or telemetry radio. It is designed to make it possible to update the devices firmware via MAVLink messages or change the devices settings. A message with zero bytes can be used to change just the baudrate."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Baudrate",
+                Description = "Baudrate of transfer. Zero means no change.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Timeout",
+                Description = "Timeout for reply data in milliseconds",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Device",
+                Description = "See SERIAL_CONTROL_DEV enum",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("SerialControlDev"),
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Flags",
+                Description = "See SERIAL_CONTROL_FLAG enum",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("SerialControlFlag"),
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Count",
+                Description = "how many bytes in this transfer",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Data",
+                Description = "serial data",
+                NumElements = 70,
+            });
+
+        }
+
+        private UInt32 mBaudrate;
+        private UInt16 mTimeout;
+        private SerialControlDev mDevice;
+        private SerialControlFlag mFlags;
+        private byte mCount;
+        private byte[] mData = new byte[70];
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// RTK GPS data. Gives information on the relative baseline calculation the GPS is reporting
+    /// </summary>
+    public class UasGpsRtk: UasMessage
+    {
+        /// <summary>
+        /// Time since boot of last baseline message received in ms.
+        /// </summary>
+        public UInt32 TimeLastBaselineMs {
+            get { return mTimeLastBaselineMs; }
+            set { mTimeLastBaselineMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS Time of Week of last baseline
+        /// </summary>
+        public UInt32 Tow {
+            get { return mTow; }
+            set { mTow = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current baseline in ECEF x or NED north component in mm.
+        /// </summary>
+        public Int32 BaselineAMm {
+            get { return mBaselineAMm; }
+            set { mBaselineAMm = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current baseline in ECEF y or NED east component in mm.
+        /// </summary>
+        public Int32 BaselineBMm {
+            get { return mBaselineBMm; }
+            set { mBaselineBMm = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current baseline in ECEF z or NED down component in mm.
+        /// </summary>
+        public Int32 BaselineCMm {
+            get { return mBaselineCMm; }
+            set { mBaselineCMm = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current estimate of baseline accuracy.
+        /// </summary>
+        public UInt32 Accuracy {
+            get { return mAccuracy; }
+            set { mAccuracy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current number of integer ambiguity hypotheses.
+        /// </summary>
+        public Int32 IarNumHypotheses {
+            get { return mIarNumHypotheses; }
+            set { mIarNumHypotheses = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS Week Number of last baseline
+        /// </summary>
+        public UInt16 Wn {
+            get { return mWn; }
+            set { mWn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Identification of connected RTK receiver.
+        /// </summary>
+        public byte RtkReceiverId {
+            get { return mRtkReceiverId; }
+            set { mRtkReceiverId = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS-specific health report for RTK data.
+        /// </summary>
+        public byte RtkHealth {
+            get { return mRtkHealth; }
+            set { mRtkHealth = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Rate of baseline messages being received by GPS, in HZ
+        /// </summary>
+        public byte RtkRate {
+            get { return mRtkRate; }
+            set { mRtkRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current number of sats used for RTK calculation.
+        /// </summary>
+        public byte Nsats {
+            get { return mNsats; }
+            set { mNsats = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Coordinate system of baseline. 0 == ECEF, 1 == NED
+        /// </summary>
+        public byte BaselineCoordsType {
+            get { return mBaselineCoordsType; }
+            set { mBaselineCoordsType = value; NotifyUpdated(); }
+        }
+
+        public UasGpsRtk()
+        {
+            mMessageId = 127;
+            CrcExtra = 25;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeLastBaselineMs);
+            s.Write(mTow);
+            s.Write(mBaselineAMm);
+            s.Write(mBaselineBMm);
+            s.Write(mBaselineCMm);
+            s.Write(mAccuracy);
+            s.Write(mIarNumHypotheses);
+            s.Write(mWn);
+            s.Write(mRtkReceiverId);
+            s.Write(mRtkHealth);
+            s.Write(mRtkRate);
+            s.Write(mNsats);
+            s.Write(mBaselineCoordsType);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeLastBaselineMs = s.ReadUInt32();
+            this.mTow = s.ReadUInt32();
+            this.mBaselineAMm = s.ReadInt32();
+            this.mBaselineBMm = s.ReadInt32();
+            this.mBaselineCMm = s.ReadInt32();
+            this.mAccuracy = s.ReadUInt32();
+            this.mIarNumHypotheses = s.ReadInt32();
+            this.mWn = s.ReadUInt16();
+            this.mRtkReceiverId = s.ReadByte();
+            this.mRtkHealth = s.ReadByte();
+            this.mRtkRate = s.ReadByte();
+            this.mNsats = s.ReadByte();
+            this.mBaselineCoordsType = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "RTK GPS data. Gives information on the relative baseline calculation the GPS is reporting"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeLastBaselineMs",
+                Description = "Time since boot of last baseline message received in ms.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Tow",
+                Description = "GPS Time of Week of last baseline",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BaselineAMm",
+                Description = "Current baseline in ECEF x or NED north component in mm.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BaselineBMm",
+                Description = "Current baseline in ECEF y or NED east component in mm.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BaselineCMm",
+                Description = "Current baseline in ECEF z or NED down component in mm.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Accuracy",
+                Description = "Current estimate of baseline accuracy.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "IarNumHypotheses",
+                Description = "Current number of integer ambiguity hypotheses.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Wn",
+                Description = "GPS Week Number of last baseline",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "RtkReceiverId",
+                Description = "Identification of connected RTK receiver.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "RtkHealth",
+                Description = "GPS-specific health report for RTK data.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "RtkRate",
+                Description = "Rate of baseline messages being received by GPS, in HZ",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Nsats",
+                Description = "Current number of sats used for RTK calculation.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BaselineCoordsType",
+                Description = "Coordinate system of baseline. 0 == ECEF, 1 == NED",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeLastBaselineMs;
+        private UInt32 mTow;
+        private Int32 mBaselineAMm;
+        private Int32 mBaselineBMm;
+        private Int32 mBaselineCMm;
+        private UInt32 mAccuracy;
+        private Int32 mIarNumHypotheses;
+        private UInt16 mWn;
+        private byte mRtkReceiverId;
+        private byte mRtkHealth;
+        private byte mRtkRate;
+        private byte mNsats;
+        private byte mBaselineCoordsType;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// RTK GPS data. Gives information on the relative baseline calculation the GPS is reporting
+    /// </summary>
+    public class UasGps2Rtk: UasMessage
+    {
+        /// <summary>
+        /// Time since boot of last baseline message received in ms.
+        /// </summary>
+        public UInt32 TimeLastBaselineMs {
+            get { return mTimeLastBaselineMs; }
+            set { mTimeLastBaselineMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS Time of Week of last baseline
+        /// </summary>
+        public UInt32 Tow {
+            get { return mTow; }
+            set { mTow = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current baseline in ECEF x or NED north component in mm.
+        /// </summary>
+        public Int32 BaselineAMm {
+            get { return mBaselineAMm; }
+            set { mBaselineAMm = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current baseline in ECEF y or NED east component in mm.
+        /// </summary>
+        public Int32 BaselineBMm {
+            get { return mBaselineBMm; }
+            set { mBaselineBMm = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current baseline in ECEF z or NED down component in mm.
+        /// </summary>
+        public Int32 BaselineCMm {
+            get { return mBaselineCMm; }
+            set { mBaselineCMm = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current estimate of baseline accuracy.
+        /// </summary>
+        public UInt32 Accuracy {
+            get { return mAccuracy; }
+            set { mAccuracy = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current number of integer ambiguity hypotheses.
+        /// </summary>
+        public Int32 IarNumHypotheses {
+            get { return mIarNumHypotheses; }
+            set { mIarNumHypotheses = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS Week Number of last baseline
+        /// </summary>
+        public UInt16 Wn {
+            get { return mWn; }
+            set { mWn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Identification of connected RTK receiver.
+        /// </summary>
+        public byte RtkReceiverId {
+            get { return mRtkReceiverId; }
+            set { mRtkReceiverId = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS-specific health report for RTK data.
+        /// </summary>
+        public byte RtkHealth {
+            get { return mRtkHealth; }
+            set { mRtkHealth = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Rate of baseline messages being received by GPS, in HZ
+        /// </summary>
+        public byte RtkRate {
+            get { return mRtkRate; }
+            set { mRtkRate = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current number of sats used for RTK calculation.
+        /// </summary>
+        public byte Nsats {
+            get { return mNsats; }
+            set { mNsats = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Coordinate system of baseline. 0 == ECEF, 1 == NED
+        /// </summary>
+        public byte BaselineCoordsType {
+            get { return mBaselineCoordsType; }
+            set { mBaselineCoordsType = value; NotifyUpdated(); }
+        }
+
+        public UasGps2Rtk()
+        {
+            mMessageId = 128;
+            CrcExtra = 226;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeLastBaselineMs);
+            s.Write(mTow);
+            s.Write(mBaselineAMm);
+            s.Write(mBaselineBMm);
+            s.Write(mBaselineCMm);
+            s.Write(mAccuracy);
+            s.Write(mIarNumHypotheses);
+            s.Write(mWn);
+            s.Write(mRtkReceiverId);
+            s.Write(mRtkHealth);
+            s.Write(mRtkRate);
+            s.Write(mNsats);
+            s.Write(mBaselineCoordsType);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeLastBaselineMs = s.ReadUInt32();
+            this.mTow = s.ReadUInt32();
+            this.mBaselineAMm = s.ReadInt32();
+            this.mBaselineBMm = s.ReadInt32();
+            this.mBaselineCMm = s.ReadInt32();
+            this.mAccuracy = s.ReadUInt32();
+            this.mIarNumHypotheses = s.ReadInt32();
+            this.mWn = s.ReadUInt16();
+            this.mRtkReceiverId = s.ReadByte();
+            this.mRtkHealth = s.ReadByte();
+            this.mRtkRate = s.ReadByte();
+            this.mNsats = s.ReadByte();
+            this.mBaselineCoordsType = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "RTK GPS data. Gives information on the relative baseline calculation the GPS is reporting"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeLastBaselineMs",
+                Description = "Time since boot of last baseline message received in ms.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Tow",
+                Description = "GPS Time of Week of last baseline",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BaselineAMm",
+                Description = "Current baseline in ECEF x or NED north component in mm.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BaselineBMm",
+                Description = "Current baseline in ECEF y or NED east component in mm.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BaselineCMm",
+                Description = "Current baseline in ECEF z or NED down component in mm.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Accuracy",
+                Description = "Current estimate of baseline accuracy.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "IarNumHypotheses",
+                Description = "Current number of integer ambiguity hypotheses.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Wn",
+                Description = "GPS Week Number of last baseline",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "RtkReceiverId",
+                Description = "Identification of connected RTK receiver.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "RtkHealth",
+                Description = "GPS-specific health report for RTK data.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "RtkRate",
+                Description = "Rate of baseline messages being received by GPS, in HZ",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Nsats",
+                Description = "Current number of sats used for RTK calculation.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BaselineCoordsType",
+                Description = "Coordinate system of baseline. 0 == ECEF, 1 == NED",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeLastBaselineMs;
+        private UInt32 mTow;
+        private Int32 mBaselineAMm;
+        private Int32 mBaselineBMm;
+        private Int32 mBaselineCMm;
+        private UInt32 mAccuracy;
+        private Int32 mIarNumHypotheses;
+        private UInt16 mWn;
+        private byte mRtkReceiverId;
+        private byte mRtkHealth;
+        private byte mRtkRate;
+        private byte mNsats;
+        private byte mBaselineCoordsType;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// The RAW IMU readings for 3rd 9DOF sensor setup. This message should contain the scaled values to the described units
+    /// </summary>
+    public class UasScaledImu3: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (milliseconds since system boot)
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X acceleration (mg)
+        /// </summary>
+        public Int16 Xacc {
+            get { return mXacc; }
+            set { mXacc = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y acceleration (mg)
+        /// </summary>
+        public Int16 Yacc {
+            get { return mYacc; }
+            set { mYacc = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z acceleration (mg)
+        /// </summary>
+        public Int16 Zacc {
+            get { return mZacc; }
+            set { mZacc = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Angular speed around X axis (millirad /sec)
+        /// </summary>
+        public Int16 Xgyro {
+            get { return mXgyro; }
+            set { mXgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Angular speed around Y axis (millirad /sec)
+        /// </summary>
+        public Int16 Ygyro {
+            get { return mYgyro; }
+            set { mYgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Angular speed around Z axis (millirad /sec)
+        /// </summary>
+        public Int16 Zgyro {
+            get { return mZgyro; }
+            set { mZgyro = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X Magnetic field (milli tesla)
+        /// </summary>
+        public Int16 Xmag {
+            get { return mXmag; }
+            set { mXmag = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y Magnetic field (milli tesla)
+        /// </summary>
+        public Int16 Ymag {
+            get { return mYmag; }
+            set { mYmag = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z Magnetic field (milli tesla)
+        /// </summary>
+        public Int16 Zmag {
+            get { return mZmag; }
+            set { mZmag = value; NotifyUpdated(); }
+        }
+
+        public UasScaledImu3()
+        {
+            mMessageId = 129;
+            CrcExtra = 46;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mXacc);
+            s.Write(mYacc);
+            s.Write(mZacc);
+            s.Write(mXgyro);
+            s.Write(mYgyro);
+            s.Write(mZgyro);
+            s.Write(mXmag);
+            s.Write(mYmag);
+            s.Write(mZmag);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mXacc = s.ReadInt16();
+            this.mYacc = s.ReadInt16();
+            this.mZacc = s.ReadInt16();
+            this.mXgyro = s.ReadInt16();
+            this.mYgyro = s.ReadInt16();
+            this.mZgyro = s.ReadInt16();
+            this.mXmag = s.ReadInt16();
+            this.mYmag = s.ReadInt16();
+            this.mZmag = s.ReadInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "The RAW IMU readings for 3rd 9DOF sensor setup. This message should contain the scaled values to the described units"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp (milliseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Xacc",
+                Description = "X acceleration (mg)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Yacc",
+                Description = "Y acceleration (mg)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Zacc",
+                Description = "Z acceleration (mg)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Xgyro",
+                Description = "Angular speed around X axis (millirad /sec)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Ygyro",
+                Description = "Angular speed around Y axis (millirad /sec)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Zgyro",
+                Description = "Angular speed around Z axis (millirad /sec)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Xmag",
+                Description = "X Magnetic field (milli tesla)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Ymag",
+                Description = "Y Magnetic field (milli tesla)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Zmag",
+                Description = "Z Magnetic field (milli tesla)",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private Int16 mXacc;
+        private Int16 mYacc;
+        private Int16 mZacc;
+        private Int16 mXgyro;
+        private Int16 mYgyro;
+        private Int16 mZgyro;
+        private Int16 mXmag;
+        private Int16 mYmag;
+        private Int16 mZmag;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasDataTransmissionHandshake: UasMessage
+    {
+        /// <summary>
+        /// total data size in bytes (set on ACK only)
+        /// </summary>
+        public UInt32 Size {
+            get { return mSize; }
+            set { mSize = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Width of a matrix or image
+        /// </summary>
+        public UInt16 Width {
+            get { return mWidth; }
+            set { mWidth = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Height of a matrix or image
+        /// </summary>
+        public UInt16 Height {
+            get { return mHeight; }
+            set { mHeight = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// number of packets beeing sent (set on ACK only)
+        /// </summary>
+        public UInt16 Packets {
+            get { return mPackets; }
+            set { mPackets = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// type of requested/acknowledged data (as defined in ENUM DATA_TYPES in mavlink/include/mavlink_types.h)
+        /// </summary>
+        public byte Type {
+            get { return mType; }
+            set { mType = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// payload size per packet (normally 253 byte, see DATA field size in message ENCAPSULATED_DATA) (set on ACK only)
+        /// </summary>
+        public byte Payload {
+            get { return mPayload; }
+            set { mPayload = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// JPEG quality out of [1,100]
+        /// </summary>
+        public byte JpgQuality {
+            get { return mJpgQuality; }
+            set { mJpgQuality = value; NotifyUpdated(); }
+        }
+
+        public UasDataTransmissionHandshake()
+        {
+            mMessageId = 130;
+            CrcExtra = 29;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mSize);
+            s.Write(mWidth);
+            s.Write(mHeight);
+            s.Write(mPackets);
+            s.Write(mType);
+            s.Write(mPayload);
+            s.Write(mJpgQuality);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mSize = s.ReadUInt32();
+            this.mWidth = s.ReadUInt16();
+            this.mHeight = s.ReadUInt16();
+            this.mPackets = s.ReadUInt16();
+            this.mType = s.ReadByte();
+            this.mPayload = s.ReadByte();
+            this.mJpgQuality = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Size",
+                Description = "total data size in bytes (set on ACK only)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Width",
+                Description = "Width of a matrix or image",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Height",
+                Description = "Height of a matrix or image",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Packets",
+                Description = "number of packets beeing sent (set on ACK only)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Type",
+                Description = "type of requested/acknowledged data (as defined in ENUM DATA_TYPES in mavlink/include/mavlink_types.h)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Payload",
+                Description = "payload size per packet (normally 253 byte, see DATA field size in message ENCAPSULATED_DATA) (set on ACK only)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "JpgQuality",
+                Description = "JPEG quality out of [1,100]",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mSize;
+        private UInt16 mWidth;
+        private UInt16 mHeight;
+        private UInt16 mPackets;
+        private byte mType;
+        private byte mPayload;
+        private byte mJpgQuality;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasEncapsulatedData: UasMessage
+    {
+        /// <summary>
+        /// sequence number (starting with 0 on every transmission)
+        /// </summary>
+        public UInt16 Seqnr {
+            get { return mSeqnr; }
+            set { mSeqnr = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// image data bytes
+        /// </summary>
+        public byte[] Data {
+            get { return mData; }
+            set { mData = value; NotifyUpdated(); }
+        }
+
+        public UasEncapsulatedData()
+        {
+            mMessageId = 131;
+            CrcExtra = 223;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mSeqnr);
+            s.Write(mData[0]); 
+            s.Write(mData[1]); 
+            s.Write(mData[2]); 
+            s.Write(mData[3]); 
+            s.Write(mData[4]); 
+            s.Write(mData[5]); 
+            s.Write(mData[6]); 
+            s.Write(mData[7]); 
+            s.Write(mData[8]); 
+            s.Write(mData[9]); 
+            s.Write(mData[10]); 
+            s.Write(mData[11]); 
+            s.Write(mData[12]); 
+            s.Write(mData[13]); 
+            s.Write(mData[14]); 
+            s.Write(mData[15]); 
+            s.Write(mData[16]); 
+            s.Write(mData[17]); 
+            s.Write(mData[18]); 
+            s.Write(mData[19]); 
+            s.Write(mData[20]); 
+            s.Write(mData[21]); 
+            s.Write(mData[22]); 
+            s.Write(mData[23]); 
+            s.Write(mData[24]); 
+            s.Write(mData[25]); 
+            s.Write(mData[26]); 
+            s.Write(mData[27]); 
+            s.Write(mData[28]); 
+            s.Write(mData[29]); 
+            s.Write(mData[30]); 
+            s.Write(mData[31]); 
+            s.Write(mData[32]); 
+            s.Write(mData[33]); 
+            s.Write(mData[34]); 
+            s.Write(mData[35]); 
+            s.Write(mData[36]); 
+            s.Write(mData[37]); 
+            s.Write(mData[38]); 
+            s.Write(mData[39]); 
+            s.Write(mData[40]); 
+            s.Write(mData[41]); 
+            s.Write(mData[42]); 
+            s.Write(mData[43]); 
+            s.Write(mData[44]); 
+            s.Write(mData[45]); 
+            s.Write(mData[46]); 
+            s.Write(mData[47]); 
+            s.Write(mData[48]); 
+            s.Write(mData[49]); 
+            s.Write(mData[50]); 
+            s.Write(mData[51]); 
+            s.Write(mData[52]); 
+            s.Write(mData[53]); 
+            s.Write(mData[54]); 
+            s.Write(mData[55]); 
+            s.Write(mData[56]); 
+            s.Write(mData[57]); 
+            s.Write(mData[58]); 
+            s.Write(mData[59]); 
+            s.Write(mData[60]); 
+            s.Write(mData[61]); 
+            s.Write(mData[62]); 
+            s.Write(mData[63]); 
+            s.Write(mData[64]); 
+            s.Write(mData[65]); 
+            s.Write(mData[66]); 
+            s.Write(mData[67]); 
+            s.Write(mData[68]); 
+            s.Write(mData[69]); 
+            s.Write(mData[70]); 
+            s.Write(mData[71]); 
+            s.Write(mData[72]); 
+            s.Write(mData[73]); 
+            s.Write(mData[74]); 
+            s.Write(mData[75]); 
+            s.Write(mData[76]); 
+            s.Write(mData[77]); 
+            s.Write(mData[78]); 
+            s.Write(mData[79]); 
+            s.Write(mData[80]); 
+            s.Write(mData[81]); 
+            s.Write(mData[82]); 
+            s.Write(mData[83]); 
+            s.Write(mData[84]); 
+            s.Write(mData[85]); 
+            s.Write(mData[86]); 
+            s.Write(mData[87]); 
+            s.Write(mData[88]); 
+            s.Write(mData[89]); 
+            s.Write(mData[90]); 
+            s.Write(mData[91]); 
+            s.Write(mData[92]); 
+            s.Write(mData[93]); 
+            s.Write(mData[94]); 
+            s.Write(mData[95]); 
+            s.Write(mData[96]); 
+            s.Write(mData[97]); 
+            s.Write(mData[98]); 
+            s.Write(mData[99]); 
+            s.Write(mData[100]); 
+            s.Write(mData[101]); 
+            s.Write(mData[102]); 
+            s.Write(mData[103]); 
+            s.Write(mData[104]); 
+            s.Write(mData[105]); 
+            s.Write(mData[106]); 
+            s.Write(mData[107]); 
+            s.Write(mData[108]); 
+            s.Write(mData[109]); 
+            s.Write(mData[110]); 
+            s.Write(mData[111]); 
+            s.Write(mData[112]); 
+            s.Write(mData[113]); 
+            s.Write(mData[114]); 
+            s.Write(mData[115]); 
+            s.Write(mData[116]); 
+            s.Write(mData[117]); 
+            s.Write(mData[118]); 
+            s.Write(mData[119]); 
+            s.Write(mData[120]); 
+            s.Write(mData[121]); 
+            s.Write(mData[122]); 
+            s.Write(mData[123]); 
+            s.Write(mData[124]); 
+            s.Write(mData[125]); 
+            s.Write(mData[126]); 
+            s.Write(mData[127]); 
+            s.Write(mData[128]); 
+            s.Write(mData[129]); 
+            s.Write(mData[130]); 
+            s.Write(mData[131]); 
+            s.Write(mData[132]); 
+            s.Write(mData[133]); 
+            s.Write(mData[134]); 
+            s.Write(mData[135]); 
+            s.Write(mData[136]); 
+            s.Write(mData[137]); 
+            s.Write(mData[138]); 
+            s.Write(mData[139]); 
+            s.Write(mData[140]); 
+            s.Write(mData[141]); 
+            s.Write(mData[142]); 
+            s.Write(mData[143]); 
+            s.Write(mData[144]); 
+            s.Write(mData[145]); 
+            s.Write(mData[146]); 
+            s.Write(mData[147]); 
+            s.Write(mData[148]); 
+            s.Write(mData[149]); 
+            s.Write(mData[150]); 
+            s.Write(mData[151]); 
+            s.Write(mData[152]); 
+            s.Write(mData[153]); 
+            s.Write(mData[154]); 
+            s.Write(mData[155]); 
+            s.Write(mData[156]); 
+            s.Write(mData[157]); 
+            s.Write(mData[158]); 
+            s.Write(mData[159]); 
+            s.Write(mData[160]); 
+            s.Write(mData[161]); 
+            s.Write(mData[162]); 
+            s.Write(mData[163]); 
+            s.Write(mData[164]); 
+            s.Write(mData[165]); 
+            s.Write(mData[166]); 
+            s.Write(mData[167]); 
+            s.Write(mData[168]); 
+            s.Write(mData[169]); 
+            s.Write(mData[170]); 
+            s.Write(mData[171]); 
+            s.Write(mData[172]); 
+            s.Write(mData[173]); 
+            s.Write(mData[174]); 
+            s.Write(mData[175]); 
+            s.Write(mData[176]); 
+            s.Write(mData[177]); 
+            s.Write(mData[178]); 
+            s.Write(mData[179]); 
+            s.Write(mData[180]); 
+            s.Write(mData[181]); 
+            s.Write(mData[182]); 
+            s.Write(mData[183]); 
+            s.Write(mData[184]); 
+            s.Write(mData[185]); 
+            s.Write(mData[186]); 
+            s.Write(mData[187]); 
+            s.Write(mData[188]); 
+            s.Write(mData[189]); 
+            s.Write(mData[190]); 
+            s.Write(mData[191]); 
+            s.Write(mData[192]); 
+            s.Write(mData[193]); 
+            s.Write(mData[194]); 
+            s.Write(mData[195]); 
+            s.Write(mData[196]); 
+            s.Write(mData[197]); 
+            s.Write(mData[198]); 
+            s.Write(mData[199]); 
+            s.Write(mData[200]); 
+            s.Write(mData[201]); 
+            s.Write(mData[202]); 
+            s.Write(mData[203]); 
+            s.Write(mData[204]); 
+            s.Write(mData[205]); 
+            s.Write(mData[206]); 
+            s.Write(mData[207]); 
+            s.Write(mData[208]); 
+            s.Write(mData[209]); 
+            s.Write(mData[210]); 
+            s.Write(mData[211]); 
+            s.Write(mData[212]); 
+            s.Write(mData[213]); 
+            s.Write(mData[214]); 
+            s.Write(mData[215]); 
+            s.Write(mData[216]); 
+            s.Write(mData[217]); 
+            s.Write(mData[218]); 
+            s.Write(mData[219]); 
+            s.Write(mData[220]); 
+            s.Write(mData[221]); 
+            s.Write(mData[222]); 
+            s.Write(mData[223]); 
+            s.Write(mData[224]); 
+            s.Write(mData[225]); 
+            s.Write(mData[226]); 
+            s.Write(mData[227]); 
+            s.Write(mData[228]); 
+            s.Write(mData[229]); 
+            s.Write(mData[230]); 
+            s.Write(mData[231]); 
+            s.Write(mData[232]); 
+            s.Write(mData[233]); 
+            s.Write(mData[234]); 
+            s.Write(mData[235]); 
+            s.Write(mData[236]); 
+            s.Write(mData[237]); 
+            s.Write(mData[238]); 
+            s.Write(mData[239]); 
+            s.Write(mData[240]); 
+            s.Write(mData[241]); 
+            s.Write(mData[242]); 
+            s.Write(mData[243]); 
+            s.Write(mData[244]); 
+            s.Write(mData[245]); 
+            s.Write(mData[246]); 
+            s.Write(mData[247]); 
+            s.Write(mData[248]); 
+            s.Write(mData[249]); 
+            s.Write(mData[250]); 
+            s.Write(mData[251]); 
+            s.Write(mData[252]); 
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mSeqnr = s.ReadUInt16();
+            this.mData[0] = s.ReadByte();
+            this.mData[1] = s.ReadByte();
+            this.mData[2] = s.ReadByte();
+            this.mData[3] = s.ReadByte();
+            this.mData[4] = s.ReadByte();
+            this.mData[5] = s.ReadByte();
+            this.mData[6] = s.ReadByte();
+            this.mData[7] = s.ReadByte();
+            this.mData[8] = s.ReadByte();
+            this.mData[9] = s.ReadByte();
+            this.mData[10] = s.ReadByte();
+            this.mData[11] = s.ReadByte();
+            this.mData[12] = s.ReadByte();
+            this.mData[13] = s.ReadByte();
+            this.mData[14] = s.ReadByte();
+            this.mData[15] = s.ReadByte();
+            this.mData[16] = s.ReadByte();
+            this.mData[17] = s.ReadByte();
+            this.mData[18] = s.ReadByte();
+            this.mData[19] = s.ReadByte();
+            this.mData[20] = s.ReadByte();
+            this.mData[21] = s.ReadByte();
+            this.mData[22] = s.ReadByte();
+            this.mData[23] = s.ReadByte();
+            this.mData[24] = s.ReadByte();
+            this.mData[25] = s.ReadByte();
+            this.mData[26] = s.ReadByte();
+            this.mData[27] = s.ReadByte();
+            this.mData[28] = s.ReadByte();
+            this.mData[29] = s.ReadByte();
+            this.mData[30] = s.ReadByte();
+            this.mData[31] = s.ReadByte();
+            this.mData[32] = s.ReadByte();
+            this.mData[33] = s.ReadByte();
+            this.mData[34] = s.ReadByte();
+            this.mData[35] = s.ReadByte();
+            this.mData[36] = s.ReadByte();
+            this.mData[37] = s.ReadByte();
+            this.mData[38] = s.ReadByte();
+            this.mData[39] = s.ReadByte();
+            this.mData[40] = s.ReadByte();
+            this.mData[41] = s.ReadByte();
+            this.mData[42] = s.ReadByte();
+            this.mData[43] = s.ReadByte();
+            this.mData[44] = s.ReadByte();
+            this.mData[45] = s.ReadByte();
+            this.mData[46] = s.ReadByte();
+            this.mData[47] = s.ReadByte();
+            this.mData[48] = s.ReadByte();
+            this.mData[49] = s.ReadByte();
+            this.mData[50] = s.ReadByte();
+            this.mData[51] = s.ReadByte();
+            this.mData[52] = s.ReadByte();
+            this.mData[53] = s.ReadByte();
+            this.mData[54] = s.ReadByte();
+            this.mData[55] = s.ReadByte();
+            this.mData[56] = s.ReadByte();
+            this.mData[57] = s.ReadByte();
+            this.mData[58] = s.ReadByte();
+            this.mData[59] = s.ReadByte();
+            this.mData[60] = s.ReadByte();
+            this.mData[61] = s.ReadByte();
+            this.mData[62] = s.ReadByte();
+            this.mData[63] = s.ReadByte();
+            this.mData[64] = s.ReadByte();
+            this.mData[65] = s.ReadByte();
+            this.mData[66] = s.ReadByte();
+            this.mData[67] = s.ReadByte();
+            this.mData[68] = s.ReadByte();
+            this.mData[69] = s.ReadByte();
+            this.mData[70] = s.ReadByte();
+            this.mData[71] = s.ReadByte();
+            this.mData[72] = s.ReadByte();
+            this.mData[73] = s.ReadByte();
+            this.mData[74] = s.ReadByte();
+            this.mData[75] = s.ReadByte();
+            this.mData[76] = s.ReadByte();
+            this.mData[77] = s.ReadByte();
+            this.mData[78] = s.ReadByte();
+            this.mData[79] = s.ReadByte();
+            this.mData[80] = s.ReadByte();
+            this.mData[81] = s.ReadByte();
+            this.mData[82] = s.ReadByte();
+            this.mData[83] = s.ReadByte();
+            this.mData[84] = s.ReadByte();
+            this.mData[85] = s.ReadByte();
+            this.mData[86] = s.ReadByte();
+            this.mData[87] = s.ReadByte();
+            this.mData[88] = s.ReadByte();
+            this.mData[89] = s.ReadByte();
+            this.mData[90] = s.ReadByte();
+            this.mData[91] = s.ReadByte();
+            this.mData[92] = s.ReadByte();
+            this.mData[93] = s.ReadByte();
+            this.mData[94] = s.ReadByte();
+            this.mData[95] = s.ReadByte();
+            this.mData[96] = s.ReadByte();
+            this.mData[97] = s.ReadByte();
+            this.mData[98] = s.ReadByte();
+            this.mData[99] = s.ReadByte();
+            this.mData[100] = s.ReadByte();
+            this.mData[101] = s.ReadByte();
+            this.mData[102] = s.ReadByte();
+            this.mData[103] = s.ReadByte();
+            this.mData[104] = s.ReadByte();
+            this.mData[105] = s.ReadByte();
+            this.mData[106] = s.ReadByte();
+            this.mData[107] = s.ReadByte();
+            this.mData[108] = s.ReadByte();
+            this.mData[109] = s.ReadByte();
+            this.mData[110] = s.ReadByte();
+            this.mData[111] = s.ReadByte();
+            this.mData[112] = s.ReadByte();
+            this.mData[113] = s.ReadByte();
+            this.mData[114] = s.ReadByte();
+            this.mData[115] = s.ReadByte();
+            this.mData[116] = s.ReadByte();
+            this.mData[117] = s.ReadByte();
+            this.mData[118] = s.ReadByte();
+            this.mData[119] = s.ReadByte();
+            this.mData[120] = s.ReadByte();
+            this.mData[121] = s.ReadByte();
+            this.mData[122] = s.ReadByte();
+            this.mData[123] = s.ReadByte();
+            this.mData[124] = s.ReadByte();
+            this.mData[125] = s.ReadByte();
+            this.mData[126] = s.ReadByte();
+            this.mData[127] = s.ReadByte();
+            this.mData[128] = s.ReadByte();
+            this.mData[129] = s.ReadByte();
+            this.mData[130] = s.ReadByte();
+            this.mData[131] = s.ReadByte();
+            this.mData[132] = s.ReadByte();
+            this.mData[133] = s.ReadByte();
+            this.mData[134] = s.ReadByte();
+            this.mData[135] = s.ReadByte();
+            this.mData[136] = s.ReadByte();
+            this.mData[137] = s.ReadByte();
+            this.mData[138] = s.ReadByte();
+            this.mData[139] = s.ReadByte();
+            this.mData[140] = s.ReadByte();
+            this.mData[141] = s.ReadByte();
+            this.mData[142] = s.ReadByte();
+            this.mData[143] = s.ReadByte();
+            this.mData[144] = s.ReadByte();
+            this.mData[145] = s.ReadByte();
+            this.mData[146] = s.ReadByte();
+            this.mData[147] = s.ReadByte();
+            this.mData[148] = s.ReadByte();
+            this.mData[149] = s.ReadByte();
+            this.mData[150] = s.ReadByte();
+            this.mData[151] = s.ReadByte();
+            this.mData[152] = s.ReadByte();
+            this.mData[153] = s.ReadByte();
+            this.mData[154] = s.ReadByte();
+            this.mData[155] = s.ReadByte();
+            this.mData[156] = s.ReadByte();
+            this.mData[157] = s.ReadByte();
+            this.mData[158] = s.ReadByte();
+            this.mData[159] = s.ReadByte();
+            this.mData[160] = s.ReadByte();
+            this.mData[161] = s.ReadByte();
+            this.mData[162] = s.ReadByte();
+            this.mData[163] = s.ReadByte();
+            this.mData[164] = s.ReadByte();
+            this.mData[165] = s.ReadByte();
+            this.mData[166] = s.ReadByte();
+            this.mData[167] = s.ReadByte();
+            this.mData[168] = s.ReadByte();
+            this.mData[169] = s.ReadByte();
+            this.mData[170] = s.ReadByte();
+            this.mData[171] = s.ReadByte();
+            this.mData[172] = s.ReadByte();
+            this.mData[173] = s.ReadByte();
+            this.mData[174] = s.ReadByte();
+            this.mData[175] = s.ReadByte();
+            this.mData[176] = s.ReadByte();
+            this.mData[177] = s.ReadByte();
+            this.mData[178] = s.ReadByte();
+            this.mData[179] = s.ReadByte();
+            this.mData[180] = s.ReadByte();
+            this.mData[181] = s.ReadByte();
+            this.mData[182] = s.ReadByte();
+            this.mData[183] = s.ReadByte();
+            this.mData[184] = s.ReadByte();
+            this.mData[185] = s.ReadByte();
+            this.mData[186] = s.ReadByte();
+            this.mData[187] = s.ReadByte();
+            this.mData[188] = s.ReadByte();
+            this.mData[189] = s.ReadByte();
+            this.mData[190] = s.ReadByte();
+            this.mData[191] = s.ReadByte();
+            this.mData[192] = s.ReadByte();
+            this.mData[193] = s.ReadByte();
+            this.mData[194] = s.ReadByte();
+            this.mData[195] = s.ReadByte();
+            this.mData[196] = s.ReadByte();
+            this.mData[197] = s.ReadByte();
+            this.mData[198] = s.ReadByte();
+            this.mData[199] = s.ReadByte();
+            this.mData[200] = s.ReadByte();
+            this.mData[201] = s.ReadByte();
+            this.mData[202] = s.ReadByte();
+            this.mData[203] = s.ReadByte();
+            this.mData[204] = s.ReadByte();
+            this.mData[205] = s.ReadByte();
+            this.mData[206] = s.ReadByte();
+            this.mData[207] = s.ReadByte();
+            this.mData[208] = s.ReadByte();
+            this.mData[209] = s.ReadByte();
+            this.mData[210] = s.ReadByte();
+            this.mData[211] = s.ReadByte();
+            this.mData[212] = s.ReadByte();
+            this.mData[213] = s.ReadByte();
+            this.mData[214] = s.ReadByte();
+            this.mData[215] = s.ReadByte();
+            this.mData[216] = s.ReadByte();
+            this.mData[217] = s.ReadByte();
+            this.mData[218] = s.ReadByte();
+            this.mData[219] = s.ReadByte();
+            this.mData[220] = s.ReadByte();
+            this.mData[221] = s.ReadByte();
+            this.mData[222] = s.ReadByte();
+            this.mData[223] = s.ReadByte();
+            this.mData[224] = s.ReadByte();
+            this.mData[225] = s.ReadByte();
+            this.mData[226] = s.ReadByte();
+            this.mData[227] = s.ReadByte();
+            this.mData[228] = s.ReadByte();
+            this.mData[229] = s.ReadByte();
+            this.mData[230] = s.ReadByte();
+            this.mData[231] = s.ReadByte();
+            this.mData[232] = s.ReadByte();
+            this.mData[233] = s.ReadByte();
+            this.mData[234] = s.ReadByte();
+            this.mData[235] = s.ReadByte();
+            this.mData[236] = s.ReadByte();
+            this.mData[237] = s.ReadByte();
+            this.mData[238] = s.ReadByte();
+            this.mData[239] = s.ReadByte();
+            this.mData[240] = s.ReadByte();
+            this.mData[241] = s.ReadByte();
+            this.mData[242] = s.ReadByte();
+            this.mData[243] = s.ReadByte();
+            this.mData[244] = s.ReadByte();
+            this.mData[245] = s.ReadByte();
+            this.mData[246] = s.ReadByte();
+            this.mData[247] = s.ReadByte();
+            this.mData[248] = s.ReadByte();
+            this.mData[249] = s.ReadByte();
+            this.mData[250] = s.ReadByte();
+            this.mData[251] = s.ReadByte();
+            this.mData[252] = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Seqnr",
+                Description = "sequence number (starting with 0 on every transmission)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Data",
+                Description = "image data bytes",
+                NumElements = 253,
+            });
+
+        }
+
+        private UInt16 mSeqnr;
+        private byte[] mData = new byte[253];
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasDistanceSensor: UasMessage
+    {
+        /// <summary>
+        /// Time since system boot
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Minimum distance the sensor can measure in centimeters
+        /// </summary>
+        public UInt16 MinDistance {
+            get { return mMinDistance; }
+            set { mMinDistance = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Maximum distance the sensor can measure in centimeters
+        /// </summary>
+        public UInt16 MaxDistance {
+            get { return mMaxDistance; }
+            set { mMaxDistance = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current distance reading
+        /// </summary>
+        public UInt16 CurrentDistance {
+            get { return mCurrentDistance; }
+            set { mCurrentDistance = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Type from MAV_DISTANCE_SENSOR enum.
+        /// </summary>
+        public MavDistanceSensor Type {
+            get { return mType; }
+            set { mType = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Onboard ID of the sensor
+        /// </summary>
+        public byte Id {
+            get { return mId; }
+            set { mId = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Direction the sensor faces from FIXME enum.
+        /// </summary>
+        public byte Orientation {
+            get { return mOrientation; }
+            set { mOrientation = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Measurement covariance in centimeters, 0 for unknown / invalid readings
+        /// </summary>
+        public byte Covariance {
+            get { return mCovariance; }
+            set { mCovariance = value; NotifyUpdated(); }
+        }
+
+        public UasDistanceSensor()
+        {
+            mMessageId = 132;
+            CrcExtra = 85;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mMinDistance);
+            s.Write(mMaxDistance);
+            s.Write(mCurrentDistance);
+            s.Write((byte)mType);
+            s.Write(mId);
+            s.Write(mOrientation);
+            s.Write(mCovariance);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mMinDistance = s.ReadUInt16();
+            this.mMaxDistance = s.ReadUInt16();
+            this.mCurrentDistance = s.ReadUInt16();
+            this.mType = (MavDistanceSensor)s.ReadByte();
+            this.mId = s.ReadByte();
+            this.mOrientation = s.ReadByte();
+            this.mCovariance = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Time since system boot",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MinDistance",
+                Description = "Minimum distance the sensor can measure in centimeters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MaxDistance",
+                Description = "Maximum distance the sensor can measure in centimeters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CurrentDistance",
+                Description = "Current distance reading",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Type",
+                Description = "Type from MAV_DISTANCE_SENSOR enum.",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavDistanceSensor"),
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Id",
+                Description = "Onboard ID of the sensor",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Orientation",
+                Description = "Direction the sensor faces from FIXME enum.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Covariance",
+                Description = "Measurement covariance in centimeters, 0 for unknown / invalid readings",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private UInt16 mMinDistance;
+        private UInt16 mMaxDistance;
+        private UInt16 mCurrentDistance;
+        private MavDistanceSensor mType;
+        private byte mId;
+        private byte mOrientation;
+        private byte mCovariance;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Request for terrain data and terrain status
+    /// </summary>
+    public class UasTerrainRequest: UasMessage
+    {
+        /// <summary>
+        /// Bitmask of requested 4x4 grids (row major 8x7 array of grids, 56 bits)
+        /// </summary>
+        public UInt64 Mask {
+            get { return mMask; }
+            set { mMask = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Latitude of SW corner of first grid (degrees *10^7)
+        /// </summary>
+        public Int32 Lat {
+            get { return mLat; }
+            set { mLat = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Longitude of SW corner of first grid (in degrees *10^7)
+        /// </summary>
+        public Int32 Lon {
+            get { return mLon; }
+            set { mLon = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Grid spacing in meters
+        /// </summary>
+        public UInt16 GridSpacing {
+            get { return mGridSpacing; }
+            set { mGridSpacing = value; NotifyUpdated(); }
+        }
+
+        public UasTerrainRequest()
+        {
+            mMessageId = 133;
+            CrcExtra = 6;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mMask);
+            s.Write(mLat);
+            s.Write(mLon);
+            s.Write(mGridSpacing);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mMask = s.ReadUInt64();
+            this.mLat = s.ReadInt32();
+            this.mLon = s.ReadInt32();
+            this.mGridSpacing = s.ReadUInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Request for terrain data and terrain status"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Mask",
+                Description = "Bitmask of requested 4x4 grids (row major 8x7 array of grids, 56 bits)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lat",
+                Description = "Latitude of SW corner of first grid (degrees *10^7)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lon",
+                Description = "Longitude of SW corner of first grid (in degrees *10^7)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GridSpacing",
+                Description = "Grid spacing in meters",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mMask;
+        private Int32 mLat;
+        private Int32 mLon;
+        private UInt16 mGridSpacing;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Terrain data sent from GCS. The lat/lon and grid_spacing must be the same as a lat/lon from a TERRAIN_REQUEST
+    /// </summary>
+    public class UasTerrainData: UasMessage
+    {
+        /// <summary>
+        /// Latitude of SW corner of first grid (degrees *10^7)
+        /// </summary>
+        public Int32 Lat {
+            get { return mLat; }
+            set { mLat = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Longitude of SW corner of first grid (in degrees *10^7)
+        /// </summary>
+        public Int32 Lon {
+            get { return mLon; }
+            set { mLon = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Grid spacing in meters
+        /// </summary>
+        public UInt16 GridSpacing {
+            get { return mGridSpacing; }
+            set { mGridSpacing = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Terrain data in meters AMSL
+        /// </summary>
+        public Int16[] Data {
+            get { return mData; }
+            set { mData = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// bit within the terrain request mask
+        /// </summary>
+        public byte Gridbit {
+            get { return mGridbit; }
+            set { mGridbit = value; NotifyUpdated(); }
+        }
+
+        public UasTerrainData()
+        {
+            mMessageId = 134;
+            CrcExtra = 229;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mLat);
+            s.Write(mLon);
+            s.Write(mGridSpacing);
+            s.Write(mData[0]); 
+            s.Write(mData[1]); 
+            s.Write(mData[2]); 
+            s.Write(mData[3]); 
+            s.Write(mData[4]); 
+            s.Write(mData[5]); 
+            s.Write(mData[6]); 
+            s.Write(mData[7]); 
+            s.Write(mData[8]); 
+            s.Write(mData[9]); 
+            s.Write(mData[10]); 
+            s.Write(mData[11]); 
+            s.Write(mData[12]); 
+            s.Write(mData[13]); 
+            s.Write(mData[14]); 
+            s.Write(mData[15]); 
+            s.Write(mGridbit);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mLat = s.ReadInt32();
+            this.mLon = s.ReadInt32();
+            this.mGridSpacing = s.ReadUInt16();
+            this.mData[0] = s.ReadInt16();
+            this.mData[1] = s.ReadInt16();
+            this.mData[2] = s.ReadInt16();
+            this.mData[3] = s.ReadInt16();
+            this.mData[4] = s.ReadInt16();
+            this.mData[5] = s.ReadInt16();
+            this.mData[6] = s.ReadInt16();
+            this.mData[7] = s.ReadInt16();
+            this.mData[8] = s.ReadInt16();
+            this.mData[9] = s.ReadInt16();
+            this.mData[10] = s.ReadInt16();
+            this.mData[11] = s.ReadInt16();
+            this.mData[12] = s.ReadInt16();
+            this.mData[13] = s.ReadInt16();
+            this.mData[14] = s.ReadInt16();
+            this.mData[15] = s.ReadInt16();
+            this.mGridbit = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Terrain data sent from GCS. The lat/lon and grid_spacing must be the same as a lat/lon from a TERRAIN_REQUEST"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lat",
+                Description = "Latitude of SW corner of first grid (degrees *10^7)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lon",
+                Description = "Longitude of SW corner of first grid (in degrees *10^7)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GridSpacing",
+                Description = "Grid spacing in meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Data",
+                Description = "Terrain data in meters AMSL",
+                NumElements = 16,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Gridbit",
+                Description = "bit within the terrain request mask",
+                NumElements = 1,
+            });
+
+        }
+
+        private Int32 mLat;
+        private Int32 mLon;
+        private UInt16 mGridSpacing;
+        private Int16[] mData = new Int16[16];
+        private byte mGridbit;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Request that the vehicle report terrain height at the given location. Used by GCS to check if vehicle has all terrain data needed for a mission.
+    /// </summary>
+    public class UasTerrainCheck: UasMessage
+    {
+        /// <summary>
+        /// Latitude (degrees *10^7)
+        /// </summary>
+        public Int32 Lat {
+            get { return mLat; }
+            set { mLat = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Longitude (degrees *10^7)
+        /// </summary>
+        public Int32 Lon {
+            get { return mLon; }
+            set { mLon = value; NotifyUpdated(); }
+        }
+
+        public UasTerrainCheck()
+        {
+            mMessageId = 135;
+            CrcExtra = 203;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mLat);
+            s.Write(mLon);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mLat = s.ReadInt32();
+            this.mLon = s.ReadInt32();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Request that the vehicle report terrain height at the given location. Used by GCS to check if vehicle has all terrain data needed for a mission."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lat",
+                Description = "Latitude (degrees *10^7)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lon",
+                Description = "Longitude (degrees *10^7)",
+                NumElements = 1,
+            });
+
+        }
+
+        private Int32 mLat;
+        private Int32 mLon;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Response from a TERRAIN_CHECK request
+    /// </summary>
+    public class UasTerrainReport: UasMessage
+    {
+        /// <summary>
+        /// Latitude (degrees *10^7)
+        /// </summary>
+        public Int32 Lat {
+            get { return mLat; }
+            set { mLat = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Longitude (degrees *10^7)
+        /// </summary>
+        public Int32 Lon {
+            get { return mLon; }
+            set { mLon = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Terrain height in meters AMSL
+        /// </summary>
+        public float TerrainHeight {
+            get { return mTerrainHeight; }
+            set { mTerrainHeight = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current vehicle height above lat/lon terrain height (meters)
+        /// </summary>
+        public float CurrentHeight {
+            get { return mCurrentHeight; }
+            set { mCurrentHeight = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// grid spacing (zero if terrain at this location unavailable)
+        /// </summary>
+        public UInt16 Spacing {
+            get { return mSpacing; }
+            set { mSpacing = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Number of 4x4 terrain blocks waiting to be received or read from disk
+        /// </summary>
+        public UInt16 Pending {
+            get { return mPending; }
+            set { mPending = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Number of 4x4 terrain blocks in memory
+        /// </summary>
+        public UInt16 Loaded {
+            get { return mLoaded; }
+            set { mLoaded = value; NotifyUpdated(); }
+        }
+
+        public UasTerrainReport()
+        {
+            mMessageId = 136;
+            CrcExtra = 1;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mLat);
+            s.Write(mLon);
+            s.Write(mTerrainHeight);
+            s.Write(mCurrentHeight);
+            s.Write(mSpacing);
+            s.Write(mPending);
+            s.Write(mLoaded);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mLat = s.ReadInt32();
+            this.mLon = s.ReadInt32();
+            this.mTerrainHeight = s.ReadSingle();
+            this.mCurrentHeight = s.ReadSingle();
+            this.mSpacing = s.ReadUInt16();
+            this.mPending = s.ReadUInt16();
+            this.mLoaded = s.ReadUInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Response from a TERRAIN_CHECK request"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lat",
+                Description = "Latitude (degrees *10^7)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lon",
+                Description = "Longitude (degrees *10^7)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TerrainHeight",
+                Description = "Terrain height in meters AMSL",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CurrentHeight",
+                Description = "Current vehicle height above lat/lon terrain height (meters)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Spacing",
+                Description = "grid spacing (zero if terrain at this location unavailable)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Pending",
+                Description = "Number of 4x4 terrain blocks waiting to be received or read from disk",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Loaded",
+                Description = "Number of 4x4 terrain blocks in memory",
+                NumElements = 1,
+            });
+
+        }
+
+        private Int32 mLat;
+        private Int32 mLon;
+        private float mTerrainHeight;
+        private float mCurrentHeight;
+        private UInt16 mSpacing;
+        private UInt16 mPending;
+        private UInt16 mLoaded;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Barometer readings for 2nd barometer
+    /// </summary>
+    public class UasScaledPressure2: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (milliseconds since system boot)
+        /// </summary>
+        public UInt32 TimeBootMs {
+            get { return mTimeBootMs; }
+            set { mTimeBootMs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Absolute pressure (hectopascal)
+        /// </summary>
+        public float PressAbs {
+            get { return mPressAbs; }
+            set { mPressAbs = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Differential pressure 1 (hectopascal)
+        /// </summary>
+        public float PressDiff {
+            get { return mPressDiff; }
+            set { mPressDiff = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Temperature measurement (0.01 degrees celsius)
+        /// </summary>
+        public Int16 Temperature {
+            get { return mTemperature; }
+            set { mTemperature = value; NotifyUpdated(); }
+        }
+
+        public UasScaledPressure2()
+        {
+            mMessageId = 137;
+            CrcExtra = 195;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeBootMs);
+            s.Write(mPressAbs);
+            s.Write(mPressDiff);
+            s.Write(mTemperature);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeBootMs = s.ReadUInt32();
+            this.mPressAbs = s.ReadSingle();
+            this.mPressDiff = s.ReadSingle();
+            this.mTemperature = s.ReadInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Barometer readings for 2nd barometer"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeBootMs",
+                Description = "Timestamp (milliseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "PressAbs",
+                Description = "Absolute pressure (hectopascal)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "PressDiff",
+                Description = "Differential pressure 1 (hectopascal)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Temperature",
+                Description = "Temperature measurement (0.01 degrees celsius)",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeBootMs;
+        private float mPressAbs;
+        private float mPressDiff;
+        private Int16 mTemperature;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Motion capture attitude and position
+    /// </summary>
+    public class UasAttPosMocap: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (micros since boot or Unix epoch)
+        /// </summary>
+        public UInt64 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)
+        /// </summary>
+        public float[] Q {
+            get { return mQ; }
+            set { mQ = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// X position in meters (NED)
+        /// </summary>
+        public float X {
+            get { return mX; }
+            set { mX = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Y position in meters (NED)
+        /// </summary>
+        public float Y {
+            get { return mY; }
+            set { mY = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Z position in meters (NED)
+        /// </summary>
+        public float Z {
+            get { return mZ; }
+            set { mZ = value; NotifyUpdated(); }
+        }
+
+        public UasAttPosMocap()
+        {
+            mMessageId = 138;
+            CrcExtra = 109;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mQ[0]); 
+            s.Write(mQ[1]); 
+            s.Write(mQ[2]); 
+            s.Write(mQ[3]); 
+            s.Write(mX);
+            s.Write(mY);
+            s.Write(mZ);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt64();
+            this.mQ[0] = s.ReadSingle();
+            this.mQ[1] = s.ReadSingle();
+            this.mQ[2] = s.ReadSingle();
+            this.mQ[3] = s.ReadSingle();
+            this.mX = s.ReadSingle();
+            this.mY = s.ReadSingle();
+            this.mZ = s.ReadSingle();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Motion capture attitude and position"
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (micros since boot or Unix epoch)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Q",
+                Description = "Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0)",
+                NumElements = 4,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "X",
+                Description = "X position in meters (NED)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Y",
+                Description = "Y position in meters (NED)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Z",
+                Description = "Z position in meters (NED)",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mTimeUsec;
+        private float[] mQ = new float[4];
+        private float mX;
+        private float mY;
+        private float mZ;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Set the vehicle attitude and body angular rates.
+    /// </summary>
+    public class UasSetActuatorControlTarget: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (micros since boot or Unix epoch)
+        /// </summary>
+        public UInt64 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Actuator controls. Normed to -1..+1 where 0 is neutral position. Throttle for single rotation direction motors is 0..1, negative range for reverse direction. Standard mapping for attitude controls (group 0): (index 0-7): roll, pitch, yaw, throttle, flaps, spoilers, airbrakes, landing gear. Load a pass-through mixer to repurpose them as generic outputs.
+        /// </summary>
+        public float[] Controls {
+            get { return mControls; }
+            set { mControls = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Actuator group. The '_mlx' indicates this is a multi-instance message and a MAVLink parser should use this field to difference between instances.
+        /// </summary>
+        public byte GroupMlx {
+            get { return mGroupMlx; }
+            set { mGroupMlx = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// System ID
+        /// </summary>
+        public byte TargetSystem {
+            get { return mTargetSystem; }
+            set { mTargetSystem = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Component ID
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        public UasSetActuatorControlTarget()
+        {
+            mMessageId = 139;
+            CrcExtra = 168;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mControls[0]); 
+            s.Write(mControls[1]); 
+            s.Write(mControls[2]); 
+            s.Write(mControls[3]); 
+            s.Write(mControls[4]); 
+            s.Write(mControls[5]); 
+            s.Write(mControls[6]); 
+            s.Write(mControls[7]); 
+            s.Write(mGroupMlx);
+            s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt64();
+            this.mControls[0] = s.ReadSingle();
+            this.mControls[1] = s.ReadSingle();
+            this.mControls[2] = s.ReadSingle();
+            this.mControls[3] = s.ReadSingle();
+            this.mControls[4] = s.ReadSingle();
+            this.mControls[5] = s.ReadSingle();
+            this.mControls[6] = s.ReadSingle();
+            this.mControls[7] = s.ReadSingle();
+            this.mGroupMlx = s.ReadByte();
+            this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Set the vehicle attitude and body angular rates."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (micros since boot or Unix epoch)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Controls",
+                Description = "Actuator controls. Normed to -1..+1 where 0 is neutral position. Throttle for single rotation direction motors is 0..1, negative range for reverse direction. Standard mapping for attitude controls (group 0): (index 0-7): roll, pitch, yaw, throttle, flaps, spoilers, airbrakes, landing gear. Load a pass-through mixer to repurpose them as generic outputs.",
+                NumElements = 8,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GroupMlx",
+                Description = "Actuator group. The '_mlx' indicates this is a multi-instance message and a MAVLink parser should use this field to difference between instances.",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetSystem",
+                Description = "System ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mTimeUsec;
+        private float[] mControls = new float[8];
+        private byte mGroupMlx;
+        private byte mTargetSystem;
+        private byte mTargetComponent;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Set the vehicle attitude and body angular rates.
+    /// </summary>
+    public class UasActuatorControlTarget: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (micros since boot or Unix epoch)
+        /// </summary>
+        public UInt64 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Actuator controls. Normed to -1..+1 where 0 is neutral position. Throttle for single rotation direction motors is 0..1, negative range for reverse direction. Standard mapping for attitude controls (group 0): (index 0-7): roll, pitch, yaw, throttle, flaps, spoilers, airbrakes, landing gear. Load a pass-through mixer to repurpose them as generic outputs.
+        /// </summary>
+        public float[] Controls {
+            get { return mControls; }
+            set { mControls = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Actuator group. The '_mlx' indicates this is a multi-instance message and a MAVLink parser should use this field to difference between instances.
+        /// </summary>
+        public byte GroupMlx {
+            get { return mGroupMlx; }
+            set { mGroupMlx = value; NotifyUpdated(); }
+        }
+
+        public UasActuatorControlTarget()
+        {
+            mMessageId = 140;
+            CrcExtra = 181;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mControls[0]); 
+            s.Write(mControls[1]); 
+            s.Write(mControls[2]); 
+            s.Write(mControls[3]); 
+            s.Write(mControls[4]); 
+            s.Write(mControls[5]); 
+            s.Write(mControls[6]); 
+            s.Write(mControls[7]); 
+            s.Write(mGroupMlx);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt64();
+            this.mControls[0] = s.ReadSingle();
+            this.mControls[1] = s.ReadSingle();
+            this.mControls[2] = s.ReadSingle();
+            this.mControls[3] = s.ReadSingle();
+            this.mControls[4] = s.ReadSingle();
+            this.mControls[5] = s.ReadSingle();
+            this.mControls[6] = s.ReadSingle();
+            this.mControls[7] = s.ReadSingle();
+            this.mGroupMlx = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = "Set the vehicle attitude and body angular rates."
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (micros since boot or Unix epoch)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Controls",
+                Description = "Actuator controls. Normed to -1..+1 where 0 is neutral position. Throttle for single rotation direction motors is 0..1, negative range for reverse direction. Standard mapping for attitude controls (group 0): (index 0-7): roll, pitch, yaw, throttle, flaps, spoilers, airbrakes, landing gear. Load a pass-through mixer to repurpose them as generic outputs.",
+                NumElements = 8,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GroupMlx",
+                Description = "Actuator group. The '_mlx' indicates this is a multi-instance message and a MAVLink parser should use this field to difference between instances.",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mTimeUsec;
+        private float[] mControls = new float[8];
+        private byte mGroupMlx;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    /// <summary>
+    /// Battery information
     /// </summary>
     public class UasBatteryStatus: UasMessage
     {
@@ -14423,51 +20183,19 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Battery voltage of cell 1, in millivolts (1 = 1 millivolt)
+        /// Temperature of the battery in centi-degrees celsius. INT16_MAX for unknown temperature.
         /// </summary>
-        public UInt16 VoltageCell1 {
-            get { return mVoltageCell1; }
-            set { mVoltageCell1 = value; NotifyUpdated(); }
+        public Int16 Temperature {
+            get { return mTemperature; }
+            set { mTemperature = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Battery voltage of cell 2, in millivolts (1 = 1 millivolt), -1: no cell
+        /// Battery voltage of cells, in millivolts (1 = 1 millivolt)
         /// </summary>
-        public UInt16 VoltageCell2 {
-            get { return mVoltageCell2; }
-            set { mVoltageCell2 = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Battery voltage of cell 3, in millivolts (1 = 1 millivolt), -1: no cell
-        /// </summary>
-        public UInt16 VoltageCell3 {
-            get { return mVoltageCell3; }
-            set { mVoltageCell3 = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Battery voltage of cell 4, in millivolts (1 = 1 millivolt), -1: no cell
-        /// </summary>
-        public UInt16 VoltageCell4 {
-            get { return mVoltageCell4; }
-            set { mVoltageCell4 = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Battery voltage of cell 5, in millivolts (1 = 1 millivolt), -1: no cell
-        /// </summary>
-        public UInt16 VoltageCell5 {
-            get { return mVoltageCell5; }
-            set { mVoltageCell5 = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Battery voltage of cell 6, in millivolts (1 = 1 millivolt), -1: no cell
-        /// </summary>
-        public UInt16 VoltageCell6 {
-            get { return mVoltageCell6; }
-            set { mVoltageCell6 = value; NotifyUpdated(); }
+        public UInt16[] Voltages {
+            get { return mVoltages; }
+            set { mVoltages = value; NotifyUpdated(); }
         }
 
         /// <summary>
@@ -14479,11 +20207,27 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// Accupack ID
+        /// Battery ID
         /// </summary>
-        public byte AccuId {
-            get { return mAccuId; }
-            set { mAccuId = value; NotifyUpdated(); }
+        public byte Id {
+            get { return mId; }
+            set { mId = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Function of the battery
+        /// </summary>
+        public byte BatteryFunction {
+            get { return mBatteryFunction; }
+            set { mBatteryFunction = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Type (chemistry) of the battery
+        /// </summary>
+        public byte Type {
+            get { return mType; }
+            set { mType = value; NotifyUpdated(); }
         }
 
         /// <summary>
@@ -14497,21 +20241,28 @@ namespace MavLinkNet
         public UasBatteryStatus()
         {
             mMessageId = 147;
-            CrcExtra = 177;
+            CrcExtra = 154;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
             s.Write(mCurrentConsumed);
             s.Write(mEnergyConsumed);
-            s.Write(mVoltageCell1);
-            s.Write(mVoltageCell2);
-            s.Write(mVoltageCell3);
-            s.Write(mVoltageCell4);
-            s.Write(mVoltageCell5);
-            s.Write(mVoltageCell6);
+            s.Write(mTemperature);
+            s.Write(mVoltages[0]); 
+            s.Write(mVoltages[1]); 
+            s.Write(mVoltages[2]); 
+            s.Write(mVoltages[3]); 
+            s.Write(mVoltages[4]); 
+            s.Write(mVoltages[5]); 
+            s.Write(mVoltages[6]); 
+            s.Write(mVoltages[7]); 
+            s.Write(mVoltages[8]); 
+            s.Write(mVoltages[9]); 
             s.Write(mCurrentBattery);
-            s.Write(mAccuId);
+            s.Write(mId);
+            s.Write(mBatteryFunction);
+            s.Write(mType);
             s.Write(mBatteryRemaining);
         }
 
@@ -14519,21 +20270,28 @@ namespace MavLinkNet
         {
             this.mCurrentConsumed = s.ReadInt32();
             this.mEnergyConsumed = s.ReadInt32();
-            this.mVoltageCell1 = s.ReadUInt16();
-            this.mVoltageCell2 = s.ReadUInt16();
-            this.mVoltageCell3 = s.ReadUInt16();
-            this.mVoltageCell4 = s.ReadUInt16();
-            this.mVoltageCell5 = s.ReadUInt16();
-            this.mVoltageCell6 = s.ReadUInt16();
+            this.mTemperature = s.ReadInt16();
+            this.mVoltages[0] = s.ReadUInt16();
+            this.mVoltages[1] = s.ReadUInt16();
+            this.mVoltages[2] = s.ReadUInt16();
+            this.mVoltages[3] = s.ReadUInt16();
+            this.mVoltages[4] = s.ReadUInt16();
+            this.mVoltages[5] = s.ReadUInt16();
+            this.mVoltages[6] = s.ReadUInt16();
+            this.mVoltages[7] = s.ReadUInt16();
+            this.mVoltages[8] = s.ReadUInt16();
+            this.mVoltages[9] = s.ReadUInt16();
             this.mCurrentBattery = s.ReadInt16();
-            this.mAccuId = s.ReadByte();
+            this.mId = s.ReadByte();
+            this.mBatteryFunction = s.ReadByte();
+            this.mType = s.ReadByte();
             this.mBatteryRemaining = s.ReadSByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Transmitte battery informations for a accu pack."
+                Description = "Battery information"
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
@@ -14549,39 +20307,15 @@ namespace MavLinkNet
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "VoltageCell1",
-                Description = "Battery voltage of cell 1, in millivolts (1 = 1 millivolt)",
+                Name = "Temperature",
+                Description = "Temperature of the battery in centi-degrees celsius. INT16_MAX for unknown temperature.",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "VoltageCell2",
-                Description = "Battery voltage of cell 2, in millivolts (1 = 1 millivolt), -1: no cell",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "VoltageCell3",
-                Description = "Battery voltage of cell 3, in millivolts (1 = 1 millivolt), -1: no cell",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "VoltageCell4",
-                Description = "Battery voltage of cell 4, in millivolts (1 = 1 millivolt), -1: no cell",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "VoltageCell5",
-                Description = "Battery voltage of cell 5, in millivolts (1 = 1 millivolt), -1: no cell",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "VoltageCell6",
-                Description = "Battery voltage of cell 6, in millivolts (1 = 1 millivolt), -1: no cell",
-                NumElements = 1,
+                Name = "Voltages",
+                Description = "Battery voltage of cells, in millivolts (1 = 1 millivolt)",
+                NumElements = 10,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
@@ -14591,8 +20325,20 @@ namespace MavLinkNet
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "AccuId",
-                Description = "Accupack ID",
+                Name = "Id",
+                Description = "Battery ID",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "BatteryFunction",
+                Description = "Function of the battery",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Type",
+                Description = "Type (chemistry) of the battery",
                 NumElements = 1,
             });
 
@@ -14606,14 +20352,12 @@ namespace MavLinkNet
 
         private Int32 mCurrentConsumed;
         private Int32 mEnergyConsumed;
-        private UInt16 mVoltageCell1;
-        private UInt16 mVoltageCell2;
-        private UInt16 mVoltageCell3;
-        private UInt16 mVoltageCell4;
-        private UInt16 mVoltageCell5;
-        private UInt16 mVoltageCell6;
+        private Int16 mTemperature;
+        private UInt16[] mVoltages = new UInt16[10];
         private Int16 mCurrentBattery;
-        private byte mAccuId;
+        private byte mId;
+        private byte mBatteryFunction;
+        private byte mType;
         private SByte mBatteryRemaining;
     }
 
@@ -14622,185 +20366,262 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Set the 8 DOF setpoint for a controller.
+    /// Version and capability of autopilot software
     /// </summary>
-    public class UasSetpoint8dof: UasMessage
+    public class UasAutopilotVersion: UasMessage
     {
         /// <summary>
-        /// Value 1
+        /// bitmask of capabilities (see MAV_PROTOCOL_CAPABILITY enum)
         /// </summary>
-        public float Val1 {
-            get { return mVal1; }
-            set { mVal1 = value; NotifyUpdated(); }
+        public MavProtocolCapability Capabilities {
+            get { return mCapabilities; }
+            set { mCapabilities = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Value 2
+        /// UID if provided by hardware
         /// </summary>
-        public float Val2 {
-            get { return mVal2; }
-            set { mVal2 = value; NotifyUpdated(); }
+        public UInt64 Uid {
+            get { return mUid; }
+            set { mUid = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Value 3
+        /// Firmware version number
         /// </summary>
-        public float Val3 {
-            get { return mVal3; }
-            set { mVal3 = value; NotifyUpdated(); }
+        public UInt32 FlightSwVersion {
+            get { return mFlightSwVersion; }
+            set { mFlightSwVersion = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Value 4
+        /// Middleware version number
         /// </summary>
-        public float Val4 {
-            get { return mVal4; }
-            set { mVal4 = value; NotifyUpdated(); }
+        public UInt32 MiddlewareSwVersion {
+            get { return mMiddlewareSwVersion; }
+            set { mMiddlewareSwVersion = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Value 5
+        /// Operating system version number
         /// </summary>
-        public float Val5 {
-            get { return mVal5; }
-            set { mVal5 = value; NotifyUpdated(); }
+        public UInt32 OsSwVersion {
+            get { return mOsSwVersion; }
+            set { mOsSwVersion = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Value 6
+        /// HW / board version (last 8 bytes should be silicon ID, if any)
         /// </summary>
-        public float Val6 {
-            get { return mVal6; }
-            set { mVal6 = value; NotifyUpdated(); }
+        public UInt32 BoardVersion {
+            get { return mBoardVersion; }
+            set { mBoardVersion = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Value 7
+        /// ID of the board vendor
         /// </summary>
-        public float Val7 {
-            get { return mVal7; }
-            set { mVal7 = value; NotifyUpdated(); }
+        public UInt16 VendorId {
+            get { return mVendorId; }
+            set { mVendorId = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Value 8
+        /// ID of the product
         /// </summary>
-        public float Val8 {
-            get { return mVal8; }
-            set { mVal8 = value; NotifyUpdated(); }
+        public UInt16 ProductId {
+            get { return mProductId; }
+            set { mProductId = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// System ID
+        /// Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
         /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
+        public byte[] FlightCustomVersion {
+            get { return mFlightCustomVersion; }
+            set { mFlightCustomVersion = value; NotifyUpdated(); }
         }
 
-        public UasSetpoint8dof()
+        /// <summary>
+        /// Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+        /// </summary>
+        public byte[] MiddlewareCustomVersion {
+            get { return mMiddlewareCustomVersion; }
+            set { mMiddlewareCustomVersion = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.
+        /// </summary>
+        public byte[] OsCustomVersion {
+            get { return mOsCustomVersion; }
+            set { mOsCustomVersion = value; NotifyUpdated(); }
+        }
+
+        public UasAutopilotVersion()
         {
             mMessageId = 148;
-            CrcExtra = 241;
+            CrcExtra = 178;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mVal1);
-            s.Write(mVal2);
-            s.Write(mVal3);
-            s.Write(mVal4);
-            s.Write(mVal5);
-            s.Write(mVal6);
-            s.Write(mVal7);
-            s.Write(mVal8);
-            s.Write(mTargetSystem);
+            s.Write((UInt64)mCapabilities);
+            s.Write(mUid);
+            s.Write(mFlightSwVersion);
+            s.Write(mMiddlewareSwVersion);
+            s.Write(mOsSwVersion);
+            s.Write(mBoardVersion);
+            s.Write(mVendorId);
+            s.Write(mProductId);
+            s.Write(mFlightCustomVersion[0]); 
+            s.Write(mFlightCustomVersion[1]); 
+            s.Write(mFlightCustomVersion[2]); 
+            s.Write(mFlightCustomVersion[3]); 
+            s.Write(mFlightCustomVersion[4]); 
+            s.Write(mFlightCustomVersion[5]); 
+            s.Write(mFlightCustomVersion[6]); 
+            s.Write(mFlightCustomVersion[7]); 
+            s.Write(mMiddlewareCustomVersion[0]); 
+            s.Write(mMiddlewareCustomVersion[1]); 
+            s.Write(mMiddlewareCustomVersion[2]); 
+            s.Write(mMiddlewareCustomVersion[3]); 
+            s.Write(mMiddlewareCustomVersion[4]); 
+            s.Write(mMiddlewareCustomVersion[5]); 
+            s.Write(mMiddlewareCustomVersion[6]); 
+            s.Write(mMiddlewareCustomVersion[7]); 
+            s.Write(mOsCustomVersion[0]); 
+            s.Write(mOsCustomVersion[1]); 
+            s.Write(mOsCustomVersion[2]); 
+            s.Write(mOsCustomVersion[3]); 
+            s.Write(mOsCustomVersion[4]); 
+            s.Write(mOsCustomVersion[5]); 
+            s.Write(mOsCustomVersion[6]); 
+            s.Write(mOsCustomVersion[7]); 
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mVal1 = s.ReadSingle();
-            this.mVal2 = s.ReadSingle();
-            this.mVal3 = s.ReadSingle();
-            this.mVal4 = s.ReadSingle();
-            this.mVal5 = s.ReadSingle();
-            this.mVal6 = s.ReadSingle();
-            this.mVal7 = s.ReadSingle();
-            this.mVal8 = s.ReadSingle();
-            this.mTargetSystem = s.ReadByte();
+            this.mCapabilities = (MavProtocolCapability)s.ReadUInt64();
+            this.mUid = s.ReadUInt64();
+            this.mFlightSwVersion = s.ReadUInt32();
+            this.mMiddlewareSwVersion = s.ReadUInt32();
+            this.mOsSwVersion = s.ReadUInt32();
+            this.mBoardVersion = s.ReadUInt32();
+            this.mVendorId = s.ReadUInt16();
+            this.mProductId = s.ReadUInt16();
+            this.mFlightCustomVersion[0] = s.ReadByte();
+            this.mFlightCustomVersion[1] = s.ReadByte();
+            this.mFlightCustomVersion[2] = s.ReadByte();
+            this.mFlightCustomVersion[3] = s.ReadByte();
+            this.mFlightCustomVersion[4] = s.ReadByte();
+            this.mFlightCustomVersion[5] = s.ReadByte();
+            this.mFlightCustomVersion[6] = s.ReadByte();
+            this.mFlightCustomVersion[7] = s.ReadByte();
+            this.mMiddlewareCustomVersion[0] = s.ReadByte();
+            this.mMiddlewareCustomVersion[1] = s.ReadByte();
+            this.mMiddlewareCustomVersion[2] = s.ReadByte();
+            this.mMiddlewareCustomVersion[3] = s.ReadByte();
+            this.mMiddlewareCustomVersion[4] = s.ReadByte();
+            this.mMiddlewareCustomVersion[5] = s.ReadByte();
+            this.mMiddlewareCustomVersion[6] = s.ReadByte();
+            this.mMiddlewareCustomVersion[7] = s.ReadByte();
+            this.mOsCustomVersion[0] = s.ReadByte();
+            this.mOsCustomVersion[1] = s.ReadByte();
+            this.mOsCustomVersion[2] = s.ReadByte();
+            this.mOsCustomVersion[3] = s.ReadByte();
+            this.mOsCustomVersion[4] = s.ReadByte();
+            this.mOsCustomVersion[5] = s.ReadByte();
+            this.mOsCustomVersion[6] = s.ReadByte();
+            this.mOsCustomVersion[7] = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Set the 8 DOF setpoint for a controller."
+                Description = "Version and capability of autopilot software"
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Val1",
-                Description = "Value 1",
+                Name = "Capabilities",
+                Description = "bitmask of capabilities (see MAV_PROTOCOL_CAPABILITY enum)",
+                NumElements = 1,
+                EnumMetadata = UasSummary.GetEnumMetadata("MavProtocolCapability"),
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Uid",
+                Description = "UID if provided by hardware",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Val2",
-                Description = "Value 2",
+                Name = "FlightSwVersion",
+                Description = "Firmware version number",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Val3",
-                Description = "Value 3",
+                Name = "MiddlewareSwVersion",
+                Description = "Middleware version number",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Val4",
-                Description = "Value 4",
+                Name = "OsSwVersion",
+                Description = "Operating system version number",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Val5",
-                Description = "Value 5",
+                Name = "BoardVersion",
+                Description = "HW / board version (last 8 bytes should be silicon ID, if any)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Val6",
-                Description = "Value 6",
+                Name = "VendorId",
+                Description = "ID of the board vendor",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Val7",
-                Description = "Value 7",
+                Name = "ProductId",
+                Description = "ID of the product",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Val8",
-                Description = "Value 8",
-                NumElements = 1,
+                Name = "FlightCustomVersion",
+                Description = "Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.",
+                NumElements = 8,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
+                Name = "MiddlewareCustomVersion",
+                Description = "Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.",
+                NumElements = 8,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "OsCustomVersion",
+                Description = "Custom version field, commonly the first 8 bytes of the git hash. This is not an unique identifier, but should allow to identify the commit using the main version number even for very large code bases.",
+                NumElements = 8,
             });
 
         }
 
-        private float mVal1;
-        private float mVal2;
-        private float mVal3;
-        private float mVal4;
-        private float mVal5;
-        private float mVal6;
-        private float mVal7;
-        private float mVal8;
-        private byte mTargetSystem;
+        private MavProtocolCapability mCapabilities;
+        private UInt64 mUid;
+        private UInt32 mFlightSwVersion;
+        private UInt32 mMiddlewareSwVersion;
+        private UInt32 mOsSwVersion;
+        private UInt32 mBoardVersion;
+        private UInt16 mVendorId;
+        private UInt16 mProductId;
+        private byte[] mFlightCustomVersion = new byte[8];
+        private byte[] mMiddlewareCustomVersion = new byte[8];
+        private byte[] mOsCustomVersion = new byte[8];
     }
 
 
@@ -14808,151 +20629,613 @@ namespace MavLinkNet
 
 
     /// <summary>
-    /// Set the 6 DOF setpoint for a attitude and position controller.
+    /// Message implementing parts of the V2 payload specs in V1 frames for transitional support.
     /// </summary>
-    public class UasSetpoint6dof: UasMessage
+    public class UasV2Extension: UasMessage
     {
         /// <summary>
-        /// Translational Component in x
+        /// A code that identifies the software component that understands this message (analogous to usb device classes or mime type strings).  If this code is less than 32768, it is considered a 'registered' protocol extension and the corresponding entry should be added to https://github.com/mavlink/mavlink/extension-message-ids.xml.  Software creators can register blocks of message IDs as needed (useful for GCS specific metadata, etc...). Message_types greater than 32767 are considered local experiments and should not be checked in to any widely distributed codebase.
         /// </summary>
-        public float TransX {
-            get { return mTransX; }
-            set { mTransX = value; NotifyUpdated(); }
+        public UInt16 MessageType {
+            get { return mMessageType; }
+            set { mMessageType = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Translational Component in y
+        /// Network ID (0 for broadcast)
         /// </summary>
-        public float TransY {
-            get { return mTransY; }
-            set { mTransY = value; NotifyUpdated(); }
+        public byte TargetNetwork {
+            get { return mTargetNetwork; }
+            set { mTargetNetwork = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Translational Component in z
-        /// </summary>
-        public float TransZ {
-            get { return mTransZ; }
-            set { mTransZ = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Rotational Component in x
-        /// </summary>
-        public float RotX {
-            get { return mRotX; }
-            set { mRotX = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Rotational Component in y
-        /// </summary>
-        public float RotY {
-            get { return mRotY; }
-            set { mRotY = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Rotational Component in z
-        /// </summary>
-        public float RotZ {
-            get { return mRotZ; }
-            set { mRotZ = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID
+        /// System ID (0 for broadcast)
         /// </summary>
         public byte TargetSystem {
             get { return mTargetSystem; }
             set { mTargetSystem = value; NotifyUpdated(); }
         }
 
-        public UasSetpoint6dof()
+        /// <summary>
+        /// Component ID (0 for broadcast)
+        /// </summary>
+        public byte TargetComponent {
+            get { return mTargetComponent; }
+            set { mTargetComponent = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification.
+        /// </summary>
+        public byte[] Payload {
+            get { return mPayload; }
+            set { mPayload = value; NotifyUpdated(); }
+        }
+
+        public UasV2Extension()
         {
-            mMessageId = 149;
-            CrcExtra = 15;
+            mMessageId = 248;
+            CrcExtra = 8;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mTransX);
-            s.Write(mTransY);
-            s.Write(mTransZ);
-            s.Write(mRotX);
-            s.Write(mRotY);
-            s.Write(mRotZ);
+            s.Write(mMessageType);
+            s.Write(mTargetNetwork);
             s.Write(mTargetSystem);
+            s.Write(mTargetComponent);
+            s.Write(mPayload[0]); 
+            s.Write(mPayload[1]); 
+            s.Write(mPayload[2]); 
+            s.Write(mPayload[3]); 
+            s.Write(mPayload[4]); 
+            s.Write(mPayload[5]); 
+            s.Write(mPayload[6]); 
+            s.Write(mPayload[7]); 
+            s.Write(mPayload[8]); 
+            s.Write(mPayload[9]); 
+            s.Write(mPayload[10]); 
+            s.Write(mPayload[11]); 
+            s.Write(mPayload[12]); 
+            s.Write(mPayload[13]); 
+            s.Write(mPayload[14]); 
+            s.Write(mPayload[15]); 
+            s.Write(mPayload[16]); 
+            s.Write(mPayload[17]); 
+            s.Write(mPayload[18]); 
+            s.Write(mPayload[19]); 
+            s.Write(mPayload[20]); 
+            s.Write(mPayload[21]); 
+            s.Write(mPayload[22]); 
+            s.Write(mPayload[23]); 
+            s.Write(mPayload[24]); 
+            s.Write(mPayload[25]); 
+            s.Write(mPayload[26]); 
+            s.Write(mPayload[27]); 
+            s.Write(mPayload[28]); 
+            s.Write(mPayload[29]); 
+            s.Write(mPayload[30]); 
+            s.Write(mPayload[31]); 
+            s.Write(mPayload[32]); 
+            s.Write(mPayload[33]); 
+            s.Write(mPayload[34]); 
+            s.Write(mPayload[35]); 
+            s.Write(mPayload[36]); 
+            s.Write(mPayload[37]); 
+            s.Write(mPayload[38]); 
+            s.Write(mPayload[39]); 
+            s.Write(mPayload[40]); 
+            s.Write(mPayload[41]); 
+            s.Write(mPayload[42]); 
+            s.Write(mPayload[43]); 
+            s.Write(mPayload[44]); 
+            s.Write(mPayload[45]); 
+            s.Write(mPayload[46]); 
+            s.Write(mPayload[47]); 
+            s.Write(mPayload[48]); 
+            s.Write(mPayload[49]); 
+            s.Write(mPayload[50]); 
+            s.Write(mPayload[51]); 
+            s.Write(mPayload[52]); 
+            s.Write(mPayload[53]); 
+            s.Write(mPayload[54]); 
+            s.Write(mPayload[55]); 
+            s.Write(mPayload[56]); 
+            s.Write(mPayload[57]); 
+            s.Write(mPayload[58]); 
+            s.Write(mPayload[59]); 
+            s.Write(mPayload[60]); 
+            s.Write(mPayload[61]); 
+            s.Write(mPayload[62]); 
+            s.Write(mPayload[63]); 
+            s.Write(mPayload[64]); 
+            s.Write(mPayload[65]); 
+            s.Write(mPayload[66]); 
+            s.Write(mPayload[67]); 
+            s.Write(mPayload[68]); 
+            s.Write(mPayload[69]); 
+            s.Write(mPayload[70]); 
+            s.Write(mPayload[71]); 
+            s.Write(mPayload[72]); 
+            s.Write(mPayload[73]); 
+            s.Write(mPayload[74]); 
+            s.Write(mPayload[75]); 
+            s.Write(mPayload[76]); 
+            s.Write(mPayload[77]); 
+            s.Write(mPayload[78]); 
+            s.Write(mPayload[79]); 
+            s.Write(mPayload[80]); 
+            s.Write(mPayload[81]); 
+            s.Write(mPayload[82]); 
+            s.Write(mPayload[83]); 
+            s.Write(mPayload[84]); 
+            s.Write(mPayload[85]); 
+            s.Write(mPayload[86]); 
+            s.Write(mPayload[87]); 
+            s.Write(mPayload[88]); 
+            s.Write(mPayload[89]); 
+            s.Write(mPayload[90]); 
+            s.Write(mPayload[91]); 
+            s.Write(mPayload[92]); 
+            s.Write(mPayload[93]); 
+            s.Write(mPayload[94]); 
+            s.Write(mPayload[95]); 
+            s.Write(mPayload[96]); 
+            s.Write(mPayload[97]); 
+            s.Write(mPayload[98]); 
+            s.Write(mPayload[99]); 
+            s.Write(mPayload[100]); 
+            s.Write(mPayload[101]); 
+            s.Write(mPayload[102]); 
+            s.Write(mPayload[103]); 
+            s.Write(mPayload[104]); 
+            s.Write(mPayload[105]); 
+            s.Write(mPayload[106]); 
+            s.Write(mPayload[107]); 
+            s.Write(mPayload[108]); 
+            s.Write(mPayload[109]); 
+            s.Write(mPayload[110]); 
+            s.Write(mPayload[111]); 
+            s.Write(mPayload[112]); 
+            s.Write(mPayload[113]); 
+            s.Write(mPayload[114]); 
+            s.Write(mPayload[115]); 
+            s.Write(mPayload[116]); 
+            s.Write(mPayload[117]); 
+            s.Write(mPayload[118]); 
+            s.Write(mPayload[119]); 
+            s.Write(mPayload[120]); 
+            s.Write(mPayload[121]); 
+            s.Write(mPayload[122]); 
+            s.Write(mPayload[123]); 
+            s.Write(mPayload[124]); 
+            s.Write(mPayload[125]); 
+            s.Write(mPayload[126]); 
+            s.Write(mPayload[127]); 
+            s.Write(mPayload[128]); 
+            s.Write(mPayload[129]); 
+            s.Write(mPayload[130]); 
+            s.Write(mPayload[131]); 
+            s.Write(mPayload[132]); 
+            s.Write(mPayload[133]); 
+            s.Write(mPayload[134]); 
+            s.Write(mPayload[135]); 
+            s.Write(mPayload[136]); 
+            s.Write(mPayload[137]); 
+            s.Write(mPayload[138]); 
+            s.Write(mPayload[139]); 
+            s.Write(mPayload[140]); 
+            s.Write(mPayload[141]); 
+            s.Write(mPayload[142]); 
+            s.Write(mPayload[143]); 
+            s.Write(mPayload[144]); 
+            s.Write(mPayload[145]); 
+            s.Write(mPayload[146]); 
+            s.Write(mPayload[147]); 
+            s.Write(mPayload[148]); 
+            s.Write(mPayload[149]); 
+            s.Write(mPayload[150]); 
+            s.Write(mPayload[151]); 
+            s.Write(mPayload[152]); 
+            s.Write(mPayload[153]); 
+            s.Write(mPayload[154]); 
+            s.Write(mPayload[155]); 
+            s.Write(mPayload[156]); 
+            s.Write(mPayload[157]); 
+            s.Write(mPayload[158]); 
+            s.Write(mPayload[159]); 
+            s.Write(mPayload[160]); 
+            s.Write(mPayload[161]); 
+            s.Write(mPayload[162]); 
+            s.Write(mPayload[163]); 
+            s.Write(mPayload[164]); 
+            s.Write(mPayload[165]); 
+            s.Write(mPayload[166]); 
+            s.Write(mPayload[167]); 
+            s.Write(mPayload[168]); 
+            s.Write(mPayload[169]); 
+            s.Write(mPayload[170]); 
+            s.Write(mPayload[171]); 
+            s.Write(mPayload[172]); 
+            s.Write(mPayload[173]); 
+            s.Write(mPayload[174]); 
+            s.Write(mPayload[175]); 
+            s.Write(mPayload[176]); 
+            s.Write(mPayload[177]); 
+            s.Write(mPayload[178]); 
+            s.Write(mPayload[179]); 
+            s.Write(mPayload[180]); 
+            s.Write(mPayload[181]); 
+            s.Write(mPayload[182]); 
+            s.Write(mPayload[183]); 
+            s.Write(mPayload[184]); 
+            s.Write(mPayload[185]); 
+            s.Write(mPayload[186]); 
+            s.Write(mPayload[187]); 
+            s.Write(mPayload[188]); 
+            s.Write(mPayload[189]); 
+            s.Write(mPayload[190]); 
+            s.Write(mPayload[191]); 
+            s.Write(mPayload[192]); 
+            s.Write(mPayload[193]); 
+            s.Write(mPayload[194]); 
+            s.Write(mPayload[195]); 
+            s.Write(mPayload[196]); 
+            s.Write(mPayload[197]); 
+            s.Write(mPayload[198]); 
+            s.Write(mPayload[199]); 
+            s.Write(mPayload[200]); 
+            s.Write(mPayload[201]); 
+            s.Write(mPayload[202]); 
+            s.Write(mPayload[203]); 
+            s.Write(mPayload[204]); 
+            s.Write(mPayload[205]); 
+            s.Write(mPayload[206]); 
+            s.Write(mPayload[207]); 
+            s.Write(mPayload[208]); 
+            s.Write(mPayload[209]); 
+            s.Write(mPayload[210]); 
+            s.Write(mPayload[211]); 
+            s.Write(mPayload[212]); 
+            s.Write(mPayload[213]); 
+            s.Write(mPayload[214]); 
+            s.Write(mPayload[215]); 
+            s.Write(mPayload[216]); 
+            s.Write(mPayload[217]); 
+            s.Write(mPayload[218]); 
+            s.Write(mPayload[219]); 
+            s.Write(mPayload[220]); 
+            s.Write(mPayload[221]); 
+            s.Write(mPayload[222]); 
+            s.Write(mPayload[223]); 
+            s.Write(mPayload[224]); 
+            s.Write(mPayload[225]); 
+            s.Write(mPayload[226]); 
+            s.Write(mPayload[227]); 
+            s.Write(mPayload[228]); 
+            s.Write(mPayload[229]); 
+            s.Write(mPayload[230]); 
+            s.Write(mPayload[231]); 
+            s.Write(mPayload[232]); 
+            s.Write(mPayload[233]); 
+            s.Write(mPayload[234]); 
+            s.Write(mPayload[235]); 
+            s.Write(mPayload[236]); 
+            s.Write(mPayload[237]); 
+            s.Write(mPayload[238]); 
+            s.Write(mPayload[239]); 
+            s.Write(mPayload[240]); 
+            s.Write(mPayload[241]); 
+            s.Write(mPayload[242]); 
+            s.Write(mPayload[243]); 
+            s.Write(mPayload[244]); 
+            s.Write(mPayload[245]); 
+            s.Write(mPayload[246]); 
+            s.Write(mPayload[247]); 
+            s.Write(mPayload[248]); 
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mTransX = s.ReadSingle();
-            this.mTransY = s.ReadSingle();
-            this.mTransZ = s.ReadSingle();
-            this.mRotX = s.ReadSingle();
-            this.mRotY = s.ReadSingle();
-            this.mRotZ = s.ReadSingle();
+            this.mMessageType = s.ReadUInt16();
+            this.mTargetNetwork = s.ReadByte();
             this.mTargetSystem = s.ReadByte();
+            this.mTargetComponent = s.ReadByte();
+            this.mPayload[0] = s.ReadByte();
+            this.mPayload[1] = s.ReadByte();
+            this.mPayload[2] = s.ReadByte();
+            this.mPayload[3] = s.ReadByte();
+            this.mPayload[4] = s.ReadByte();
+            this.mPayload[5] = s.ReadByte();
+            this.mPayload[6] = s.ReadByte();
+            this.mPayload[7] = s.ReadByte();
+            this.mPayload[8] = s.ReadByte();
+            this.mPayload[9] = s.ReadByte();
+            this.mPayload[10] = s.ReadByte();
+            this.mPayload[11] = s.ReadByte();
+            this.mPayload[12] = s.ReadByte();
+            this.mPayload[13] = s.ReadByte();
+            this.mPayload[14] = s.ReadByte();
+            this.mPayload[15] = s.ReadByte();
+            this.mPayload[16] = s.ReadByte();
+            this.mPayload[17] = s.ReadByte();
+            this.mPayload[18] = s.ReadByte();
+            this.mPayload[19] = s.ReadByte();
+            this.mPayload[20] = s.ReadByte();
+            this.mPayload[21] = s.ReadByte();
+            this.mPayload[22] = s.ReadByte();
+            this.mPayload[23] = s.ReadByte();
+            this.mPayload[24] = s.ReadByte();
+            this.mPayload[25] = s.ReadByte();
+            this.mPayload[26] = s.ReadByte();
+            this.mPayload[27] = s.ReadByte();
+            this.mPayload[28] = s.ReadByte();
+            this.mPayload[29] = s.ReadByte();
+            this.mPayload[30] = s.ReadByte();
+            this.mPayload[31] = s.ReadByte();
+            this.mPayload[32] = s.ReadByte();
+            this.mPayload[33] = s.ReadByte();
+            this.mPayload[34] = s.ReadByte();
+            this.mPayload[35] = s.ReadByte();
+            this.mPayload[36] = s.ReadByte();
+            this.mPayload[37] = s.ReadByte();
+            this.mPayload[38] = s.ReadByte();
+            this.mPayload[39] = s.ReadByte();
+            this.mPayload[40] = s.ReadByte();
+            this.mPayload[41] = s.ReadByte();
+            this.mPayload[42] = s.ReadByte();
+            this.mPayload[43] = s.ReadByte();
+            this.mPayload[44] = s.ReadByte();
+            this.mPayload[45] = s.ReadByte();
+            this.mPayload[46] = s.ReadByte();
+            this.mPayload[47] = s.ReadByte();
+            this.mPayload[48] = s.ReadByte();
+            this.mPayload[49] = s.ReadByte();
+            this.mPayload[50] = s.ReadByte();
+            this.mPayload[51] = s.ReadByte();
+            this.mPayload[52] = s.ReadByte();
+            this.mPayload[53] = s.ReadByte();
+            this.mPayload[54] = s.ReadByte();
+            this.mPayload[55] = s.ReadByte();
+            this.mPayload[56] = s.ReadByte();
+            this.mPayload[57] = s.ReadByte();
+            this.mPayload[58] = s.ReadByte();
+            this.mPayload[59] = s.ReadByte();
+            this.mPayload[60] = s.ReadByte();
+            this.mPayload[61] = s.ReadByte();
+            this.mPayload[62] = s.ReadByte();
+            this.mPayload[63] = s.ReadByte();
+            this.mPayload[64] = s.ReadByte();
+            this.mPayload[65] = s.ReadByte();
+            this.mPayload[66] = s.ReadByte();
+            this.mPayload[67] = s.ReadByte();
+            this.mPayload[68] = s.ReadByte();
+            this.mPayload[69] = s.ReadByte();
+            this.mPayload[70] = s.ReadByte();
+            this.mPayload[71] = s.ReadByte();
+            this.mPayload[72] = s.ReadByte();
+            this.mPayload[73] = s.ReadByte();
+            this.mPayload[74] = s.ReadByte();
+            this.mPayload[75] = s.ReadByte();
+            this.mPayload[76] = s.ReadByte();
+            this.mPayload[77] = s.ReadByte();
+            this.mPayload[78] = s.ReadByte();
+            this.mPayload[79] = s.ReadByte();
+            this.mPayload[80] = s.ReadByte();
+            this.mPayload[81] = s.ReadByte();
+            this.mPayload[82] = s.ReadByte();
+            this.mPayload[83] = s.ReadByte();
+            this.mPayload[84] = s.ReadByte();
+            this.mPayload[85] = s.ReadByte();
+            this.mPayload[86] = s.ReadByte();
+            this.mPayload[87] = s.ReadByte();
+            this.mPayload[88] = s.ReadByte();
+            this.mPayload[89] = s.ReadByte();
+            this.mPayload[90] = s.ReadByte();
+            this.mPayload[91] = s.ReadByte();
+            this.mPayload[92] = s.ReadByte();
+            this.mPayload[93] = s.ReadByte();
+            this.mPayload[94] = s.ReadByte();
+            this.mPayload[95] = s.ReadByte();
+            this.mPayload[96] = s.ReadByte();
+            this.mPayload[97] = s.ReadByte();
+            this.mPayload[98] = s.ReadByte();
+            this.mPayload[99] = s.ReadByte();
+            this.mPayload[100] = s.ReadByte();
+            this.mPayload[101] = s.ReadByte();
+            this.mPayload[102] = s.ReadByte();
+            this.mPayload[103] = s.ReadByte();
+            this.mPayload[104] = s.ReadByte();
+            this.mPayload[105] = s.ReadByte();
+            this.mPayload[106] = s.ReadByte();
+            this.mPayload[107] = s.ReadByte();
+            this.mPayload[108] = s.ReadByte();
+            this.mPayload[109] = s.ReadByte();
+            this.mPayload[110] = s.ReadByte();
+            this.mPayload[111] = s.ReadByte();
+            this.mPayload[112] = s.ReadByte();
+            this.mPayload[113] = s.ReadByte();
+            this.mPayload[114] = s.ReadByte();
+            this.mPayload[115] = s.ReadByte();
+            this.mPayload[116] = s.ReadByte();
+            this.mPayload[117] = s.ReadByte();
+            this.mPayload[118] = s.ReadByte();
+            this.mPayload[119] = s.ReadByte();
+            this.mPayload[120] = s.ReadByte();
+            this.mPayload[121] = s.ReadByte();
+            this.mPayload[122] = s.ReadByte();
+            this.mPayload[123] = s.ReadByte();
+            this.mPayload[124] = s.ReadByte();
+            this.mPayload[125] = s.ReadByte();
+            this.mPayload[126] = s.ReadByte();
+            this.mPayload[127] = s.ReadByte();
+            this.mPayload[128] = s.ReadByte();
+            this.mPayload[129] = s.ReadByte();
+            this.mPayload[130] = s.ReadByte();
+            this.mPayload[131] = s.ReadByte();
+            this.mPayload[132] = s.ReadByte();
+            this.mPayload[133] = s.ReadByte();
+            this.mPayload[134] = s.ReadByte();
+            this.mPayload[135] = s.ReadByte();
+            this.mPayload[136] = s.ReadByte();
+            this.mPayload[137] = s.ReadByte();
+            this.mPayload[138] = s.ReadByte();
+            this.mPayload[139] = s.ReadByte();
+            this.mPayload[140] = s.ReadByte();
+            this.mPayload[141] = s.ReadByte();
+            this.mPayload[142] = s.ReadByte();
+            this.mPayload[143] = s.ReadByte();
+            this.mPayload[144] = s.ReadByte();
+            this.mPayload[145] = s.ReadByte();
+            this.mPayload[146] = s.ReadByte();
+            this.mPayload[147] = s.ReadByte();
+            this.mPayload[148] = s.ReadByte();
+            this.mPayload[149] = s.ReadByte();
+            this.mPayload[150] = s.ReadByte();
+            this.mPayload[151] = s.ReadByte();
+            this.mPayload[152] = s.ReadByte();
+            this.mPayload[153] = s.ReadByte();
+            this.mPayload[154] = s.ReadByte();
+            this.mPayload[155] = s.ReadByte();
+            this.mPayload[156] = s.ReadByte();
+            this.mPayload[157] = s.ReadByte();
+            this.mPayload[158] = s.ReadByte();
+            this.mPayload[159] = s.ReadByte();
+            this.mPayload[160] = s.ReadByte();
+            this.mPayload[161] = s.ReadByte();
+            this.mPayload[162] = s.ReadByte();
+            this.mPayload[163] = s.ReadByte();
+            this.mPayload[164] = s.ReadByte();
+            this.mPayload[165] = s.ReadByte();
+            this.mPayload[166] = s.ReadByte();
+            this.mPayload[167] = s.ReadByte();
+            this.mPayload[168] = s.ReadByte();
+            this.mPayload[169] = s.ReadByte();
+            this.mPayload[170] = s.ReadByte();
+            this.mPayload[171] = s.ReadByte();
+            this.mPayload[172] = s.ReadByte();
+            this.mPayload[173] = s.ReadByte();
+            this.mPayload[174] = s.ReadByte();
+            this.mPayload[175] = s.ReadByte();
+            this.mPayload[176] = s.ReadByte();
+            this.mPayload[177] = s.ReadByte();
+            this.mPayload[178] = s.ReadByte();
+            this.mPayload[179] = s.ReadByte();
+            this.mPayload[180] = s.ReadByte();
+            this.mPayload[181] = s.ReadByte();
+            this.mPayload[182] = s.ReadByte();
+            this.mPayload[183] = s.ReadByte();
+            this.mPayload[184] = s.ReadByte();
+            this.mPayload[185] = s.ReadByte();
+            this.mPayload[186] = s.ReadByte();
+            this.mPayload[187] = s.ReadByte();
+            this.mPayload[188] = s.ReadByte();
+            this.mPayload[189] = s.ReadByte();
+            this.mPayload[190] = s.ReadByte();
+            this.mPayload[191] = s.ReadByte();
+            this.mPayload[192] = s.ReadByte();
+            this.mPayload[193] = s.ReadByte();
+            this.mPayload[194] = s.ReadByte();
+            this.mPayload[195] = s.ReadByte();
+            this.mPayload[196] = s.ReadByte();
+            this.mPayload[197] = s.ReadByte();
+            this.mPayload[198] = s.ReadByte();
+            this.mPayload[199] = s.ReadByte();
+            this.mPayload[200] = s.ReadByte();
+            this.mPayload[201] = s.ReadByte();
+            this.mPayload[202] = s.ReadByte();
+            this.mPayload[203] = s.ReadByte();
+            this.mPayload[204] = s.ReadByte();
+            this.mPayload[205] = s.ReadByte();
+            this.mPayload[206] = s.ReadByte();
+            this.mPayload[207] = s.ReadByte();
+            this.mPayload[208] = s.ReadByte();
+            this.mPayload[209] = s.ReadByte();
+            this.mPayload[210] = s.ReadByte();
+            this.mPayload[211] = s.ReadByte();
+            this.mPayload[212] = s.ReadByte();
+            this.mPayload[213] = s.ReadByte();
+            this.mPayload[214] = s.ReadByte();
+            this.mPayload[215] = s.ReadByte();
+            this.mPayload[216] = s.ReadByte();
+            this.mPayload[217] = s.ReadByte();
+            this.mPayload[218] = s.ReadByte();
+            this.mPayload[219] = s.ReadByte();
+            this.mPayload[220] = s.ReadByte();
+            this.mPayload[221] = s.ReadByte();
+            this.mPayload[222] = s.ReadByte();
+            this.mPayload[223] = s.ReadByte();
+            this.mPayload[224] = s.ReadByte();
+            this.mPayload[225] = s.ReadByte();
+            this.mPayload[226] = s.ReadByte();
+            this.mPayload[227] = s.ReadByte();
+            this.mPayload[228] = s.ReadByte();
+            this.mPayload[229] = s.ReadByte();
+            this.mPayload[230] = s.ReadByte();
+            this.mPayload[231] = s.ReadByte();
+            this.mPayload[232] = s.ReadByte();
+            this.mPayload[233] = s.ReadByte();
+            this.mPayload[234] = s.ReadByte();
+            this.mPayload[235] = s.ReadByte();
+            this.mPayload[236] = s.ReadByte();
+            this.mPayload[237] = s.ReadByte();
+            this.mPayload[238] = s.ReadByte();
+            this.mPayload[239] = s.ReadByte();
+            this.mPayload[240] = s.ReadByte();
+            this.mPayload[241] = s.ReadByte();
+            this.mPayload[242] = s.ReadByte();
+            this.mPayload[243] = s.ReadByte();
+            this.mPayload[244] = s.ReadByte();
+            this.mPayload[245] = s.ReadByte();
+            this.mPayload[246] = s.ReadByte();
+            this.mPayload[247] = s.ReadByte();
+            this.mPayload[248] = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Set the 6 DOF setpoint for a attitude and position controller."
+                Description = "Message implementing parts of the V2 payload specs in V1 frames for transitional support."
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TransX",
-                Description = "Translational Component in x",
+                Name = "MessageType",
+                Description = "A code that identifies the software component that understands this message (analogous to usb device classes or mime type strings).  If this code is less than 32768, it is considered a 'registered' protocol extension and the corresponding entry should be added to https://github.com/mavlink/mavlink/extension-message-ids.xml.  Software creators can register blocks of message IDs as needed (useful for GCS specific metadata, etc...). Message_types greater than 32767 are considered local experiments and should not be checked in to any widely distributed codebase.",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TransY",
-                Description = "Translational Component in y",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TransZ",
-                Description = "Translational Component in z",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RotX",
-                Description = "Rotational Component in x",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RotY",
-                Description = "Rotational Component in y",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RotZ",
-                Description = "Rotational Component in z",
+                Name = "TargetNetwork",
+                Description = "Network ID (0 for broadcast)",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "TargetSystem",
-                Description = "System ID",
+                Description = "System ID (0 for broadcast)",
                 NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TargetComponent",
+                Description = "Component ID (0 for broadcast)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Payload",
+                Description = "Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification.",
+                NumElements = 249,
             });
 
         }
 
-        private float mTransX;
-        private float mTransY;
-        private float mTransZ;
-        private float mRotX;
-        private float mRotY;
-        private float mRotZ;
+        private UInt16 mMessageType;
+        private byte mTargetNetwork;
         private byte mTargetSystem;
+        private byte mTargetComponent;
+        private byte[] mPayload = new byte[249];
     }
 
 
@@ -15709,435 +21992,1730 @@ namespace MavLinkNet
     // ___________________________________________________________________________________
 
 
-    /// <summary>
-    /// Offsets and calibrations values for hardware          sensors. This makes it easier to debug the calibration process.
-    /// </summary>
-    public class UasSensorOffsets: UasMessage
+    public class UasBmsStatusData: UasMessage
     {
         /// <summary>
-        /// magnetic declination (radians)
+        /// Power up time [s]; after 65535 s, it overflows back to 0
         /// </summary>
-        public float MagDeclination {
-            get { return mMagDeclination; }
-            set { mMagDeclination = value; NotifyUpdated(); }
+        public UInt16 Timer {
+            get { return mTimer; }
+            set { mTimer = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// raw pressure from barometer
+        /// Actual capacity of pack [AH], unsigned, 0 to 65 kAH
         /// </summary>
-        public Int32 RawPress {
-            get { return mRawPress; }
-            set { mRawPress = value; NotifyUpdated(); }
+        public UInt16 Capacity {
+            get { return mCapacity; }
+            set { mCapacity = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// raw temperature from barometer
+        /// BMS state of system
         /// </summary>
-        public Int32 RawTemp {
-            get { return mRawTemp; }
-            set { mRawTemp = value; NotifyUpdated(); }
+        public byte Status {
+            get { return mStatus; }
+            set { mStatus = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// gyro X calibration
+        /// Byte of flags
         /// </summary>
-        public float GyroCalX {
-            get { return mGyroCalX; }
-            set { mGyroCalX = value; NotifyUpdated(); }
+        public byte Flags {
+            get { return mFlags; }
+            set { mFlags = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// gyro Y calibration
+        /// Fault code, stored
         /// </summary>
-        public float GyroCalY {
-            get { return mGyroCalY; }
-            set { mGyroCalY = value; NotifyUpdated(); }
+        public byte FaultCode {
+            get { return mFaultCode; }
+            set { mFaultCode = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// gyro Z calibration
+        /// bits of the faults from the BMS
         /// </summary>
-        public float GyroCalZ {
-            get { return mGyroCalZ; }
-            set { mGyroCalZ = value; NotifyUpdated(); }
+        public byte LevelFaultFlags {
+            get { return mLevelFaultFlags; }
+            set { mLevelFaultFlags = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// accel X calibration
+        /// State Of Health [%], unsigned, 0 to 100. 100 % = all OK
         /// </summary>
-        public float AccelCalX {
-            get { return mAccelCalX; }
-            set { mAccelCalX = value; NotifyUpdated(); }
+        public byte Soh {
+            get { return mSoh; }
+            set { mSoh = value; NotifyUpdated(); }
         }
 
-        /// <summary>
-        /// accel Y calibration
-        /// </summary>
-        public float AccelCalY {
-            get { return mAccelCalY; }
-            set { mAccelCalY = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// accel Z calibration
-        /// </summary>
-        public float AccelCalZ {
-            get { return mAccelCalZ; }
-            set { mAccelCalZ = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// magnetometer X offset
-        /// </summary>
-        public Int16 MagOfsX {
-            get { return mMagOfsX; }
-            set { mMagOfsX = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// magnetometer Y offset
-        /// </summary>
-        public Int16 MagOfsY {
-            get { return mMagOfsY; }
-            set { mMagOfsY = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// magnetometer Z offset
-        /// </summary>
-        public Int16 MagOfsZ {
-            get { return mMagOfsZ; }
-            set { mMagOfsZ = value; NotifyUpdated(); }
-        }
-
-        public UasSensorOffsets()
+        public UasBmsStatusData()
         {
             mMessageId = 150;
-            CrcExtra = 134;
+            CrcExtra = 207;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mMagDeclination);
-            s.Write(mRawPress);
-            s.Write(mRawTemp);
-            s.Write(mGyroCalX);
-            s.Write(mGyroCalY);
-            s.Write(mGyroCalZ);
-            s.Write(mAccelCalX);
-            s.Write(mAccelCalY);
-            s.Write(mAccelCalZ);
-            s.Write(mMagOfsX);
-            s.Write(mMagOfsY);
-            s.Write(mMagOfsZ);
+            s.Write(mTimer);
+            s.Write(mCapacity);
+            s.Write(mStatus);
+            s.Write(mFlags);
+            s.Write(mFaultCode);
+            s.Write(mLevelFaultFlags);
+            s.Write(mSoh);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mMagDeclination = s.ReadSingle();
-            this.mRawPress = s.ReadInt32();
-            this.mRawTemp = s.ReadInt32();
-            this.mGyroCalX = s.ReadSingle();
-            this.mGyroCalY = s.ReadSingle();
-            this.mGyroCalZ = s.ReadSingle();
-            this.mAccelCalX = s.ReadSingle();
-            this.mAccelCalY = s.ReadSingle();
-            this.mAccelCalZ = s.ReadSingle();
-            this.mMagOfsX = s.ReadInt16();
-            this.mMagOfsY = s.ReadInt16();
-            this.mMagOfsZ = s.ReadInt16();
+            this.mTimer = s.ReadUInt16();
+            this.mCapacity = s.ReadUInt16();
+            this.mStatus = s.ReadByte();
+            this.mFlags = s.ReadByte();
+            this.mFaultCode = s.ReadByte();
+            this.mLevelFaultFlags = s.ReadByte();
+            this.mSoh = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Offsets and calibrations values for hardware          sensors. This makes it easier to debug the calibration process."
+                Description = ""
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MagDeclination",
-                Description = "magnetic declination (radians)",
+                Name = "Timer",
+                Description = "Power up time [s]; after 65535 s, it overflows back to 0",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RawPress",
-                Description = "raw pressure from barometer",
+                Name = "Capacity",
+                Description = "Actual capacity of pack [AH], unsigned, 0 to 65 kAH",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RawTemp",
-                Description = "raw temperature from barometer",
+                Name = "Status",
+                Description = "BMS state of system",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "GyroCalX",
-                Description = "gyro X calibration",
+                Name = "Flags",
+                Description = "Byte of flags",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "GyroCalY",
-                Description = "gyro Y calibration",
+                Name = "FaultCode",
+                Description = "Fault code, stored",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "GyroCalZ",
-                Description = "gyro Z calibration",
+                Name = "LevelFaultFlags",
+                Description = "bits of the faults from the BMS",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "AccelCalX",
-                Description = "accel X calibration",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "AccelCalY",
-                Description = "accel Y calibration",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "AccelCalZ",
-                Description = "accel Z calibration",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MagOfsX",
-                Description = "magnetometer X offset",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MagOfsY",
-                Description = "magnetometer Y offset",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MagOfsZ",
-                Description = "magnetometer Z offset",
+                Name = "Soh",
+                Description = "State Of Health [%], unsigned, 0 to 100. 100 % = all OK",
                 NumElements = 1,
             });
 
         }
 
-        private float mMagDeclination;
-        private Int32 mRawPress;
-        private Int32 mRawTemp;
-        private float mGyroCalX;
-        private float mGyroCalY;
-        private float mGyroCalZ;
-        private float mAccelCalX;
-        private float mAccelCalY;
-        private float mAccelCalZ;
-        private Int16 mMagOfsX;
-        private Int16 mMagOfsY;
-        private Int16 mMagOfsZ;
+        private UInt16 mTimer;
+        private UInt16 mCapacity;
+        private byte mStatus;
+        private byte mFlags;
+        private byte mFaultCode;
+        private byte mLevelFaultFlags;
+        private byte mSoh;
     }
 
 
     // ___________________________________________________________________________________
 
 
-    /// <summary>
-    /// set the magnetometer offsets
-    /// </summary>
-    public class UasSetMagOffsets: UasMessage
+    public class UasBmsPowerData: UasMessage
     {
         /// <summary>
-        /// magnetometer X offset
+        /// Total voltage of pack [V], unsigned, 0 to 65 kV, as the sum of all cell voltages
         /// </summary>
-        public Int16 MagOfsX {
-            get { return mMagOfsX; }
-            set { mMagOfsX = value; NotifyUpdated(); }
+        public UInt16 Packvoltage {
+            get { return mPackvoltage; }
+            set { mPackvoltage = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// magnetometer Y offset
+        /// NET Pack current [A], signed, positive out of pack, -32kA to + 32kA, averaged over 1 s
         /// </summary>
-        public Int16 MagOfsY {
-            get { return mMagOfsY; }
-            set { mMagOfsY = value; NotifyUpdated(); }
+        public Int16 Current {
+            get { return mCurrent; }
+            set { mCurrent = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// magnetometer Z offset
+        /// Depth Of Discharge [AH], unsigned, 0 to 65 kAH. When deeply discharged, its value may exceed the actual capacity's value
         /// </summary>
-        public Int16 MagOfsZ {
-            get { return mMagOfsZ; }
-            set { mMagOfsZ = value; NotifyUpdated(); }
+        public UInt16 Dod {
+            get { return mDod; }
+            set { mDod = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// System ID
+        /// Average Source Current [100 mA] signed, 1 s average
         /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
+        public Int16 AvgSrcCur {
+            get { return mAvgSrcCur; }
+            set { mAvgSrcCur = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Component ID
+        /// Average Load Current [100 mA] signed, 1 s average
         /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
+        public Int16 AvgLoadCur {
+            get { return mAvgLoadCur; }
+            set { mAvgLoadCur = value; NotifyUpdated(); }
         }
 
-        public UasSetMagOffsets()
+        /// <summary>
+        /// State Of Charge [%], unsigned, 0 to 100. When deeply discharged, its value does not go below 0
+        /// </summary>
+        public byte Soc {
+            get { return mSoc; }
+            set { mSoc = value; NotifyUpdated(); }
+        }
+
+        public UasBmsPowerData()
         {
             mMessageId = 151;
-            CrcExtra = 219;
+            CrcExtra = 85;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mMagOfsX);
-            s.Write(mMagOfsY);
-            s.Write(mMagOfsZ);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
+            s.Write(mPackvoltage);
+            s.Write(mCurrent);
+            s.Write(mDod);
+            s.Write(mAvgSrcCur);
+            s.Write(mAvgLoadCur);
+            s.Write(mSoc);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mMagOfsX = s.ReadInt16();
-            this.mMagOfsY = s.ReadInt16();
-            this.mMagOfsZ = s.ReadInt16();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
+            this.mPackvoltage = s.ReadUInt16();
+            this.mCurrent = s.ReadInt16();
+            this.mDod = s.ReadUInt16();
+            this.mAvgSrcCur = s.ReadInt16();
+            this.mAvgLoadCur = s.ReadInt16();
+            this.mSoc = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "set the magnetometer offsets"
+                Description = ""
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MagOfsX",
-                Description = "magnetometer X offset",
+                Name = "Packvoltage",
+                Description = "Total voltage of pack [V], unsigned, 0 to 65 kV, as the sum of all cell voltages",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MagOfsY",
-                Description = "magnetometer Y offset",
+                Name = "Current",
+                Description = "NET Pack current [A], signed, positive out of pack, -32kA to + 32kA, averaged over 1 s",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MagOfsZ",
-                Description = "magnetometer Z offset",
+                Name = "Dod",
+                Description = "Depth Of Discharge [AH], unsigned, 0 to 65 kAH. When deeply discharged, its value may exceed the actual capacity's value",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
+                Name = "AvgSrcCur",
+                Description = "Average Source Current [100 mA] signed, 1 s average",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
+                Name = "AvgLoadCur",
+                Description = "Average Load Current [100 mA] signed, 1 s average",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Soc",
+                Description = "State Of Charge [%], unsigned, 0 to 100. When deeply discharged, its value does not go below 0",
                 NumElements = 1,
             });
 
         }
 
-        private Int16 mMagOfsX;
-        private Int16 mMagOfsY;
-        private Int16 mMagOfsZ;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
+        private UInt16 mPackvoltage;
+        private Int16 mCurrent;
+        private UInt16 mDod;
+        private Int16 mAvgSrcCur;
+        private Int16 mAvgLoadCur;
+        private byte mSoc;
     }
 
 
     // ___________________________________________________________________________________
 
 
-    /// <summary>
-    /// state of APM memory
-    /// </summary>
-    public class UasMeminfo: UasMessage
+    public class UasBmsCellData: UasMessage
     {
         /// <summary>
-        /// heap top
+        /// Average pack temperature [C], signed, -127C to +127C
         /// </summary>
-        public UInt16 Brkval {
-            get { return mBrkval; }
-            set { mBrkval = value; NotifyUpdated(); }
+        public SByte Temperature {
+            get { return mTemperature; }
+            set { mTemperature = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// free memory
+        /// Voltages [100 mV] of least charged cell, 0 to 25.5 V 
         /// </summary>
-        public UInt16 Freemem {
-            get { return mFreemem; }
-            set { mFreemem = value; NotifyUpdated(); }
+        public byte MinVtg {
+            get { return mMinVtg; }
+            set { mMinVtg = value; NotifyUpdated(); }
         }
 
-        public UasMeminfo()
+        /// <summary>
+        /// ID of the cell that has the lowest voltage. 1 to 254
+        /// </summary>
+        public byte MinVtgid {
+            get { return mMinVtgid; }
+            set { mMinVtgid = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Voltages [100 mV] of most charged cell, 0 to 25.5 V 
+        /// </summary>
+        public byte MaxVtg {
+            get { return mMaxVtg; }
+            set { mMaxVtg = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// ID of the cell that has the highest voltage. 1 to 254
+        /// </summary>
+        public byte MaxVtgid {
+            get { return mMaxVtgid; }
+            set { mMaxVtgid = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Temperatures [C] of coldest and hottest sensors, signed, -127 C to +127 C
+        /// </summary>
+        public SByte MinTmp {
+            get { return mMinTmp; }
+            set { mMinTmp = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// ID of the cell that has the lowest Temp. 1 to 254
+        /// </summary>
+        public byte MinTmpid {
+            get { return mMinTmpid; }
+            set { mMinTmpid = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Temperatures [C] of coldest and hottest sensors, signed, -127 C to +127 C
+        /// </summary>
+        public SByte MaxTmp {
+            get { return mMaxTmp; }
+            set { mMaxTmp = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// ID of the cell that has the highest Temp. 1 to 254
+        /// </summary>
+        public byte MaxTmpid {
+            get { return mMaxTmpid; }
+            set { mMaxTmpid = value; NotifyUpdated(); }
+        }
+
+        public UasBmsCellData()
         {
             mMessageId = 152;
+            CrcExtra = 51;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTemperature);
+            s.Write(mMinVtg);
+            s.Write(mMinVtgid);
+            s.Write(mMaxVtg);
+            s.Write(mMaxVtgid);
+            s.Write(mMinTmp);
+            s.Write(mMinTmpid);
+            s.Write(mMaxTmp);
+            s.Write(mMaxTmpid);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTemperature = s.ReadSByte();
+            this.mMinVtg = s.ReadByte();
+            this.mMinVtgid = s.ReadByte();
+            this.mMaxVtg = s.ReadByte();
+            this.mMaxVtgid = s.ReadByte();
+            this.mMinTmp = s.ReadSByte();
+            this.mMinTmpid = s.ReadByte();
+            this.mMaxTmp = s.ReadSByte();
+            this.mMaxTmpid = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Temperature",
+                Description = "Average pack temperature [C], signed, -127C to +127C",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MinVtg",
+                Description = "Voltages [100 mV] of least charged cell, 0 to 25.5 V ",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MinVtgid",
+                Description = "ID of the cell that has the lowest voltage. 1 to 254",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MaxVtg",
+                Description = "Voltages [100 mV] of most charged cell, 0 to 25.5 V ",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MaxVtgid",
+                Description = "ID of the cell that has the highest voltage. 1 to 254",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MinTmp",
+                Description = "Temperatures [C] of coldest and hottest sensors, signed, -127 C to +127 C",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MinTmpid",
+                Description = "ID of the cell that has the lowest Temp. 1 to 254",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MaxTmp",
+                Description = "Temperatures [C] of coldest and hottest sensors, signed, -127 C to +127 C",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MaxTmpid",
+                Description = "ID of the cell that has the highest Temp. 1 to 254",
+                NumElements = 1,
+            });
+
+        }
+
+        private SByte mTemperature;
+        private byte mMinVtg;
+        private byte mMinVtgid;
+        private byte mMaxVtg;
+        private byte mMaxVtgid;
+        private SByte mMinTmp;
+        private byte mMinTmpid;
+        private SByte mMaxTmp;
+        private byte mMaxTmpid;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasMppt1Raw: UasMessage
+    {
+        /// <summary>
+        /// Input voltage to MPPT RAW
+        /// </summary>
+        public UInt16 VoltageIn {
+            get { return mVoltageIn; }
+            set { mVoltageIn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Input current to MPPT RAW
+        /// </summary>
+        public UInt16 CurrentIn {
+            get { return mCurrentIn; }
+            set { mCurrentIn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// output voltage from MPPT RAW
+        /// </summary>
+        public UInt16 VoltageOut {
+            get { return mVoltageOut; }
+            set { mVoltageOut = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Drivetek MPPT status flags
+        /// </summary>
+        public byte Status {
+            get { return mStatus; }
+            set { mStatus = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Ambient temperature
+        /// </summary>
+        public byte AmbientTemp {
+            get { return mAmbientTemp; }
+            set { mAmbientTemp = value; NotifyUpdated(); }
+        }
+
+        public UasMppt1Raw()
+        {
+            mMessageId = 155;
             CrcExtra = 208;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mBrkval);
-            s.Write(mFreemem);
+            s.Write(mVoltageIn);
+            s.Write(mCurrentIn);
+            s.Write(mVoltageOut);
+            s.Write(mStatus);
+            s.Write(mAmbientTemp);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mBrkval = s.ReadUInt16();
-            this.mFreemem = s.ReadUInt16();
+            this.mVoltageIn = s.ReadUInt16();
+            this.mCurrentIn = s.ReadUInt16();
+            this.mVoltageOut = s.ReadUInt16();
+            this.mStatus = s.ReadByte();
+            this.mAmbientTemp = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "state of APM memory"
+                Description = ""
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Brkval",
-                Description = "heap top",
+                Name = "VoltageIn",
+                Description = "Input voltage to MPPT RAW",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Freemem",
-                Description = "free memory",
+                Name = "CurrentIn",
+                Description = "Input current to MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "VoltageOut",
+                Description = "output voltage from MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Status",
+                Description = "Drivetek MPPT status flags",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "AmbientTemp",
+                Description = "Ambient temperature",
                 NumElements = 1,
             });
 
         }
 
-        private UInt16 mBrkval;
-        private UInt16 mFreemem;
+        private UInt16 mVoltageIn;
+        private UInt16 mCurrentIn;
+        private UInt16 mVoltageOut;
+        private byte mStatus;
+        private byte mAmbientTemp;
     }
 
 
     // ___________________________________________________________________________________
 
 
-    /// <summary>
-    /// raw ADC output
-    /// </summary>
-    public class UasApAdc: UasMessage
+    public class UasMppt2Raw: UasMessage
     {
         /// <summary>
-        /// ADC output 1
+        /// Input voltage to MPPT RAW
+        /// </summary>
+        public UInt16 VoltageIn {
+            get { return mVoltageIn; }
+            set { mVoltageIn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Input current to MPPT RAW
+        /// </summary>
+        public UInt16 CurrentIn {
+            get { return mCurrentIn; }
+            set { mCurrentIn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// output voltage from MPPT RAW
+        /// </summary>
+        public UInt16 VoltageOut {
+            get { return mVoltageOut; }
+            set { mVoltageOut = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Drivetek MPPT status flags
+        /// </summary>
+        public byte Status {
+            get { return mStatus; }
+            set { mStatus = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Ambient temperature
+        /// </summary>
+        public byte AmbientTemp {
+            get { return mAmbientTemp; }
+            set { mAmbientTemp = value; NotifyUpdated(); }
+        }
+
+        public UasMppt2Raw()
+        {
+            mMessageId = 156;
+            CrcExtra = 84;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mVoltageIn);
+            s.Write(mCurrentIn);
+            s.Write(mVoltageOut);
+            s.Write(mStatus);
+            s.Write(mAmbientTemp);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mVoltageIn = s.ReadUInt16();
+            this.mCurrentIn = s.ReadUInt16();
+            this.mVoltageOut = s.ReadUInt16();
+            this.mStatus = s.ReadByte();
+            this.mAmbientTemp = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "VoltageIn",
+                Description = "Input voltage to MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CurrentIn",
+                Description = "Input current to MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "VoltageOut",
+                Description = "output voltage from MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Status",
+                Description = "Drivetek MPPT status flags",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "AmbientTemp",
+                Description = "Ambient temperature",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt16 mVoltageIn;
+        private UInt16 mCurrentIn;
+        private UInt16 mVoltageOut;
+        private byte mStatus;
+        private byte mAmbientTemp;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasMppt3Raw: UasMessage
+    {
+        /// <summary>
+        /// Input voltage to MPPT RAW
+        /// </summary>
+        public UInt16 VoltageIn {
+            get { return mVoltageIn; }
+            set { mVoltageIn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Input current to MPPT RAW
+        /// </summary>
+        public UInt16 CurrentIn {
+            get { return mCurrentIn; }
+            set { mCurrentIn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// output voltage from MPPT RAW
+        /// </summary>
+        public UInt16 VoltageOut {
+            get { return mVoltageOut; }
+            set { mVoltageOut = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Drivetek MPPT status flags
+        /// </summary>
+        public byte Status {
+            get { return mStatus; }
+            set { mStatus = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Ambient temperature
+        /// </summary>
+        public byte AmbientTemp {
+            get { return mAmbientTemp; }
+            set { mAmbientTemp = value; NotifyUpdated(); }
+        }
+
+        public UasMppt3Raw()
+        {
+            mMessageId = 157;
+            CrcExtra = 215;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mVoltageIn);
+            s.Write(mCurrentIn);
+            s.Write(mVoltageOut);
+            s.Write(mStatus);
+            s.Write(mAmbientTemp);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mVoltageIn = s.ReadUInt16();
+            this.mCurrentIn = s.ReadUInt16();
+            this.mVoltageOut = s.ReadUInt16();
+            this.mStatus = s.ReadByte();
+            this.mAmbientTemp = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "VoltageIn",
+                Description = "Input voltage to MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CurrentIn",
+                Description = "Input current to MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "VoltageOut",
+                Description = "output voltage from MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Status",
+                Description = "Drivetek MPPT status flags",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "AmbientTemp",
+                Description = "Ambient temperature",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt16 mVoltageIn;
+        private UInt16 mCurrentIn;
+        private UInt16 mVoltageOut;
+        private byte mStatus;
+        private byte mAmbientTemp;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasMppt4Raw: UasMessage
+    {
+        /// <summary>
+        /// Input voltage to MPPT RAW
+        /// </summary>
+        public UInt16 VoltageIn {
+            get { return mVoltageIn; }
+            set { mVoltageIn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Input current to MPPT RAW
+        /// </summary>
+        public UInt16 CurrentIn {
+            get { return mCurrentIn; }
+            set { mCurrentIn = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// output voltage from MPPT RAW
+        /// </summary>
+        public UInt16 VoltageOut {
+            get { return mVoltageOut; }
+            set { mVoltageOut = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Drivetek MPPT status flags
+        /// </summary>
+        public byte Status {
+            get { return mStatus; }
+            set { mStatus = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Ambient temperature
+        /// </summary>
+        public byte AmbientTemp {
+            get { return mAmbientTemp; }
+            set { mAmbientTemp = value; NotifyUpdated(); }
+        }
+
+        public UasMppt4Raw()
+        {
+            mMessageId = 158;
+            CrcExtra = 69;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mVoltageIn);
+            s.Write(mCurrentIn);
+            s.Write(mVoltageOut);
+            s.Write(mStatus);
+            s.Write(mAmbientTemp);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mVoltageIn = s.ReadUInt16();
+            this.mCurrentIn = s.ReadUInt16();
+            this.mVoltageOut = s.ReadUInt16();
+            this.mStatus = s.ReadByte();
+            this.mAmbientTemp = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "VoltageIn",
+                Description = "Input voltage to MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "CurrentIn",
+                Description = "Input current to MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "VoltageOut",
+                Description = "output voltage from MPPT RAW",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Status",
+                Description = "Drivetek MPPT status flags",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "AmbientTemp",
+                Description = "Ambient temperature",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt16 mVoltageIn;
+        private UInt16 mCurrentIn;
+        private UInt16 mVoltageOut;
+        private byte mStatus;
+        private byte mAmbientTemp;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasSpeedHalleffect: UasMessage
+    {
+        /// <summary>
+        ///  the HES RPM
+        /// </summary>
+        public UInt16 HesRpm {
+            get { return mHesRpm; }
+            set { mHesRpm = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        ///  the motordriver RPM
+        /// </summary>
+        public UInt16 MotorRpm {
+            get { return mMotorRpm; }
+            set { mMotorRpm = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        ///  the average speed combined from both sensors 
+        /// </summary>
+        public byte AvgSpeed {
+            get { return mAvgSpeed; }
+            set { mAvgSpeed = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        ///  the HE speed 
+        /// </summary>
+        public byte HesSpeed {
+            get { return mHesSpeed; }
+            set { mHesSpeed = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        ///  the motor driver speed 
+        /// </summary>
+        public byte MotorSpeed {
+            get { return mMotorSpeed; }
+            set { mMotorSpeed = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// status flags
+        /// </summary>
+        public byte Flags {
+            get { return mFlags; }
+            set { mFlags = value; NotifyUpdated(); }
+        }
+
+        public UasSpeedHalleffect()
+        {
+            mMessageId = 159;
+            CrcExtra = 183;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mHesRpm);
+            s.Write(mMotorRpm);
+            s.Write(mAvgSpeed);
+            s.Write(mHesSpeed);
+            s.Write(mMotorSpeed);
+            s.Write(mFlags);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mHesRpm = s.ReadUInt16();
+            this.mMotorRpm = s.ReadUInt16();
+            this.mAvgSpeed = s.ReadByte();
+            this.mHesSpeed = s.ReadByte();
+            this.mMotorSpeed = s.ReadByte();
+            this.mFlags = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "HesRpm",
+                Description = " the HES RPM",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MotorRpm",
+                Description = " the motordriver RPM",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "AvgSpeed",
+                Description = " the average speed combined from both sensors ",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "HesSpeed",
+                Description = " the HE speed ",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "MotorSpeed",
+                Description = " the motor driver speed ",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Flags",
+                Description = "status flags",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt16 mHesRpm;
+        private UInt16 mMotorRpm;
+        private byte mAvgSpeed;
+        private byte mHesSpeed;
+        private byte mMotorSpeed;
+        private byte mFlags;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasGpsPos: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+        /// </summary>
+        public UInt32 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Latitude (WGS84), in degrees * 1E7
+        /// </summary>
+        public Int32 Lat {
+            get { return mLat; }
+            set { mLat = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Longitude (WGS84), in degrees * 1E7
+        /// </summary>
+        public Int32 Lon {
+            get { return mLon; }
+            set { mLon = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX
+        /// </summary>
+        public UInt16 Vel {
+            get { return mVel; }
+            set { mVel = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Current heading in degrees, in compass units (0..360, 0=north)
+        /// </summary>
+        public UInt16 Heading {
+            get { return mHeading; }
+            set { mHeading = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// 0 = fix not available, 1 = GPS sps mode, 2 = Differential GPS, SPS mode, fix valid, 3 = GPS PPS mode, fix valid
+        /// </summary>
+        public byte GgaGpsQuality {
+            get { return mGgaGpsQuality; }
+            set { mGgaGpsQuality = value; NotifyUpdated(); }
+        }
+
+        public UasGpsPos()
+        {
+            mMessageId = 160;
+            CrcExtra = 207;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mLat);
+            s.Write(mLon);
+            s.Write(mVel);
+            s.Write(mHeading);
+            s.Write(mGgaGpsQuality);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt32();
+            this.mLat = s.ReadInt32();
+            this.mLon = s.ReadInt32();
+            this.mVel = s.ReadUInt16();
+            this.mHeading = s.ReadUInt16();
+            this.mGgaGpsQuality = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (microseconds since UNIX epoch or microseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lat",
+                Description = "Latitude (WGS84), in degrees * 1E7",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Lon",
+                Description = "Longitude (WGS84), in degrees * 1E7",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Vel",
+                Description = "GPS ground speed (m/s * 100). If unknown, set to: UINT16_MAX",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Heading",
+                Description = "Current heading in degrees, in compass units (0..360, 0=north)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GgaGpsQuality",
+                Description = "0 = fix not available, 1 = GPS sps mode, 2 = Differential GPS, SPS mode, fix valid, 3 = GPS PPS mode, fix valid",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeUsec;
+        private Int32 mLat;
+        private Int32 mLon;
+        private UInt16 mVel;
+        private UInt16 mHeading;
+        private byte mGgaGpsQuality;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasGpsStatusTime: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+        /// </summary>
+        public UInt32 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Altitude: mean-sea-level (geoid) meters
+        /// </summary>
+        public UInt16 GgaAltitude {
+            get { return mGgaAltitude; }
+            set { mGgaAltitude = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RMC Hour
+        /// </summary>
+        public byte GpsHour {
+            get { return mGpsHour; }
+            set { mGpsHour = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RMC Minute
+        /// </summary>
+        public byte GpsMinute {
+            get { return mGpsMinute; }
+            set { mGpsMinute = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// RMC Second
+        /// </summary>
+        public byte GpsSecond {
+            get { return mGpsSecond; }
+            set { mGpsSecond = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// 0 = fix not available, 1 = GPS sps mode, 2 = Differential GPS, SPS mode, fix valid, 3 = GPS PPS mode, fix valid
+        /// </summary>
+        public byte GgaGpsQuality {
+            get { return mGgaGpsQuality; }
+            set { mGgaGpsQuality = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Number of satellites visible. If unknown, set to 255
+        /// </summary>
+        public byte SatellitesVisible {
+            get { return mSatellitesVisible; }
+            set { mSatellitesVisible = value; NotifyUpdated(); }
+        }
+
+        public UasGpsStatusTime()
+        {
+            mMessageId = 161;
+            CrcExtra = 156;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mGgaAltitude);
+            s.Write(mGpsHour);
+            s.Write(mGpsMinute);
+            s.Write(mGpsSecond);
+            s.Write(mGgaGpsQuality);
+            s.Write(mSatellitesVisible);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt32();
+            this.mGgaAltitude = s.ReadUInt16();
+            this.mGpsHour = s.ReadByte();
+            this.mGpsMinute = s.ReadByte();
+            this.mGpsSecond = s.ReadByte();
+            this.mGgaGpsQuality = s.ReadByte();
+            this.mSatellitesVisible = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (microseconds since UNIX epoch or microseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GgaAltitude",
+                Description = "Altitude: mean-sea-level (geoid) meters",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GpsHour",
+                Description = "RMC Hour",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GpsMinute",
+                Description = "RMC Minute",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GpsSecond",
+                Description = "RMC Second",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GgaGpsQuality",
+                Description = "0 = fix not available, 1 = GPS sps mode, 2 = Differential GPS, SPS mode, fix valid, 3 = GPS PPS mode, fix valid",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "SatellitesVisible",
+                Description = "Number of satellites visible. If unknown, set to 255",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt32 mTimeUsec;
+        private UInt16 mGgaAltitude;
+        private byte mGpsHour;
+        private byte mGpsMinute;
+        private byte mGpsSecond;
+        private byte mGgaGpsQuality;
+        private byte mSatellitesVisible;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasImuAccelRaw: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+        /// </summary>
+        public UInt64 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for acceleration X
+        /// </summary>
+        public Int16 AccelX {
+            get { return mAccelX; }
+            set { mAccelX = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for acceleration Y
+        /// </summary>
+        public Int16 AccelY {
+            get { return mAccelY; }
+            set { mAccelY = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for acceleration Z
+        /// </summary>
+        public Int16 AccelZ {
+            get { return mAccelZ; }
+            set { mAccelZ = value; NotifyUpdated(); }
+        }
+
+        public UasImuAccelRaw()
+        {
+            mMessageId = 162;
+            CrcExtra = 158;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mAccelX);
+            s.Write(mAccelY);
+            s.Write(mAccelZ);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt64();
+            this.mAccelX = s.ReadInt16();
+            this.mAccelY = s.ReadInt16();
+            this.mAccelZ = s.ReadInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (microseconds since UNIX epoch or microseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "AccelX",
+                Description = "IMU raw output value for acceleration X",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "AccelY",
+                Description = "IMU raw output value for acceleration Y",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "AccelZ",
+                Description = "IMU raw output value for acceleration Z",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mTimeUsec;
+        private Int16 mAccelX;
+        private Int16 mAccelY;
+        private Int16 mAccelZ;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasImuGyroRaw: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+        /// </summary>
+        public UInt64 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for gyro X
+        /// </summary>
+        public Int16 GyroX {
+            get { return mGyroX; }
+            set { mGyroX = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for gyro Y
+        /// </summary>
+        public Int16 GyroY {
+            get { return mGyroY; }
+            set { mGyroY = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for gyro Z
+        /// </summary>
+        public Int16 GyroZ {
+            get { return mGyroZ; }
+            set { mGyroZ = value; NotifyUpdated(); }
+        }
+
+        public UasImuGyroRaw()
+        {
+            mMessageId = 163;
+            CrcExtra = 161;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mGyroX);
+            s.Write(mGyroY);
+            s.Write(mGyroZ);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt64();
+            this.mGyroX = s.ReadInt16();
+            this.mGyroY = s.ReadInt16();
+            this.mGyroZ = s.ReadInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (microseconds since UNIX epoch or microseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GyroX",
+                Description = "IMU raw output value for gyro X",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GyroY",
+                Description = "IMU raw output value for gyro Y",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "GyroZ",
+                Description = "IMU raw output value for gyro Z",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mTimeUsec;
+        private Int16 mGyroX;
+        private Int16 mGyroY;
+        private Int16 mGyroZ;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasImuEulerRaw: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+        /// </summary>
+        public UInt64 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for roll
+        /// </summary>
+        public Int16 Roll {
+            get { return mRoll; }
+            set { mRoll = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for pitch
+        /// </summary>
+        public Int16 Pitch {
+            get { return mPitch; }
+            set { mPitch = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for yaw
+        /// </summary>
+        public Int16 Yaw {
+            get { return mYaw; }
+            set { mYaw = value; NotifyUpdated(); }
+        }
+
+        public UasImuEulerRaw()
+        {
+            mMessageId = 164;
+            CrcExtra = 212;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mRoll);
+            s.Write(mPitch);
+            s.Write(mYaw);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt64();
+            this.mRoll = s.ReadInt16();
+            this.mPitch = s.ReadInt16();
+            this.mYaw = s.ReadInt16();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (microseconds since UNIX epoch or microseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Roll",
+                Description = "IMU raw output value for roll",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Pitch",
+                Description = "IMU raw output value for pitch",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Yaw",
+                Description = "IMU raw output value for yaw",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mTimeUsec;
+        private Int16 mRoll;
+        private Int16 mPitch;
+        private Int16 mYaw;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasImuStatusRaw: UasMessage
+    {
+        /// <summary>
+        /// Timestamp (microseconds since UNIX epoch or microseconds since system boot)
+        /// </summary>
+        public UInt64 TimeUsec {
+            get { return mTimeUsec; }
+            set { mTimeUsec = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU raw output value for temperature
+        /// </summary>
+        public Int16 Temperature {
+            get { return mTemperature; }
+            set { mTemperature = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// IMU status flags from controller
+        /// </summary>
+        public byte Status {
+            get { return mStatus; }
+            set { mStatus = value; NotifyUpdated(); }
+        }
+
+        public UasImuStatusRaw()
+        {
+            mMessageId = 165;
+            CrcExtra = 130;
+        }
+
+        internal override void SerializeBody(BinaryWriter s)
+        {
+            s.Write(mTimeUsec);
+            s.Write(mTemperature);
+            s.Write(mStatus);
+        }
+
+        internal override void DeserializeBody(BinaryReader s)
+        {
+            this.mTimeUsec = s.ReadUInt64();
+            this.mTemperature = s.ReadInt16();
+            this.mStatus = s.ReadByte();
+        }
+
+        protected override void InitMetadata()
+        {
+            mMetadata = new UasMessageMetadata() {
+                Description = ""
+            };
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "TimeUsec",
+                Description = "Timestamp (microseconds since UNIX epoch or microseconds since system boot)",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Temperature",
+                Description = "IMU raw output value for temperature",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Status",
+                Description = "IMU status flags from controller",
+                NumElements = 1,
+            });
+
+        }
+
+        private UInt64 mTimeUsec;
+        private Int16 mTemperature;
+        private byte mStatus;
+    }
+
+
+    // ___________________________________________________________________________________
+
+
+    public class UasSensorhubRead: UasMessage
+    {
+        /// <summary>
+        /// Raw ADC0 Value
+        /// </summary>
+        public UInt16 Adc0 {
+            get { return mAdc0; }
+            set { mAdc0 = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Raw ADC1 Value
         /// </summary>
         public UInt16 Adc1 {
             get { return mAdc1; }
@@ -16145,7 +23723,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// ADC output 2
+        /// Raw ADC2 Value
         /// </summary>
         public UInt16 Adc2 {
             get { return mAdc2; }
@@ -16153,7 +23731,7 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// ADC output 3
+        /// Raw ADC3 Value
         /// </summary>
         public UInt16 Adc3 {
             get { return mAdc3; }
@@ -16161,3439 +23739,280 @@ namespace MavLinkNet
         }
 
         /// <summary>
-        /// ADC output 4
+        /// The address of this hub
         /// </summary>
-        public UInt16 Adc4 {
-            get { return mAdc4; }
-            set { mAdc4 = value; NotifyUpdated(); }
+        public byte HubAddress {
+            get { return mHubAddress; }
+            set { mHubAddress = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// ADC output 5
+        /// Status flags from the sensor hub
         /// </summary>
-        public UInt16 Adc5 {
-            get { return mAdc5; }
-            set { mAdc5 = value; NotifyUpdated(); }
+        public byte Status {
+            get { return mStatus; }
+            set { mStatus = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// ADC output 6
+        /// Integer part of DHT22 Temp in'C
         /// </summary>
-        public UInt16 Adc6 {
-            get { return mAdc6; }
-            set { mAdc6 = value; NotifyUpdated(); }
+        public SByte Dhttempintegral {
+            get { return mDhttempintegral; }
+            set { mDhttempintegral = value; NotifyUpdated(); }
         }
 
-        public UasApAdc()
+        /// <summary>
+        /// Decimal part of DHT22 Temp in'C
+        /// </summary>
+        public byte Dhttempdecimal {
+            get { return mDhttempdecimal; }
+            set { mDhttempdecimal = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Integer part of DHT22 Humidity in RH%
+        /// </summary>
+        public SByte Dhthumiintegral {
+            get { return mDhthumiintegral; }
+            set { mDhthumiintegral = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Decimal part of DHT22 Humidity in RH%
+        /// </summary>
+        public byte Dhthumidecimal {
+            get { return mDhthumidecimal; }
+            set { mDhthumidecimal = value; NotifyUpdated(); }
+        }
+
+        /// <summary>
+        /// Byte representing the status of the shift register
+        /// </summary>
+        public byte SftregByte {
+            get { return mSftregByte; }
+            set { mSftregByte = value; NotifyUpdated(); }
+        }
+
+        public UasSensorhubRead()
         {
-            mMessageId = 153;
-            CrcExtra = 188;
+            mMessageId = 170;
+            CrcExtra = 25;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
+            s.Write(mAdc0);
             s.Write(mAdc1);
             s.Write(mAdc2);
             s.Write(mAdc3);
-            s.Write(mAdc4);
-            s.Write(mAdc5);
-            s.Write(mAdc6);
+            s.Write(mHubAddress);
+            s.Write(mStatus);
+            s.Write(mDhttempintegral);
+            s.Write(mDhttempdecimal);
+            s.Write(mDhthumiintegral);
+            s.Write(mDhthumidecimal);
+            s.Write(mSftregByte);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
+            this.mAdc0 = s.ReadUInt16();
             this.mAdc1 = s.ReadUInt16();
             this.mAdc2 = s.ReadUInt16();
             this.mAdc3 = s.ReadUInt16();
-            this.mAdc4 = s.ReadUInt16();
-            this.mAdc5 = s.ReadUInt16();
-            this.mAdc6 = s.ReadUInt16();
+            this.mHubAddress = s.ReadByte();
+            this.mStatus = s.ReadByte();
+            this.mDhttempintegral = s.ReadSByte();
+            this.mDhttempdecimal = s.ReadByte();
+            this.mDhthumiintegral = s.ReadSByte();
+            this.mDhthumidecimal = s.ReadByte();
+            this.mSftregByte = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "raw ADC output"
+                Description = ""
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Adc0",
+                Description = "Raw ADC0 Value",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Adc1",
-                Description = "ADC output 1",
+                Description = "Raw ADC1 Value",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Adc2",
-                Description = "ADC output 2",
+                Description = "Raw ADC2 Value",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
                 Name = "Adc3",
-                Description = "ADC output 3",
+                Description = "Raw ADC3 Value",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Adc4",
-                Description = "ADC output 4",
+                Name = "HubAddress",
+                Description = "The address of this hub",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Adc5",
-                Description = "ADC output 5",
+                Name = "Status",
+                Description = "Status flags from the sensor hub",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Adc6",
-                Description = "ADC output 6",
+                Name = "Dhttempintegral",
+                Description = "Integer part of DHT22 Temp in'C",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Dhttempdecimal",
+                Description = "Decimal part of DHT22 Temp in'C",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Dhthumiintegral",
+                Description = "Integer part of DHT22 Humidity in RH%",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "Dhthumidecimal",
+                Description = "Decimal part of DHT22 Humidity in RH%",
+                NumElements = 1,
+            });
+
+            mMetadata.Fields.Add(new UasFieldMetadata() {
+                Name = "SftregByte",
+                Description = "Byte representing the status of the shift register",
                 NumElements = 1,
             });
 
         }
 
+        private UInt16 mAdc0;
         private UInt16 mAdc1;
         private UInt16 mAdc2;
         private UInt16 mAdc3;
-        private UInt16 mAdc4;
-        private UInt16 mAdc5;
-        private UInt16 mAdc6;
+        private byte mHubAddress;
+        private byte mStatus;
+        private SByte mDhttempintegral;
+        private byte mDhttempdecimal;
+        private SByte mDhthumiintegral;
+        private byte mDhthumidecimal;
+        private byte mSftregByte;
     }
 
 
     // ___________________________________________________________________________________
 
 
-    /// <summary>
-    /// Configure on-board Camera Control System.
-    /// </summary>
-    public class UasDigicamConfigure: UasMessage
+    public class UasSensorhubWrite: UasMessage
     {
         /// <summary>
-        /// Correspondent value to given extra_param
+        /// The address of this hub
         /// </summary>
-        public float ExtraValue {
-            get { return mExtraValue; }
-            set { mExtraValue = value; NotifyUpdated(); }
+        public byte HubAddress {
+            get { return mHubAddress; }
+            set { mHubAddress = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Divisor number //e.g. 1000 means 1/1000 (0 means ignore)
+        /// Rate to send CAN bus updates
         /// </summary>
-        public UInt16 ShutterSpeed {
-            get { return mShutterSpeed; }
-            set { mShutterSpeed = value; NotifyUpdated(); }
+        public byte UpdateRate {
+            get { return mUpdateRate; }
+            set { mUpdateRate = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// System ID
+        /// Byte representing the status of the shift register
         /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
+        public byte SftregByte {
+            get { return mSftregByte; }
+            set { mSftregByte = value; NotifyUpdated(); }
         }
 
         /// <summary>
-        /// Component ID
+        /// Spare Field
         /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
+        public byte Extrabyte {
+            get { return mExtrabyte; }
+            set { mExtrabyte = value; NotifyUpdated(); }
         }
 
-        /// <summary>
-        /// Mode enumeration from 1 to N //P, TV, AV, M, Etc (0 means ignore)
-        /// </summary>
-        public byte Mode {
-            get { return mMode; }
-            set { mMode = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// F stop number x 10 //e.g. 28 means 2.8 (0 means ignore)
-        /// </summary>
-        public byte Aperture {
-            get { return mAperture; }
-            set { mAperture = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// ISO enumeration from 1 to N //e.g. 80, 100, 200, Etc (0 means ignore)
-        /// </summary>
-        public byte Iso {
-            get { return mIso; }
-            set { mIso = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Exposure type enumeration from 1 to N (0 means ignore)
-        /// </summary>
-        public byte ExposureType {
-            get { return mExposureType; }
-            set { mExposureType = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once
-        /// </summary>
-        public byte CommandId {
-            get { return mCommandId; }
-            set { mCommandId = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)
-        /// </summary>
-        public byte EngineCutOff {
-            get { return mEngineCutOff; }
-            set { mEngineCutOff = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Extra parameters enumeration (0 means ignore)
-        /// </summary>
-        public byte ExtraParam {
-            get { return mExtraParam; }
-            set { mExtraParam = value; NotifyUpdated(); }
-        }
-
-        public UasDigicamConfigure()
-        {
-            mMessageId = 154;
-            CrcExtra = 84;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mExtraValue);
-            s.Write(mShutterSpeed);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-            s.Write(mMode);
-            s.Write(mAperture);
-            s.Write(mIso);
-            s.Write(mExposureType);
-            s.Write(mCommandId);
-            s.Write(mEngineCutOff);
-            s.Write(mExtraParam);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mExtraValue = s.ReadSingle();
-            this.mShutterSpeed = s.ReadUInt16();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-            this.mMode = s.ReadByte();
-            this.mAperture = s.ReadByte();
-            this.mIso = s.ReadByte();
-            this.mExposureType = s.ReadByte();
-            this.mCommandId = s.ReadByte();
-            this.mEngineCutOff = s.ReadByte();
-            this.mExtraParam = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Configure on-board Camera Control System."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ExtraValue",
-                Description = "Correspondent value to given extra_param",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ShutterSpeed",
-                Description = "Divisor number //e.g. 1000 means 1/1000 (0 means ignore)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Mode",
-                Description = "Mode enumeration from 1 to N //P, TV, AV, M, Etc (0 means ignore)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Aperture",
-                Description = "F stop number x 10 //e.g. 28 means 2.8 (0 means ignore)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Iso",
-                Description = "ISO enumeration from 1 to N //e.g. 80, 100, 200, Etc (0 means ignore)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ExposureType",
-                Description = "Exposure type enumeration from 1 to N (0 means ignore)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "CommandId",
-                Description = "Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "EngineCutOff",
-                Description = "Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ExtraParam",
-                Description = "Extra parameters enumeration (0 means ignore)",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mExtraValue;
-        private UInt16 mShutterSpeed;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-        private byte mMode;
-        private byte mAperture;
-        private byte mIso;
-        private byte mExposureType;
-        private byte mCommandId;
-        private byte mEngineCutOff;
-        private byte mExtraParam;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Control on-board Camera Control System to take shots.
-    /// </summary>
-    public class UasDigicamControl: UasMessage
-    {
-        /// <summary>
-        /// Correspondent value to given extra_param
-        /// </summary>
-        public float ExtraValue {
-            get { return mExtraValue; }
-            set { mExtraValue = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// 0: stop, 1: start or keep it up //Session control e.g. show/hide lens
-        /// </summary>
-        public byte Session {
-            get { return mSession; }
-            set { mSession = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// 1 to N //Zoom's absolute position (0 means ignore)
-        /// </summary>
-        public byte ZoomPos {
-            get { return mZoomPos; }
-            set { mZoomPos = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// -100 to 100 //Zooming step value to offset zoom from the current position
-        /// </summary>
-        public SByte ZoomStep {
-            get { return mZoomStep; }
-            set { mZoomStep = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// 0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus
-        /// </summary>
-        public byte FocusLock {
-            get { return mFocusLock; }
-            set { mFocusLock = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// 0: ignore, 1: shot or start filming
-        /// </summary>
-        public byte Shot {
-            get { return mShot; }
-            set { mShot = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once
-        /// </summary>
-        public byte CommandId {
-            get { return mCommandId; }
-            set { mCommandId = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Extra parameters enumeration (0 means ignore)
-        /// </summary>
-        public byte ExtraParam {
-            get { return mExtraParam; }
-            set { mExtraParam = value; NotifyUpdated(); }
-        }
-
-        public UasDigicamControl()
-        {
-            mMessageId = 155;
-            CrcExtra = 22;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mExtraValue);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-            s.Write(mSession);
-            s.Write(mZoomPos);
-            s.Write(mZoomStep);
-            s.Write(mFocusLock);
-            s.Write(mShot);
-            s.Write(mCommandId);
-            s.Write(mExtraParam);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mExtraValue = s.ReadSingle();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-            this.mSession = s.ReadByte();
-            this.mZoomPos = s.ReadByte();
-            this.mZoomStep = s.ReadSByte();
-            this.mFocusLock = s.ReadByte();
-            this.mShot = s.ReadByte();
-            this.mCommandId = s.ReadByte();
-            this.mExtraParam = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Control on-board Camera Control System to take shots."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ExtraValue",
-                Description = "Correspondent value to given extra_param",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Session",
-                Description = "0: stop, 1: start or keep it up //Session control e.g. show/hide lens",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ZoomPos",
-                Description = "1 to N //Zoom's absolute position (0 means ignore)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ZoomStep",
-                Description = "-100 to 100 //Zooming step value to offset zoom from the current position",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "FocusLock",
-                Description = "0: unlock focus or keep unlocked, 1: lock focus or keep locked, 3: re-lock focus",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Shot",
-                Description = "0: ignore, 1: shot or start filming",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "CommandId",
-                Description = "Command Identity (incremental loop: 0 to 255)//A command sent multiple times will be executed or pooled just once",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ExtraParam",
-                Description = "Extra parameters enumeration (0 means ignore)",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mExtraValue;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-        private byte mSession;
-        private byte mZoomPos;
-        private SByte mZoomStep;
-        private byte mFocusLock;
-        private byte mShot;
-        private byte mCommandId;
-        private byte mExtraParam;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Message to configure a camera mount, directional antenna, etc.
-    /// </summary>
-    public class UasMountConfigure: UasMessage
-    {
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// mount operating mode (see MAV_MOUNT_MODE enum)
-        /// </summary>
-        public MavMountMode MountMode {
-            get { return mMountMode; }
-            set { mMountMode = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// (1 = yes, 0 = no)
-        /// </summary>
-        public byte StabRoll {
-            get { return mStabRoll; }
-            set { mStabRoll = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// (1 = yes, 0 = no)
-        /// </summary>
-        public byte StabPitch {
-            get { return mStabPitch; }
-            set { mStabPitch = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// (1 = yes, 0 = no)
-        /// </summary>
-        public byte StabYaw {
-            get { return mStabYaw; }
-            set { mStabYaw = value; NotifyUpdated(); }
-        }
-
-        public UasMountConfigure()
-        {
-            mMessageId = 156;
-            CrcExtra = 19;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-            s.Write((byte)mMountMode);
-            s.Write(mStabRoll);
-            s.Write(mStabPitch);
-            s.Write(mStabYaw);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-            this.mMountMode = (MavMountMode)s.ReadByte();
-            this.mStabRoll = s.ReadByte();
-            this.mStabPitch = s.ReadByte();
-            this.mStabYaw = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Message to configure a camera mount, directional antenna, etc."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "MountMode",
-                Description = "mount operating mode (see MAV_MOUNT_MODE enum)",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("MavMountMode"),
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "StabRoll",
-                Description = "(1 = yes, 0 = no)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "StabPitch",
-                Description = "(1 = yes, 0 = no)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "StabYaw",
-                Description = "(1 = yes, 0 = no)",
-                NumElements = 1,
-            });
-
-        }
-
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-        private MavMountMode mMountMode;
-        private byte mStabRoll;
-        private byte mStabPitch;
-        private byte mStabYaw;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Message to control a camera mount, directional antenna, etc.
-    /// </summary>
-    public class UasMountControl: UasMessage
-    {
-        /// <summary>
-        /// pitch(deg*100) or lat, depending on mount mode
-        /// </summary>
-        public Int32 InputA {
-            get { return mInputA; }
-            set { mInputA = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// roll(deg*100) or lon depending on mount mode
-        /// </summary>
-        public Int32 InputB {
-            get { return mInputB; }
-            set { mInputB = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// yaw(deg*100) or alt (in cm) depending on mount mode
-        /// </summary>
-        public Int32 InputC {
-            get { return mInputC; }
-            set { mInputC = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// if '1' it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING)
-        /// </summary>
-        public byte SavePosition {
-            get { return mSavePosition; }
-            set { mSavePosition = value; NotifyUpdated(); }
-        }
-
-        public UasMountControl()
-        {
-            mMessageId = 157;
-            CrcExtra = 21;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mInputA);
-            s.Write(mInputB);
-            s.Write(mInputC);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-            s.Write(mSavePosition);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mInputA = s.ReadInt32();
-            this.mInputB = s.ReadInt32();
-            this.mInputC = s.ReadInt32();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-            this.mSavePosition = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Message to control a camera mount, directional antenna, etc."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "InputA",
-                Description = "pitch(deg*100) or lat, depending on mount mode",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "InputB",
-                Description = "roll(deg*100) or lon depending on mount mode",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "InputC",
-                Description = "yaw(deg*100) or alt (in cm) depending on mount mode",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "SavePosition",
-                Description = "if '1' it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING)",
-                NumElements = 1,
-            });
-
-        }
-
-        private Int32 mInputA;
-        private Int32 mInputB;
-        private Int32 mInputC;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-        private byte mSavePosition;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Message with some status from APM to GCS about camera or antenna mount
-    /// </summary>
-    public class UasMountStatus: UasMessage
-    {
-        /// <summary>
-        /// pitch(deg*100) or lat, depending on mount mode
-        /// </summary>
-        public Int32 PointingA {
-            get { return mPointingA; }
-            set { mPointingA = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// roll(deg*100) or lon depending on mount mode
-        /// </summary>
-        public Int32 PointingB {
-            get { return mPointingB; }
-            set { mPointingB = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// yaw(deg*100) or alt (in cm) depending on mount mode
-        /// </summary>
-        public Int32 PointingC {
-            get { return mPointingC; }
-            set { mPointingC = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        public UasMountStatus()
-        {
-            mMessageId = 158;
-            CrcExtra = 134;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mPointingA);
-            s.Write(mPointingB);
-            s.Write(mPointingC);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mPointingA = s.ReadInt32();
-            this.mPointingB = s.ReadInt32();
-            this.mPointingC = s.ReadInt32();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Message with some status from APM to GCS about camera or antenna mount"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "PointingA",
-                Description = "pitch(deg*100) or lat, depending on mount mode",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "PointingB",
-                Description = "roll(deg*100) or lon depending on mount mode",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "PointingC",
-                Description = "yaw(deg*100) or alt (in cm) depending on mount mode",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-        }
-
-        private Int32 mPointingA;
-        private Int32 mPointingB;
-        private Int32 mPointingC;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// A fence point. Used to set a point when from  	      GCS -> MAV. Also used to return a point from MAV -> GCS
-    /// </summary>
-    public class UasFencePoint: UasMessage
-    {
-        /// <summary>
-        /// Latitude of point
-        /// </summary>
-        public float Lat {
-            get { return mLat; }
-            set { mLat = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Longitude of point
-        /// </summary>
-        public float Lng {
-            get { return mLng; }
-            set { mLng = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// point index (first point is 1, 0 is for return point)
-        /// </summary>
-        public byte Idx {
-            get { return mIdx; }
-            set { mIdx = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// total number of points (for sanity checking)
-        /// </summary>
-        public byte Count {
-            get { return mCount; }
-            set { mCount = value; NotifyUpdated(); }
-        }
-
-        public UasFencePoint()
-        {
-            mMessageId = 160;
-            CrcExtra = 78;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mLat);
-            s.Write(mLng);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-            s.Write(mIdx);
-            s.Write(mCount);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mLat = s.ReadSingle();
-            this.mLng = s.ReadSingle();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-            this.mIdx = s.ReadByte();
-            this.mCount = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "A fence point. Used to set a point when from  	      GCS -> MAV. Also used to return a point from MAV -> GCS"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Lat",
-                Description = "Latitude of point",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Lng",
-                Description = "Longitude of point",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Idx",
-                Description = "point index (first point is 1, 0 is for return point)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Count",
-                Description = "total number of points (for sanity checking)",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mLat;
-        private float mLng;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-        private byte mIdx;
-        private byte mCount;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Request a current fence point from MAV
-    /// </summary>
-    public class UasFenceFetchPoint: UasMessage
-    {
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// point index (first point is 1, 0 is for return point)
-        /// </summary>
-        public byte Idx {
-            get { return mIdx; }
-            set { mIdx = value; NotifyUpdated(); }
-        }
-
-        public UasFenceFetchPoint()
-        {
-            mMessageId = 161;
-            CrcExtra = 68;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-            s.Write(mIdx);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-            this.mIdx = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Request a current fence point from MAV"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Idx",
-                Description = "point index (first point is 1, 0 is for return point)",
-                NumElements = 1,
-            });
-
-        }
-
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-        private byte mIdx;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Status of geo-fencing. Sent in extended  	    status stream when fencing enabled
-    /// </summary>
-    public class UasFenceStatus: UasMessage
-    {
-        /// <summary>
-        /// time of last breach in milliseconds since boot
-        /// </summary>
-        public UInt32 BreachTime {
-            get { return mBreachTime; }
-            set { mBreachTime = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// number of fence breaches
-        /// </summary>
-        public UInt16 BreachCount {
-            get { return mBreachCount; }
-            set { mBreachCount = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// 0 if currently inside fence, 1 if outside
-        /// </summary>
-        public byte BreachStatus {
-            get { return mBreachStatus; }
-            set { mBreachStatus = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// last breach type (see FENCE_BREACH_* enum)
-        /// </summary>
-        public FenceBreach BreachType {
-            get { return mBreachType; }
-            set { mBreachType = value; NotifyUpdated(); }
-        }
-
-        public UasFenceStatus()
-        {
-            mMessageId = 162;
-            CrcExtra = 189;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mBreachTime);
-            s.Write(mBreachCount);
-            s.Write(mBreachStatus);
-            s.Write((byte)mBreachType);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mBreachTime = s.ReadUInt32();
-            this.mBreachCount = s.ReadUInt16();
-            this.mBreachStatus = s.ReadByte();
-            this.mBreachType = (FenceBreach)s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Status of geo-fencing. Sent in extended  	    status stream when fencing enabled"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "BreachTime",
-                Description = "time of last breach in milliseconds since boot",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "BreachCount",
-                Description = "number of fence breaches",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "BreachStatus",
-                Description = "0 if currently inside fence, 1 if outside",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "BreachType",
-                Description = "last breach type (see FENCE_BREACH_* enum)",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("FenceBreach"),
-            });
-
-        }
-
-        private UInt32 mBreachTime;
-        private UInt16 mBreachCount;
-        private byte mBreachStatus;
-        private FenceBreach mBreachType;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Status of DCM attitude estimator
-    /// </summary>
-    public class UasAhrs: UasMessage
-    {
-        /// <summary>
-        /// X gyro drift estimate rad/s
-        /// </summary>
-        public float Omegaix {
-            get { return mOmegaix; }
-            set { mOmegaix = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Y gyro drift estimate rad/s
-        /// </summary>
-        public float Omegaiy {
-            get { return mOmegaiy; }
-            set { mOmegaiy = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Z gyro drift estimate rad/s
-        /// </summary>
-        public float Omegaiz {
-            get { return mOmegaiz; }
-            set { mOmegaiz = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// average accel_weight
-        /// </summary>
-        public float AccelWeight {
-            get { return mAccelWeight; }
-            set { mAccelWeight = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// average renormalisation value
-        /// </summary>
-        public float RenormVal {
-            get { return mRenormVal; }
-            set { mRenormVal = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// average error_roll_pitch value
-        /// </summary>
-        public float ErrorRp {
-            get { return mErrorRp; }
-            set { mErrorRp = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// average error_yaw value
-        /// </summary>
-        public float ErrorYaw {
-            get { return mErrorYaw; }
-            set { mErrorYaw = value; NotifyUpdated(); }
-        }
-
-        public UasAhrs()
-        {
-            mMessageId = 163;
-            CrcExtra = 127;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mOmegaix);
-            s.Write(mOmegaiy);
-            s.Write(mOmegaiz);
-            s.Write(mAccelWeight);
-            s.Write(mRenormVal);
-            s.Write(mErrorRp);
-            s.Write(mErrorYaw);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mOmegaix = s.ReadSingle();
-            this.mOmegaiy = s.ReadSingle();
-            this.mOmegaiz = s.ReadSingle();
-            this.mAccelWeight = s.ReadSingle();
-            this.mRenormVal = s.ReadSingle();
-            this.mErrorRp = s.ReadSingle();
-            this.mErrorYaw = s.ReadSingle();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Status of DCM attitude estimator"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Omegaix",
-                Description = "X gyro drift estimate rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Omegaiy",
-                Description = "Y gyro drift estimate rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Omegaiz",
-                Description = "Z gyro drift estimate rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "AccelWeight",
-                Description = "average accel_weight",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "RenormVal",
-                Description = "average renormalisation value",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ErrorRp",
-                Description = "average error_roll_pitch value",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ErrorYaw",
-                Description = "average error_yaw value",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mOmegaix;
-        private float mOmegaiy;
-        private float mOmegaiz;
-        private float mAccelWeight;
-        private float mRenormVal;
-        private float mErrorRp;
-        private float mErrorYaw;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Status of simulation environment, if used
-    /// </summary>
-    public class UasSimstate: UasMessage
-    {
-        /// <summary>
-        /// Roll angle (rad)
-        /// </summary>
-        public float Roll {
-            get { return mRoll; }
-            set { mRoll = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Pitch angle (rad)
-        /// </summary>
-        public float Pitch {
-            get { return mPitch; }
-            set { mPitch = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Yaw angle (rad)
-        /// </summary>
-        public float Yaw {
-            get { return mYaw; }
-            set { mYaw = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// X acceleration m/s/s
-        /// </summary>
-        public float Xacc {
-            get { return mXacc; }
-            set { mXacc = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Y acceleration m/s/s
-        /// </summary>
-        public float Yacc {
-            get { return mYacc; }
-            set { mYacc = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Z acceleration m/s/s
-        /// </summary>
-        public float Zacc {
-            get { return mZacc; }
-            set { mZacc = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Angular speed around X axis rad/s
-        /// </summary>
-        public float Xgyro {
-            get { return mXgyro; }
-            set { mXgyro = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Angular speed around Y axis rad/s
-        /// </summary>
-        public float Ygyro {
-            get { return mYgyro; }
-            set { mYgyro = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Angular speed around Z axis rad/s
-        /// </summary>
-        public float Zgyro {
-            get { return mZgyro; }
-            set { mZgyro = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Latitude in degrees * 1E7
-        /// </summary>
-        public Int32 Lat {
-            get { return mLat; }
-            set { mLat = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Longitude in degrees * 1E7
-        /// </summary>
-        public Int32 Lng {
-            get { return mLng; }
-            set { mLng = value; NotifyUpdated(); }
-        }
-
-        public UasSimstate()
-        {
-            mMessageId = 164;
-            CrcExtra = 154;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mRoll);
-            s.Write(mPitch);
-            s.Write(mYaw);
-            s.Write(mXacc);
-            s.Write(mYacc);
-            s.Write(mZacc);
-            s.Write(mXgyro);
-            s.Write(mYgyro);
-            s.Write(mZgyro);
-            s.Write(mLat);
-            s.Write(mLng);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mRoll = s.ReadSingle();
-            this.mPitch = s.ReadSingle();
-            this.mYaw = s.ReadSingle();
-            this.mXacc = s.ReadSingle();
-            this.mYacc = s.ReadSingle();
-            this.mZacc = s.ReadSingle();
-            this.mXgyro = s.ReadSingle();
-            this.mYgyro = s.ReadSingle();
-            this.mZgyro = s.ReadSingle();
-            this.mLat = s.ReadInt32();
-            this.mLng = s.ReadInt32();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Status of simulation environment, if used"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Roll",
-                Description = "Roll angle (rad)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pitch",
-                Description = "Pitch angle (rad)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yaw",
-                Description = "Yaw angle (rad)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Xacc",
-                Description = "X acceleration m/s/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Yacc",
-                Description = "Y acceleration m/s/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Zacc",
-                Description = "Z acceleration m/s/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Xgyro",
-                Description = "Angular speed around X axis rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Ygyro",
-                Description = "Angular speed around Y axis rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Zgyro",
-                Description = "Angular speed around Z axis rad/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Lat",
-                Description = "Latitude in degrees * 1E7",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Lng",
-                Description = "Longitude in degrees * 1E7",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mRoll;
-        private float mPitch;
-        private float mYaw;
-        private float mXacc;
-        private float mYacc;
-        private float mZacc;
-        private float mXgyro;
-        private float mYgyro;
-        private float mZgyro;
-        private Int32 mLat;
-        private Int32 mLng;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Status of key hardware
-    /// </summary>
-    public class UasHwstatus: UasMessage
-    {
-        /// <summary>
-        /// board voltage (mV)
-        /// </summary>
-        public UInt16 Vcc {
-            get { return mVcc; }
-            set { mVcc = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// I2C error count
-        /// </summary>
-        public byte I2cerr {
-            get { return mI2cerr; }
-            set { mI2cerr = value; NotifyUpdated(); }
-        }
-
-        public UasHwstatus()
-        {
-            mMessageId = 165;
-            CrcExtra = 21;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mVcc);
-            s.Write(mI2cerr);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mVcc = s.ReadUInt16();
-            this.mI2cerr = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Status of key hardware"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Vcc",
-                Description = "board voltage (mV)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "I2cerr",
-                Description = "I2C error count",
-                NumElements = 1,
-            });
-
-        }
-
-        private UInt16 mVcc;
-        private byte mI2cerr;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Status generated by radio
-    /// </summary>
-    public class UasRadio: UasMessage
-    {
-        /// <summary>
-        /// receive errors
-        /// </summary>
-        public UInt16 Rxerrors {
-            get { return mRxerrors; }
-            set { mRxerrors = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// count of error corrected packets
-        /// </summary>
-        public UInt16 Fixed {
-            get { return mFixed; }
-            set { mFixed = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// local signal strength
-        /// </summary>
-        public byte Rssi {
-            get { return mRssi; }
-            set { mRssi = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// remote signal strength
-        /// </summary>
-        public byte Remrssi {
-            get { return mRemrssi; }
-            set { mRemrssi = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// how full the tx buffer is as a percentage
-        /// </summary>
-        public byte Txbuf {
-            get { return mTxbuf; }
-            set { mTxbuf = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// background noise level
-        /// </summary>
-        public byte Noise {
-            get { return mNoise; }
-            set { mNoise = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// remote background noise level
-        /// </summary>
-        public byte Remnoise {
-            get { return mRemnoise; }
-            set { mRemnoise = value; NotifyUpdated(); }
-        }
-
-        public UasRadio()
-        {
-            mMessageId = 166;
-            CrcExtra = 21;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mRxerrors);
-            s.Write(mFixed);
-            s.Write(mRssi);
-            s.Write(mRemrssi);
-            s.Write(mTxbuf);
-            s.Write(mNoise);
-            s.Write(mRemnoise);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mRxerrors = s.ReadUInt16();
-            this.mFixed = s.ReadUInt16();
-            this.mRssi = s.ReadByte();
-            this.mRemrssi = s.ReadByte();
-            this.mTxbuf = s.ReadByte();
-            this.mNoise = s.ReadByte();
-            this.mRemnoise = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Status generated by radio"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Rxerrors",
-                Description = "receive errors",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Fixed",
-                Description = "count of error corrected packets",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Rssi",
-                Description = "local signal strength",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Remrssi",
-                Description = "remote signal strength",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Txbuf",
-                Description = "how full the tx buffer is as a percentage",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Noise",
-                Description = "background noise level",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Remnoise",
-                Description = "remote background noise level",
-                NumElements = 1,
-            });
-
-        }
-
-        private UInt16 mRxerrors;
-        private UInt16 mFixed;
-        private byte mRssi;
-        private byte mRemrssi;
-        private byte mTxbuf;
-        private byte mNoise;
-        private byte mRemnoise;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Status of AP_Limits. Sent in extended  	    status stream when AP_Limits is enabled
-    /// </summary>
-    public class UasLimitsStatus: UasMessage
-    {
-        /// <summary>
-        /// time of last breach in milliseconds since boot
-        /// </summary>
-        public UInt32 LastTrigger {
-            get { return mLastTrigger; }
-            set { mLastTrigger = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// time of last recovery action in milliseconds since boot
-        /// </summary>
-        public UInt32 LastAction {
-            get { return mLastAction; }
-            set { mLastAction = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// time of last successful recovery in milliseconds since boot
-        /// </summary>
-        public UInt32 LastRecovery {
-            get { return mLastRecovery; }
-            set { mLastRecovery = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// time of last all-clear in milliseconds since boot
-        /// </summary>
-        public UInt32 LastClear {
-            get { return mLastClear; }
-            set { mLastClear = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// number of fence breaches
-        /// </summary>
-        public UInt16 BreachCount {
-            get { return mBreachCount; }
-            set { mBreachCount = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// state of AP_Limits, (see enum LimitState, LIMITS_STATE)
-        /// </summary>
-        public LimitsState LimitsState {
-            get { return mLimitsState; }
-            set { mLimitsState = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// AP_Limit_Module bitfield of enabled modules, (see enum moduleid or LIMIT_MODULE)
-        /// </summary>
-        public LimitModule ModsEnabled {
-            get { return mModsEnabled; }
-            set { mModsEnabled = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// AP_Limit_Module bitfield of required modules, (see enum moduleid or LIMIT_MODULE)
-        /// </summary>
-        public LimitModule ModsRequired {
-            get { return mModsRequired; }
-            set { mModsRequired = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// AP_Limit_Module bitfield of triggered modules, (see enum moduleid or LIMIT_MODULE)
-        /// </summary>
-        public LimitModule ModsTriggered {
-            get { return mModsTriggered; }
-            set { mModsTriggered = value; NotifyUpdated(); }
-        }
-
-        public UasLimitsStatus()
-        {
-            mMessageId = 167;
-            CrcExtra = 144;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mLastTrigger);
-            s.Write(mLastAction);
-            s.Write(mLastRecovery);
-            s.Write(mLastClear);
-            s.Write(mBreachCount);
-            s.Write((byte)mLimitsState);
-            s.Write((byte)mModsEnabled);
-            s.Write((byte)mModsRequired);
-            s.Write((byte)mModsTriggered);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mLastTrigger = s.ReadUInt32();
-            this.mLastAction = s.ReadUInt32();
-            this.mLastRecovery = s.ReadUInt32();
-            this.mLastClear = s.ReadUInt32();
-            this.mBreachCount = s.ReadUInt16();
-            this.mLimitsState = (LimitsState)s.ReadByte();
-            this.mModsEnabled = (LimitModule)s.ReadByte();
-            this.mModsRequired = (LimitModule)s.ReadByte();
-            this.mModsTriggered = (LimitModule)s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Status of AP_Limits. Sent in extended  	    status stream when AP_Limits is enabled"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LastTrigger",
-                Description = "time of last breach in milliseconds since boot",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LastAction",
-                Description = "time of last recovery action in milliseconds since boot",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LastRecovery",
-                Description = "time of last successful recovery in milliseconds since boot",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LastClear",
-                Description = "time of last all-clear in milliseconds since boot",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "BreachCount",
-                Description = "number of fence breaches",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LimitsState",
-                Description = "state of AP_Limits, (see enum LimitState, LIMITS_STATE)",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("LimitsState"),
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ModsEnabled",
-                Description = "AP_Limit_Module bitfield of enabled modules, (see enum moduleid or LIMIT_MODULE)",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("LimitModule"),
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ModsRequired",
-                Description = "AP_Limit_Module bitfield of required modules, (see enum moduleid or LIMIT_MODULE)",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("LimitModule"),
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "ModsTriggered",
-                Description = "AP_Limit_Module bitfield of triggered modules, (see enum moduleid or LIMIT_MODULE)",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("LimitModule"),
-            });
-
-        }
-
-        private UInt32 mLastTrigger;
-        private UInt32 mLastAction;
-        private UInt32 mLastRecovery;
-        private UInt32 mLastClear;
-        private UInt16 mBreachCount;
-        private LimitsState mLimitsState;
-        private LimitModule mModsEnabled;
-        private LimitModule mModsRequired;
-        private LimitModule mModsTriggered;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Wind estimation
-    /// </summary>
-    public class UasWind: UasMessage
-    {
-        /// <summary>
-        /// wind direction that wind is coming from (degrees)
-        /// </summary>
-        public float Direction {
-            get { return mDirection; }
-            set { mDirection = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// wind speed in ground plane (m/s)
-        /// </summary>
-        public float Speed {
-            get { return mSpeed; }
-            set { mSpeed = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// vertical wind speed (m/s)
-        /// </summary>
-        public float SpeedZ {
-            get { return mSpeedZ; }
-            set { mSpeedZ = value; NotifyUpdated(); }
-        }
-
-        public UasWind()
-        {
-            mMessageId = 168;
-            CrcExtra = 1;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mDirection);
-            s.Write(mSpeed);
-            s.Write(mSpeedZ);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mDirection = s.ReadSingle();
-            this.mSpeed = s.ReadSingle();
-            this.mSpeedZ = s.ReadSingle();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Wind estimation"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Direction",
-                Description = "wind direction that wind is coming from (degrees)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Speed",
-                Description = "wind speed in ground plane (m/s)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "SpeedZ",
-                Description = "vertical wind speed (m/s)",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mDirection;
-        private float mSpeed;
-        private float mSpeedZ;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Data packet, size 16
-    /// </summary>
-    public class UasData16: UasMessage
-    {
-        /// <summary>
-        /// data type
-        /// </summary>
-        public byte Type {
-            get { return mType; }
-            set { mType = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// data length
-        /// </summary>
-        public byte Len {
-            get { return mLen; }
-            set { mLen = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// raw data
-        /// </summary>
-        public byte[] Data {
-            get { return mData; }
-            set { mData = value; NotifyUpdated(); }
-        }
-
-        public UasData16()
-        {
-            mMessageId = 169;
-            CrcExtra = 234;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mType);
-            s.Write(mLen);
-            s.Write(mData[0]); 
-            s.Write(mData[1]); 
-            s.Write(mData[2]); 
-            s.Write(mData[3]); 
-            s.Write(mData[4]); 
-            s.Write(mData[5]); 
-            s.Write(mData[6]); 
-            s.Write(mData[7]); 
-            s.Write(mData[8]); 
-            s.Write(mData[9]); 
-            s.Write(mData[10]); 
-            s.Write(mData[11]); 
-            s.Write(mData[12]); 
-            s.Write(mData[13]); 
-            s.Write(mData[14]); 
-            s.Write(mData[15]); 
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mType = s.ReadByte();
-            this.mLen = s.ReadByte();
-            this.mData[0] = s.ReadByte();
-            this.mData[1] = s.ReadByte();
-            this.mData[2] = s.ReadByte();
-            this.mData[3] = s.ReadByte();
-            this.mData[4] = s.ReadByte();
-            this.mData[5] = s.ReadByte();
-            this.mData[6] = s.ReadByte();
-            this.mData[7] = s.ReadByte();
-            this.mData[8] = s.ReadByte();
-            this.mData[9] = s.ReadByte();
-            this.mData[10] = s.ReadByte();
-            this.mData[11] = s.ReadByte();
-            this.mData[12] = s.ReadByte();
-            this.mData[13] = s.ReadByte();
-            this.mData[14] = s.ReadByte();
-            this.mData[15] = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Data packet, size 16"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Type",
-                Description = "data type",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Len",
-                Description = "data length",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Data",
-                Description = "raw data",
-                NumElements = 16,
-            });
-
-        }
-
-        private byte mType;
-        private byte mLen;
-        private byte[] mData = new byte[16];
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Data packet, size 32
-    /// </summary>
-    public class UasData32: UasMessage
-    {
-        /// <summary>
-        /// data type
-        /// </summary>
-        public byte Type {
-            get { return mType; }
-            set { mType = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// data length
-        /// </summary>
-        public byte Len {
-            get { return mLen; }
-            set { mLen = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// raw data
-        /// </summary>
-        public byte[] Data {
-            get { return mData; }
-            set { mData = value; NotifyUpdated(); }
-        }
-
-        public UasData32()
-        {
-            mMessageId = 170;
-            CrcExtra = 73;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mType);
-            s.Write(mLen);
-            s.Write(mData[0]); 
-            s.Write(mData[1]); 
-            s.Write(mData[2]); 
-            s.Write(mData[3]); 
-            s.Write(mData[4]); 
-            s.Write(mData[5]); 
-            s.Write(mData[6]); 
-            s.Write(mData[7]); 
-            s.Write(mData[8]); 
-            s.Write(mData[9]); 
-            s.Write(mData[10]); 
-            s.Write(mData[11]); 
-            s.Write(mData[12]); 
-            s.Write(mData[13]); 
-            s.Write(mData[14]); 
-            s.Write(mData[15]); 
-            s.Write(mData[16]); 
-            s.Write(mData[17]); 
-            s.Write(mData[18]); 
-            s.Write(mData[19]); 
-            s.Write(mData[20]); 
-            s.Write(mData[21]); 
-            s.Write(mData[22]); 
-            s.Write(mData[23]); 
-            s.Write(mData[24]); 
-            s.Write(mData[25]); 
-            s.Write(mData[26]); 
-            s.Write(mData[27]); 
-            s.Write(mData[28]); 
-            s.Write(mData[29]); 
-            s.Write(mData[30]); 
-            s.Write(mData[31]); 
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mType = s.ReadByte();
-            this.mLen = s.ReadByte();
-            this.mData[0] = s.ReadByte();
-            this.mData[1] = s.ReadByte();
-            this.mData[2] = s.ReadByte();
-            this.mData[3] = s.ReadByte();
-            this.mData[4] = s.ReadByte();
-            this.mData[5] = s.ReadByte();
-            this.mData[6] = s.ReadByte();
-            this.mData[7] = s.ReadByte();
-            this.mData[8] = s.ReadByte();
-            this.mData[9] = s.ReadByte();
-            this.mData[10] = s.ReadByte();
-            this.mData[11] = s.ReadByte();
-            this.mData[12] = s.ReadByte();
-            this.mData[13] = s.ReadByte();
-            this.mData[14] = s.ReadByte();
-            this.mData[15] = s.ReadByte();
-            this.mData[16] = s.ReadByte();
-            this.mData[17] = s.ReadByte();
-            this.mData[18] = s.ReadByte();
-            this.mData[19] = s.ReadByte();
-            this.mData[20] = s.ReadByte();
-            this.mData[21] = s.ReadByte();
-            this.mData[22] = s.ReadByte();
-            this.mData[23] = s.ReadByte();
-            this.mData[24] = s.ReadByte();
-            this.mData[25] = s.ReadByte();
-            this.mData[26] = s.ReadByte();
-            this.mData[27] = s.ReadByte();
-            this.mData[28] = s.ReadByte();
-            this.mData[29] = s.ReadByte();
-            this.mData[30] = s.ReadByte();
-            this.mData[31] = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Data packet, size 32"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Type",
-                Description = "data type",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Len",
-                Description = "data length",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Data",
-                Description = "raw data",
-                NumElements = 32,
-            });
-
-        }
-
-        private byte mType;
-        private byte mLen;
-        private byte[] mData = new byte[32];
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Data packet, size 64
-    /// </summary>
-    public class UasData64: UasMessage
-    {
-        /// <summary>
-        /// data type
-        /// </summary>
-        public byte Type {
-            get { return mType; }
-            set { mType = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// data length
-        /// </summary>
-        public byte Len {
-            get { return mLen; }
-            set { mLen = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// raw data
-        /// </summary>
-        public byte[] Data {
-            get { return mData; }
-            set { mData = value; NotifyUpdated(); }
-        }
-
-        public UasData64()
+        public UasSensorhubWrite()
         {
             mMessageId = 171;
-            CrcExtra = 181;
+            CrcExtra = 85;
         }
 
         internal override void SerializeBody(BinaryWriter s)
         {
-            s.Write(mType);
-            s.Write(mLen);
-            s.Write(mData[0]); 
-            s.Write(mData[1]); 
-            s.Write(mData[2]); 
-            s.Write(mData[3]); 
-            s.Write(mData[4]); 
-            s.Write(mData[5]); 
-            s.Write(mData[6]); 
-            s.Write(mData[7]); 
-            s.Write(mData[8]); 
-            s.Write(mData[9]); 
-            s.Write(mData[10]); 
-            s.Write(mData[11]); 
-            s.Write(mData[12]); 
-            s.Write(mData[13]); 
-            s.Write(mData[14]); 
-            s.Write(mData[15]); 
-            s.Write(mData[16]); 
-            s.Write(mData[17]); 
-            s.Write(mData[18]); 
-            s.Write(mData[19]); 
-            s.Write(mData[20]); 
-            s.Write(mData[21]); 
-            s.Write(mData[22]); 
-            s.Write(mData[23]); 
-            s.Write(mData[24]); 
-            s.Write(mData[25]); 
-            s.Write(mData[26]); 
-            s.Write(mData[27]); 
-            s.Write(mData[28]); 
-            s.Write(mData[29]); 
-            s.Write(mData[30]); 
-            s.Write(mData[31]); 
-            s.Write(mData[32]); 
-            s.Write(mData[33]); 
-            s.Write(mData[34]); 
-            s.Write(mData[35]); 
-            s.Write(mData[36]); 
-            s.Write(mData[37]); 
-            s.Write(mData[38]); 
-            s.Write(mData[39]); 
-            s.Write(mData[40]); 
-            s.Write(mData[41]); 
-            s.Write(mData[42]); 
-            s.Write(mData[43]); 
-            s.Write(mData[44]); 
-            s.Write(mData[45]); 
-            s.Write(mData[46]); 
-            s.Write(mData[47]); 
-            s.Write(mData[48]); 
-            s.Write(mData[49]); 
-            s.Write(mData[50]); 
-            s.Write(mData[51]); 
-            s.Write(mData[52]); 
-            s.Write(mData[53]); 
-            s.Write(mData[54]); 
-            s.Write(mData[55]); 
-            s.Write(mData[56]); 
-            s.Write(mData[57]); 
-            s.Write(mData[58]); 
-            s.Write(mData[59]); 
-            s.Write(mData[60]); 
-            s.Write(mData[61]); 
-            s.Write(mData[62]); 
-            s.Write(mData[63]); 
+            s.Write(mHubAddress);
+            s.Write(mUpdateRate);
+            s.Write(mSftregByte);
+            s.Write(mExtrabyte);
         }
 
         internal override void DeserializeBody(BinaryReader s)
         {
-            this.mType = s.ReadByte();
-            this.mLen = s.ReadByte();
-            this.mData[0] = s.ReadByte();
-            this.mData[1] = s.ReadByte();
-            this.mData[2] = s.ReadByte();
-            this.mData[3] = s.ReadByte();
-            this.mData[4] = s.ReadByte();
-            this.mData[5] = s.ReadByte();
-            this.mData[6] = s.ReadByte();
-            this.mData[7] = s.ReadByte();
-            this.mData[8] = s.ReadByte();
-            this.mData[9] = s.ReadByte();
-            this.mData[10] = s.ReadByte();
-            this.mData[11] = s.ReadByte();
-            this.mData[12] = s.ReadByte();
-            this.mData[13] = s.ReadByte();
-            this.mData[14] = s.ReadByte();
-            this.mData[15] = s.ReadByte();
-            this.mData[16] = s.ReadByte();
-            this.mData[17] = s.ReadByte();
-            this.mData[18] = s.ReadByte();
-            this.mData[19] = s.ReadByte();
-            this.mData[20] = s.ReadByte();
-            this.mData[21] = s.ReadByte();
-            this.mData[22] = s.ReadByte();
-            this.mData[23] = s.ReadByte();
-            this.mData[24] = s.ReadByte();
-            this.mData[25] = s.ReadByte();
-            this.mData[26] = s.ReadByte();
-            this.mData[27] = s.ReadByte();
-            this.mData[28] = s.ReadByte();
-            this.mData[29] = s.ReadByte();
-            this.mData[30] = s.ReadByte();
-            this.mData[31] = s.ReadByte();
-            this.mData[32] = s.ReadByte();
-            this.mData[33] = s.ReadByte();
-            this.mData[34] = s.ReadByte();
-            this.mData[35] = s.ReadByte();
-            this.mData[36] = s.ReadByte();
-            this.mData[37] = s.ReadByte();
-            this.mData[38] = s.ReadByte();
-            this.mData[39] = s.ReadByte();
-            this.mData[40] = s.ReadByte();
-            this.mData[41] = s.ReadByte();
-            this.mData[42] = s.ReadByte();
-            this.mData[43] = s.ReadByte();
-            this.mData[44] = s.ReadByte();
-            this.mData[45] = s.ReadByte();
-            this.mData[46] = s.ReadByte();
-            this.mData[47] = s.ReadByte();
-            this.mData[48] = s.ReadByte();
-            this.mData[49] = s.ReadByte();
-            this.mData[50] = s.ReadByte();
-            this.mData[51] = s.ReadByte();
-            this.mData[52] = s.ReadByte();
-            this.mData[53] = s.ReadByte();
-            this.mData[54] = s.ReadByte();
-            this.mData[55] = s.ReadByte();
-            this.mData[56] = s.ReadByte();
-            this.mData[57] = s.ReadByte();
-            this.mData[58] = s.ReadByte();
-            this.mData[59] = s.ReadByte();
-            this.mData[60] = s.ReadByte();
-            this.mData[61] = s.ReadByte();
-            this.mData[62] = s.ReadByte();
-            this.mData[63] = s.ReadByte();
+            this.mHubAddress = s.ReadByte();
+            this.mUpdateRate = s.ReadByte();
+            this.mSftregByte = s.ReadByte();
+            this.mExtrabyte = s.ReadByte();
         }
 
         protected override void InitMetadata()
         {
             mMetadata = new UasMessageMetadata() {
-                Description = "Data packet, size 64"
+                Description = ""
             };
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Type",
-                Description = "data type",
+                Name = "HubAddress",
+                Description = "The address of this hub",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Len",
-                Description = "data length",
+                Name = "UpdateRate",
+                Description = "Rate to send CAN bus updates",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Data",
-                Description = "raw data",
-                NumElements = 64,
-            });
-
-        }
-
-        private byte mType;
-        private byte mLen;
-        private byte[] mData = new byte[64];
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Data packet, size 96
-    /// </summary>
-    public class UasData96: UasMessage
-    {
-        /// <summary>
-        /// data type
-        /// </summary>
-        public byte Type {
-            get { return mType; }
-            set { mType = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// data length
-        /// </summary>
-        public byte Len {
-            get { return mLen; }
-            set { mLen = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// raw data
-        /// </summary>
-        public byte[] Data {
-            get { return mData; }
-            set { mData = value; NotifyUpdated(); }
-        }
-
-        public UasData96()
-        {
-            mMessageId = 172;
-            CrcExtra = 22;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mType);
-            s.Write(mLen);
-            s.Write(mData[0]); 
-            s.Write(mData[1]); 
-            s.Write(mData[2]); 
-            s.Write(mData[3]); 
-            s.Write(mData[4]); 
-            s.Write(mData[5]); 
-            s.Write(mData[6]); 
-            s.Write(mData[7]); 
-            s.Write(mData[8]); 
-            s.Write(mData[9]); 
-            s.Write(mData[10]); 
-            s.Write(mData[11]); 
-            s.Write(mData[12]); 
-            s.Write(mData[13]); 
-            s.Write(mData[14]); 
-            s.Write(mData[15]); 
-            s.Write(mData[16]); 
-            s.Write(mData[17]); 
-            s.Write(mData[18]); 
-            s.Write(mData[19]); 
-            s.Write(mData[20]); 
-            s.Write(mData[21]); 
-            s.Write(mData[22]); 
-            s.Write(mData[23]); 
-            s.Write(mData[24]); 
-            s.Write(mData[25]); 
-            s.Write(mData[26]); 
-            s.Write(mData[27]); 
-            s.Write(mData[28]); 
-            s.Write(mData[29]); 
-            s.Write(mData[30]); 
-            s.Write(mData[31]); 
-            s.Write(mData[32]); 
-            s.Write(mData[33]); 
-            s.Write(mData[34]); 
-            s.Write(mData[35]); 
-            s.Write(mData[36]); 
-            s.Write(mData[37]); 
-            s.Write(mData[38]); 
-            s.Write(mData[39]); 
-            s.Write(mData[40]); 
-            s.Write(mData[41]); 
-            s.Write(mData[42]); 
-            s.Write(mData[43]); 
-            s.Write(mData[44]); 
-            s.Write(mData[45]); 
-            s.Write(mData[46]); 
-            s.Write(mData[47]); 
-            s.Write(mData[48]); 
-            s.Write(mData[49]); 
-            s.Write(mData[50]); 
-            s.Write(mData[51]); 
-            s.Write(mData[52]); 
-            s.Write(mData[53]); 
-            s.Write(mData[54]); 
-            s.Write(mData[55]); 
-            s.Write(mData[56]); 
-            s.Write(mData[57]); 
-            s.Write(mData[58]); 
-            s.Write(mData[59]); 
-            s.Write(mData[60]); 
-            s.Write(mData[61]); 
-            s.Write(mData[62]); 
-            s.Write(mData[63]); 
-            s.Write(mData[64]); 
-            s.Write(mData[65]); 
-            s.Write(mData[66]); 
-            s.Write(mData[67]); 
-            s.Write(mData[68]); 
-            s.Write(mData[69]); 
-            s.Write(mData[70]); 
-            s.Write(mData[71]); 
-            s.Write(mData[72]); 
-            s.Write(mData[73]); 
-            s.Write(mData[74]); 
-            s.Write(mData[75]); 
-            s.Write(mData[76]); 
-            s.Write(mData[77]); 
-            s.Write(mData[78]); 
-            s.Write(mData[79]); 
-            s.Write(mData[80]); 
-            s.Write(mData[81]); 
-            s.Write(mData[82]); 
-            s.Write(mData[83]); 
-            s.Write(mData[84]); 
-            s.Write(mData[85]); 
-            s.Write(mData[86]); 
-            s.Write(mData[87]); 
-            s.Write(mData[88]); 
-            s.Write(mData[89]); 
-            s.Write(mData[90]); 
-            s.Write(mData[91]); 
-            s.Write(mData[92]); 
-            s.Write(mData[93]); 
-            s.Write(mData[94]); 
-            s.Write(mData[95]); 
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mType = s.ReadByte();
-            this.mLen = s.ReadByte();
-            this.mData[0] = s.ReadByte();
-            this.mData[1] = s.ReadByte();
-            this.mData[2] = s.ReadByte();
-            this.mData[3] = s.ReadByte();
-            this.mData[4] = s.ReadByte();
-            this.mData[5] = s.ReadByte();
-            this.mData[6] = s.ReadByte();
-            this.mData[7] = s.ReadByte();
-            this.mData[8] = s.ReadByte();
-            this.mData[9] = s.ReadByte();
-            this.mData[10] = s.ReadByte();
-            this.mData[11] = s.ReadByte();
-            this.mData[12] = s.ReadByte();
-            this.mData[13] = s.ReadByte();
-            this.mData[14] = s.ReadByte();
-            this.mData[15] = s.ReadByte();
-            this.mData[16] = s.ReadByte();
-            this.mData[17] = s.ReadByte();
-            this.mData[18] = s.ReadByte();
-            this.mData[19] = s.ReadByte();
-            this.mData[20] = s.ReadByte();
-            this.mData[21] = s.ReadByte();
-            this.mData[22] = s.ReadByte();
-            this.mData[23] = s.ReadByte();
-            this.mData[24] = s.ReadByte();
-            this.mData[25] = s.ReadByte();
-            this.mData[26] = s.ReadByte();
-            this.mData[27] = s.ReadByte();
-            this.mData[28] = s.ReadByte();
-            this.mData[29] = s.ReadByte();
-            this.mData[30] = s.ReadByte();
-            this.mData[31] = s.ReadByte();
-            this.mData[32] = s.ReadByte();
-            this.mData[33] = s.ReadByte();
-            this.mData[34] = s.ReadByte();
-            this.mData[35] = s.ReadByte();
-            this.mData[36] = s.ReadByte();
-            this.mData[37] = s.ReadByte();
-            this.mData[38] = s.ReadByte();
-            this.mData[39] = s.ReadByte();
-            this.mData[40] = s.ReadByte();
-            this.mData[41] = s.ReadByte();
-            this.mData[42] = s.ReadByte();
-            this.mData[43] = s.ReadByte();
-            this.mData[44] = s.ReadByte();
-            this.mData[45] = s.ReadByte();
-            this.mData[46] = s.ReadByte();
-            this.mData[47] = s.ReadByte();
-            this.mData[48] = s.ReadByte();
-            this.mData[49] = s.ReadByte();
-            this.mData[50] = s.ReadByte();
-            this.mData[51] = s.ReadByte();
-            this.mData[52] = s.ReadByte();
-            this.mData[53] = s.ReadByte();
-            this.mData[54] = s.ReadByte();
-            this.mData[55] = s.ReadByte();
-            this.mData[56] = s.ReadByte();
-            this.mData[57] = s.ReadByte();
-            this.mData[58] = s.ReadByte();
-            this.mData[59] = s.ReadByte();
-            this.mData[60] = s.ReadByte();
-            this.mData[61] = s.ReadByte();
-            this.mData[62] = s.ReadByte();
-            this.mData[63] = s.ReadByte();
-            this.mData[64] = s.ReadByte();
-            this.mData[65] = s.ReadByte();
-            this.mData[66] = s.ReadByte();
-            this.mData[67] = s.ReadByte();
-            this.mData[68] = s.ReadByte();
-            this.mData[69] = s.ReadByte();
-            this.mData[70] = s.ReadByte();
-            this.mData[71] = s.ReadByte();
-            this.mData[72] = s.ReadByte();
-            this.mData[73] = s.ReadByte();
-            this.mData[74] = s.ReadByte();
-            this.mData[75] = s.ReadByte();
-            this.mData[76] = s.ReadByte();
-            this.mData[77] = s.ReadByte();
-            this.mData[78] = s.ReadByte();
-            this.mData[79] = s.ReadByte();
-            this.mData[80] = s.ReadByte();
-            this.mData[81] = s.ReadByte();
-            this.mData[82] = s.ReadByte();
-            this.mData[83] = s.ReadByte();
-            this.mData[84] = s.ReadByte();
-            this.mData[85] = s.ReadByte();
-            this.mData[86] = s.ReadByte();
-            this.mData[87] = s.ReadByte();
-            this.mData[88] = s.ReadByte();
-            this.mData[89] = s.ReadByte();
-            this.mData[90] = s.ReadByte();
-            this.mData[91] = s.ReadByte();
-            this.mData[92] = s.ReadByte();
-            this.mData[93] = s.ReadByte();
-            this.mData[94] = s.ReadByte();
-            this.mData[95] = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Data packet, size 96"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Type",
-                Description = "data type",
+                Name = "SftregByte",
+                Description = "Byte representing the status of the shift register",
                 NumElements = 1,
             });
 
             mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Len",
-                Description = "data length",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Data",
-                Description = "raw data",
-                NumElements = 96,
-            });
-
-        }
-
-        private byte mType;
-        private byte mLen;
-        private byte[] mData = new byte[96];
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Rangefinder reporting
-    /// </summary>
-    public class UasRangefinder: UasMessage
-    {
-        /// <summary>
-        /// distance in meters
-        /// </summary>
-        public float Distance {
-            get { return mDistance; }
-            set { mDistance = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// raw voltage if available, zero otherwise
-        /// </summary>
-        public float Voltage {
-            get { return mVoltage; }
-            set { mVoltage = value; NotifyUpdated(); }
-        }
-
-        public UasRangefinder()
-        {
-            mMessageId = 173;
-            CrcExtra = 83;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mDistance);
-            s.Write(mVoltage);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mDistance = s.ReadSingle();
-            this.mVoltage = s.ReadSingle();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Rangefinder reporting"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Distance",
-                Description = "distance in meters",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Voltage",
-                Description = "raw voltage if available, zero otherwise",
+                Name = "Extrabyte",
+                Description = "Spare Field",
                 NumElements = 1,
             });
 
         }
 
-        private float mDistance;
-        private float mVoltage;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Airspeed auto-calibration
-    /// </summary>
-    public class UasAirspeedAutocal: UasMessage
-    {
-        /// <summary>
-        /// GPS velocity north m/s
-        /// </summary>
-        public float Vx {
-            get { return mVx; }
-            set { mVx = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// GPS velocity east m/s
-        /// </summary>
-        public float Vy {
-            get { return mVy; }
-            set { mVy = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// GPS velocity down m/s
-        /// </summary>
-        public float Vz {
-            get { return mVz; }
-            set { mVz = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Differential pressure pascals
-        /// </summary>
-        public float DiffPressure {
-            get { return mDiffPressure; }
-            set { mDiffPressure = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Estimated to true airspeed ratio
-        /// </summary>
-        public float Eas2tas {
-            get { return mEas2tas; }
-            set { mEas2tas = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Airspeed ratio
-        /// </summary>
-        public float Ratio {
-            get { return mRatio; }
-            set { mRatio = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// EKF state x
-        /// </summary>
-        public float StateX {
-            get { return mStateX; }
-            set { mStateX = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// EKF state y
-        /// </summary>
-        public float StateY {
-            get { return mStateY; }
-            set { mStateY = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// EKF state z
-        /// </summary>
-        public float StateZ {
-            get { return mStateZ; }
-            set { mStateZ = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// EKF Pax
-        /// </summary>
-        public float Pax {
-            get { return mPax; }
-            set { mPax = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// EKF Pby
-        /// </summary>
-        public float Pby {
-            get { return mPby; }
-            set { mPby = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// EKF Pcz
-        /// </summary>
-        public float Pcz {
-            get { return mPcz; }
-            set { mPcz = value; NotifyUpdated(); }
-        }
-
-        public UasAirspeedAutocal()
-        {
-            mMessageId = 174;
-            CrcExtra = 167;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mVx);
-            s.Write(mVy);
-            s.Write(mVz);
-            s.Write(mDiffPressure);
-            s.Write(mEas2tas);
-            s.Write(mRatio);
-            s.Write(mStateX);
-            s.Write(mStateY);
-            s.Write(mStateZ);
-            s.Write(mPax);
-            s.Write(mPby);
-            s.Write(mPcz);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mVx = s.ReadSingle();
-            this.mVy = s.ReadSingle();
-            this.mVz = s.ReadSingle();
-            this.mDiffPressure = s.ReadSingle();
-            this.mEas2tas = s.ReadSingle();
-            this.mRatio = s.ReadSingle();
-            this.mStateX = s.ReadSingle();
-            this.mStateY = s.ReadSingle();
-            this.mStateZ = s.ReadSingle();
-            this.mPax = s.ReadSingle();
-            this.mPby = s.ReadSingle();
-            this.mPcz = s.ReadSingle();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Airspeed auto-calibration"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Vx",
-                Description = "GPS velocity north m/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Vy",
-                Description = "GPS velocity east m/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Vz",
-                Description = "GPS velocity down m/s",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "DiffPressure",
-                Description = "Differential pressure pascals",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Eas2tas",
-                Description = "Estimated to true airspeed ratio",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Ratio",
-                Description = "Airspeed ratio",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "StateX",
-                Description = "EKF state x",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "StateY",
-                Description = "EKF state y",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "StateZ",
-                Description = "EKF state z",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pax",
-                Description = "EKF Pax",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pby",
-                Description = "EKF Pby",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Pcz",
-                Description = "EKF Pcz",
-                NumElements = 1,
-            });
-
-        }
-
-        private float mVx;
-        private float mVy;
-        private float mVz;
-        private float mDiffPressure;
-        private float mEas2tas;
-        private float mRatio;
-        private float mStateX;
-        private float mStateY;
-        private float mStateZ;
-        private float mPax;
-        private float mPby;
-        private float mPcz;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// A rally point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS
-    /// </summary>
-    public class UasRallyPoint: UasMessage
-    {
-        /// <summary>
-        /// Latitude of point in degrees * 1E7
-        /// </summary>
-        public Int32 Lat {
-            get { return mLat; }
-            set { mLat = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Longitude of point in degrees * 1E7
-        /// </summary>
-        public Int32 Lng {
-            get { return mLng; }
-            set { mLng = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Transit / loiter altitude in meters relative to home
-        /// </summary>
-        public Int16 Alt {
-            get { return mAlt; }
-            set { mAlt = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Break altitude in meters relative to home
-        /// </summary>
-        public Int16 BreakAlt {
-            get { return mBreakAlt; }
-            set { mBreakAlt = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Heading to aim for when landing. In centi-degrees.
-        /// </summary>
-        public UInt16 LandDir {
-            get { return mLandDir; }
-            set { mLandDir = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// point index (first point is 0)
-        /// </summary>
-        public byte Idx {
-            get { return mIdx; }
-            set { mIdx = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// total number of points (for sanity checking)
-        /// </summary>
-        public byte Count {
-            get { return mCount; }
-            set { mCount = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// See RALLY_FLAGS enum for definition of the bitmask.
-        /// </summary>
-        public RallyFlags Flags {
-            get { return mFlags; }
-            set { mFlags = value; NotifyUpdated(); }
-        }
-
-        public UasRallyPoint()
-        {
-            mMessageId = 175;
-            CrcExtra = 138;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mLat);
-            s.Write(mLng);
-            s.Write(mAlt);
-            s.Write(mBreakAlt);
-            s.Write(mLandDir);
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-            s.Write(mIdx);
-            s.Write(mCount);
-            s.Write((byte)mFlags);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mLat = s.ReadInt32();
-            this.mLng = s.ReadInt32();
-            this.mAlt = s.ReadInt16();
-            this.mBreakAlt = s.ReadInt16();
-            this.mLandDir = s.ReadUInt16();
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-            this.mIdx = s.ReadByte();
-            this.mCount = s.ReadByte();
-            this.mFlags = (RallyFlags)s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "A rally point. Used to set a point when from GCS -> MAV. Also used to return a point from MAV -> GCS"
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Lat",
-                Description = "Latitude of point in degrees * 1E7",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Lng",
-                Description = "Longitude of point in degrees * 1E7",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Alt",
-                Description = "Transit / loiter altitude in meters relative to home",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "BreakAlt",
-                Description = "Break altitude in meters relative to home",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "LandDir",
-                Description = "Heading to aim for when landing. In centi-degrees.",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Idx",
-                Description = "point index (first point is 0)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Count",
-                Description = "total number of points (for sanity checking)",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Flags",
-                Description = "See RALLY_FLAGS enum for definition of the bitmask.",
-                NumElements = 1,
-                EnumMetadata = UasSummary.GetEnumMetadata("RallyFlags"),
-            });
-
-        }
-
-        private Int32 mLat;
-        private Int32 mLng;
-        private Int16 mAlt;
-        private Int16 mBreakAlt;
-        private UInt16 mLandDir;
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-        private byte mIdx;
-        private byte mCount;
-        private RallyFlags mFlags;
-    }
-
-
-    // ___________________________________________________________________________________
-
-
-    /// <summary>
-    /// Request a current rally point from MAV. MAV should respond with a RALLY_POINT message. MAV should not respond if the request is invalid.
-    /// </summary>
-    public class UasRallyFetchPoint: UasMessage
-    {
-        /// <summary>
-        /// System ID
-        /// </summary>
-        public byte TargetSystem {
-            get { return mTargetSystem; }
-            set { mTargetSystem = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// Component ID
-        /// </summary>
-        public byte TargetComponent {
-            get { return mTargetComponent; }
-            set { mTargetComponent = value; NotifyUpdated(); }
-        }
-
-        /// <summary>
-        /// point index (first point is 0)
-        /// </summary>
-        public byte Idx {
-            get { return mIdx; }
-            set { mIdx = value; NotifyUpdated(); }
-        }
-
-        public UasRallyFetchPoint()
-        {
-            mMessageId = 176;
-            CrcExtra = 234;
-        }
-
-        internal override void SerializeBody(BinaryWriter s)
-        {
-            s.Write(mTargetSystem);
-            s.Write(mTargetComponent);
-            s.Write(mIdx);
-        }
-
-        internal override void DeserializeBody(BinaryReader s)
-        {
-            this.mTargetSystem = s.ReadByte();
-            this.mTargetComponent = s.ReadByte();
-            this.mIdx = s.ReadByte();
-        }
-
-        protected override void InitMetadata()
-        {
-            mMetadata = new UasMessageMetadata() {
-                Description = "Request a current rally point from MAV. MAV should respond with a RALLY_POINT message. MAV should not respond if the request is invalid."
-            };
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetSystem",
-                Description = "System ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "TargetComponent",
-                Description = "Component ID",
-                NumElements = 1,
-            });
-
-            mMetadata.Fields.Add(new UasFieldMetadata() {
-                Name = "Idx",
-                Description = "point index (first point is 0)",
-                NumElements = 1,
-            });
-
-        }
-
-        private byte mTargetSystem;
-        private byte mTargetComponent;
-        private byte mIdx;
+        private byte mHubAddress;
+        private byte mUpdateRate;
+        private byte mSftregByte;
+        private byte mExtrabyte;
     }
 
 
@@ -19644,30 +24063,30 @@ namespace MavLinkNet
                case 47: return new UasMissionAck();
                case 48: return new UasSetGpsGlobalOrigin();
                case 49: return new UasGpsGlobalOrigin();
-               case 50: return new UasSetLocalPositionSetpoint();
-               case 51: return new UasLocalPositionSetpoint();
-               case 52: return new UasGlobalPositionSetpointInt();
-               case 53: return new UasSetGlobalPositionSetpointInt();
+               case 50: return new UasParamMapRc();
                case 54: return new UasSafetySetAllowedArea();
                case 55: return new UasSafetyAllowedArea();
-               case 56: return new UasSetRollPitchYawThrust();
-               case 57: return new UasSetRollPitchYawSpeedThrust();
-               case 58: return new UasRollPitchYawThrustSetpoint();
-               case 59: return new UasRollPitchYawSpeedThrustSetpoint();
-               case 60: return new UasSetQuadMotorsSetpoint();
-               case 61: return new UasSetQuadSwarmRollPitchYawThrust();
+               case 61: return new UasAttitudeQuaternionCov();
                case 62: return new UasNavControllerOutput();
-               case 63: return new UasSetQuadSwarmLedRollPitchYawThrust();
-               case 64: return new UasStateCorrection();
+               case 63: return new UasGlobalPositionIntCov();
+               case 64: return new UasLocalPositionNedCov();
+               case 65: return new UasRcChannels();
                case 66: return new UasRequestDataStream();
                case 67: return new UasDataStream();
                case 69: return new UasManualControl();
                case 70: return new UasRcChannelsOverride();
+               case 73: return new UasMissionItemInt();
                case 74: return new UasVfrHud();
+               case 75: return new UasCommandInt();
                case 76: return new UasCommandLong();
                case 77: return new UasCommandAck();
-               case 80: return new UasRollPitchYawRatesThrustSetpoint();
                case 81: return new UasManualSetpoint();
+               case 82: return new UasSetAttitudeTarget();
+               case 83: return new UasAttitudeTarget();
+               case 84: return new UasSetPositionTargetLocalNed();
+               case 85: return new UasPositionTargetLocalNed();
+               case 86: return new UasSetPositionTargetGlobalInt();
+               case 87: return new UasPositionTargetGlobalInt();
                case 89: return new UasLocalPositionNedSystemGlobalOffset();
                case 90: return new UasHilState();
                case 91: return new UasHilControls();
@@ -19678,51 +24097,65 @@ namespace MavLinkNet
                case 103: return new UasVisionSpeedEstimate();
                case 104: return new UasViconPositionEstimate();
                case 105: return new UasHighresImu();
-               case 106: return new UasOmnidirectionalFlow();
+               case 106: return new UasOpticalFlowRad();
                case 107: return new UasHilSensor();
                case 108: return new UasSimState();
                case 109: return new UasRadioStatus();
-               case 110: return new UasFileTransferStart();
-               case 111: return new UasFileTransferDirList();
-               case 112: return new UasFileTransferRes();
+               case 110: return new UasFileTransferProtocol();
+               case 111: return new UasTimesync();
                case 113: return new UasHilGps();
                case 114: return new UasHilOpticalFlow();
                case 115: return new UasHilStateQuaternion();
+               case 116: return new UasScaledImu2();
+               case 117: return new UasLogRequestList();
+               case 118: return new UasLogEntry();
+               case 119: return new UasLogRequestData();
+               case 120: return new UasLogData();
+               case 121: return new UasLogErase();
+               case 122: return new UasLogRequestEnd();
+               case 123: return new UasGpsInjectData();
+               case 124: return new UasGps2Raw();
+               case 125: return new UasPowerStatus();
+               case 126: return new UasSerialControl();
+               case 127: return new UasGpsRtk();
+               case 128: return new UasGps2Rtk();
+               case 129: return new UasScaledImu3();
+               case 130: return new UasDataTransmissionHandshake();
+               case 131: return new UasEncapsulatedData();
+               case 132: return new UasDistanceSensor();
+               case 133: return new UasTerrainRequest();
+               case 134: return new UasTerrainData();
+               case 135: return new UasTerrainCheck();
+               case 136: return new UasTerrainReport();
+               case 137: return new UasScaledPressure2();
+               case 138: return new UasAttPosMocap();
+               case 139: return new UasSetActuatorControlTarget();
+               case 140: return new UasActuatorControlTarget();
                case 147: return new UasBatteryStatus();
-               case 148: return new UasSetpoint8dof();
-               case 149: return new UasSetpoint6dof();
+               case 148: return new UasAutopilotVersion();
+               case 248: return new UasV2Extension();
                case 249: return new UasMemoryVect();
                case 250: return new UasDebugVect();
                case 251: return new UasNamedValueFloat();
                case 252: return new UasNamedValueInt();
                case 253: return new UasStatustext();
                case 254: return new UasDebug();
-               case 150: return new UasSensorOffsets();
-               case 151: return new UasSetMagOffsets();
-               case 152: return new UasMeminfo();
-               case 153: return new UasApAdc();
-               case 154: return new UasDigicamConfigure();
-               case 155: return new UasDigicamControl();
-               case 156: return new UasMountConfigure();
-               case 157: return new UasMountControl();
-               case 158: return new UasMountStatus();
-               case 160: return new UasFencePoint();
-               case 161: return new UasFenceFetchPoint();
-               case 162: return new UasFenceStatus();
-               case 163: return new UasAhrs();
-               case 164: return new UasSimstate();
-               case 165: return new UasHwstatus();
-               case 166: return new UasRadio();
-               case 167: return new UasLimitsStatus();
-               case 168: return new UasWind();
-               case 169: return new UasData16();
-               case 170: return new UasData32();
-               case 171: return new UasData64();
-               case 172: return new UasData96();
-               case 173: return new UasRangefinder();
-               case 174: return new UasAirspeedAutocal();
-               case 175: return new UasRallyPoint();
-               case 176: return new UasRallyFetchPoint();
+               case 150: return new UasBmsStatusData();
+               case 151: return new UasBmsPowerData();
+               case 152: return new UasBmsCellData();
+               case 155: return new UasMppt1Raw();
+               case 156: return new UasMppt2Raw();
+               case 157: return new UasMppt3Raw();
+               case 158: return new UasMppt4Raw();
+               case 159: return new UasSpeedHalleffect();
+               case 160: return new UasGpsPos();
+               case 161: return new UasGpsStatusTime();
+               case 162: return new UasImuAccelRaw();
+               case 163: return new UasImuGyroRaw();
+               case 164: return new UasImuEulerRaw();
+               case 165: return new UasImuStatusRaw();
+               case 170: return new UasSensorhubRead();
+               case 171: return new UasSensorhubWrite();
                default: return null;
             }
         }
@@ -19769,30 +24202,30 @@ namespace MavLinkNet
                case 47: return 153;
                case 48: return 41;
                case 49: return 39;
-               case 50: return 214;
-               case 51: return 223;
-               case 52: return 141;
-               case 53: return 33;
+               case 50: return 78;
                case 54: return 15;
                case 55: return 3;
-               case 56: return 100;
-               case 57: return 24;
-               case 58: return 239;
-               case 59: return 238;
-               case 60: return 30;
-               case 61: return 240;
+               case 61: return 153;
                case 62: return 183;
-               case 63: return 130;
-               case 64: return 130;
+               case 63: return 51;
+               case 64: return 82;
+               case 65: return 118;
                case 66: return 148;
                case 67: return 21;
                case 69: return 243;
                case 70: return 124;
+               case 73: return 38;
                case 74: return 20;
+               case 75: return 158;
                case 76: return 152;
                case 77: return 143;
-               case 80: return 127;
                case 81: return 106;
+               case 82: return 49;
+               case 83: return 22;
+               case 84: return 143;
+               case 85: return 140;
+               case 86: return 5;
+               case 87: return 150;
                case 89: return 231;
                case 90: return 183;
                case 91: return 63;
@@ -19803,51 +24236,65 @@ namespace MavLinkNet
                case 103: return 208;
                case 104: return 56;
                case 105: return 93;
-               case 106: return 211;
+               case 106: return 138;
                case 107: return 108;
                case 108: return 32;
                case 109: return 185;
-               case 110: return 235;
-               case 111: return 93;
-               case 112: return 124;
+               case 110: return 84;
+               case 111: return 34;
                case 113: return 124;
-               case 114: return 119;
+               case 114: return 237;
                case 115: return 4;
-               case 147: return 177;
-               case 148: return 241;
-               case 149: return 15;
+               case 116: return 76;
+               case 117: return 128;
+               case 118: return 56;
+               case 119: return 116;
+               case 120: return 134;
+               case 121: return 237;
+               case 122: return 203;
+               case 123: return 250;
+               case 124: return 87;
+               case 125: return 203;
+               case 126: return 220;
+               case 127: return 25;
+               case 128: return 226;
+               case 129: return 46;
+               case 130: return 29;
+               case 131: return 223;
+               case 132: return 85;
+               case 133: return 6;
+               case 134: return 229;
+               case 135: return 203;
+               case 136: return 1;
+               case 137: return 195;
+               case 138: return 109;
+               case 139: return 168;
+               case 140: return 181;
+               case 147: return 154;
+               case 148: return 178;
+               case 248: return 8;
                case 249: return 204;
                case 250: return 49;
                case 251: return 170;
                case 252: return 44;
                case 253: return 83;
                case 254: return 86;
-               case 150: return 134;
-               case 151: return 219;
-               case 152: return 208;
-               case 153: return 188;
-               case 154: return 84;
-               case 155: return 22;
-               case 156: return 19;
-               case 157: return 21;
-               case 158: return 134;
-               case 160: return 78;
-               case 161: return 68;
-               case 162: return 189;
-               case 163: return 127;
-               case 164: return 154;
-               case 165: return 21;
-               case 166: return 21;
-               case 167: return 144;
-               case 168: return 1;
-               case 169: return 234;
-               case 170: return 73;
-               case 171: return 181;
-               case 172: return 22;
-               case 173: return 83;
-               case 174: return 167;
-               case 175: return 138;
-               case 176: return 234;
+               case 150: return 207;
+               case 151: return 85;
+               case 152: return 51;
+               case 155: return 208;
+               case 156: return 84;
+               case 157: return 215;
+               case 158: return 69;
+               case 159: return 183;
+               case 160: return 207;
+               case 161: return 156;
+               case 162: return 158;
+               case 163: return 161;
+               case 164: return 212;
+               case 165: return 130;
+               case 170: return 25;
+               case 171: return 85;
                default: return 0;
             }
         }
@@ -19990,6 +24437,13 @@ namespace MavLinkNet
             };
             en.Entries.Add(ent);
 
+            ent = new UasEnumEntryMetadata() {
+                Value = 17,
+                Name = "Asluav",
+                Description = "ASLUAV autopilot -- http://www.asl.ethz.ch",
+            };
+            en.Entries.Add(ent);
+
             mEnums.Add(en.Name, en);
             en = new UasEnumMetadata() {
                 Name = "MavType",
@@ -20119,6 +24573,69 @@ namespace MavLinkNet
                 Value = 17,
                 Name = "Kite",
                 Description = "Flapping wing",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 18,
+                Name = "OnboardController",
+                Description = "Onboard companion controller",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 19,
+                Name = "VtolDuorotor",
+                Description = "Two-rotor VTOL using control surfaces in vertical operation in addition. Tailsitter.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 20,
+                Name = "VtolQuadrotor",
+                Description = "Quad-rotor VTOL using a V-shaped quad config in vertical operation. Tailsitter.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 21,
+                Name = "VtolReserved1",
+                Description = "VTOL reserved 1",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 22,
+                Name = "VtolReserved2",
+                Description = "VTOL reserved 2",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 23,
+                Name = "VtolReserved3",
+                Description = "VTOL reserved 3",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 24,
+                Name = "VtolReserved4",
+                Description = "VTOL reserved 4",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 25,
+                Name = "VtolReserved5",
+                Description = "VTOL reserved 5",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 26,
+                Name = "Gimbal",
+                Description = "Onboard gimbal",
             };
             en.Entries.Add(ent);
 
@@ -20613,6 +25130,13 @@ namespace MavLinkNet
             };
             en.Entries.Add(ent);
 
+            ent = new UasEnumEntryMetadata() {
+                Value = 154,
+                Name = "MavCompIdGimbal",
+                Description = "",
+            };
+            en.Entries.Add(ent);
+
             mEnums.Add(en.Name, en);
             en = new UasEnumMetadata() {
                 Name = "MavSysStatusSensor",
@@ -20738,6 +25262,48 @@ namespace MavLinkNet
             };
             en.Entries.Add(ent);
 
+            ent = new UasEnumEntryMetadata() {
+                Value = 131072,
+                Name = "_3dGyro2",
+                Description = "0x20000 2nd 3D gyro",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 262144,
+                Name = "_3dAccel2",
+                Description = "0x40000 2nd 3D accelerometer",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 524288,
+                Name = "_3dMag2",
+                Description = "0x80000 2nd 3D magnetometer",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 1048576,
+                Name = "MavSysStatusGeofence",
+                Description = "0x100000 geofence",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 2097152,
+                Name = "MavSysStatusAhrs",
+                Description = "0x200000 AHRS subsystem health",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 4194304,
+                Name = "MavSysStatusTerrain",
+                Description = "0x400000 Terrain subsystem health",
+            };
+            en.Entries.Add(ent);
+
             mEnums.Add(en.Name, en);
             en = new UasEnumMetadata() {
                 Name = "MavFrame",
@@ -20776,6 +25342,55 @@ namespace MavLinkNet
                 Value = 4,
                 Name = "LocalEnu",
                 Description = "Local coordinate frame, Z-down (x: east, y: north, z: up)",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 5,
+                Name = "GlobalInt",
+                Description = "Global coordinate frame, WGS84 coordinate system. First value / x: latitude in degrees*1.0e-7, second value / y: longitude in degrees*1.0e-7, third value / z: positive altitude over mean sea level (MSL)",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 6,
+                Name = "GlobalRelativeAltInt",
+                Description = "Global coordinate frame, WGS84 coordinate system, relative altitude over ground with respect to the home position. First value / x: latitude in degrees*10e-7, second value / y: longitude in degrees*10e-7, third value / z: positive altitude with 0 being at the altitude of the home location.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 7,
+                Name = "LocalOffsetNed",
+                Description = "Offset to the current local frame. Anything expressed in this frame should be added to the current local frame position.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 8,
+                Name = "BodyNed",
+                Description = "Setpoint in body NED frame. This makes sense if all position control is externalized - e.g. useful to command 2 m/s^2 acceleration to the right.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 9,
+                Name = "BodyOffsetNed",
+                Description = "Offset in body NED frame. This makes sense if adding setpoints to the current flight path, to avoid an obstacle - e.g. useful to command 2 m/s^2 acceleration to the east.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 10,
+                Name = "GlobalTerrainAlt",
+                Description = "Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees, second value / y: longitude in degrees, third value / z: positive altitude in meters with 0 being at ground level in terrain model.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 11,
+                Name = "GlobalTerrainAltInt",
+                Description = "Global coordinate frame with above terrain level altitude. WGS84 coordinate system, relative altitude over terrain with respect to the waypoint coordinate. First value / x: latitude in degrees*10e-7, second value / y: longitude in degrees*10e-7, third value / z: positive altitude in meters with 0 being at ground level in terrain model.",
             };
             en.Entries.Add(ent);
 
@@ -20824,6 +25439,115 @@ namespace MavLinkNet
                 Value = 6,
                 Name = "MavlinkDataStreamImgPng",
                 Description = "",
+            };
+            en.Entries.Add(ent);
+
+            mEnums.Add(en.Name, en);
+            en = new UasEnumMetadata() {
+                Name = "FenceAction",
+                Description = "",
+            };
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 0,
+                Name = "None",
+                Description = "Disable fenced mode",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 1,
+                Name = "Guided",
+                Description = "Switched to guided mode to return point (fence point 0)",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 2,
+                Name = "Report",
+                Description = "Report fence breach, but don't take action",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 3,
+                Name = "GuidedThrPass",
+                Description = "Switched to guided mode to return point (fence point 0) with manual throttle control",
+            };
+            en.Entries.Add(ent);
+
+            mEnums.Add(en.Name, en);
+            en = new UasEnumMetadata() {
+                Name = "FenceBreach",
+                Description = "",
+            };
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 0,
+                Name = "None",
+                Description = "No last fence breach",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 1,
+                Name = "Minalt",
+                Description = "Breached minimum altitude",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 2,
+                Name = "Maxalt",
+                Description = "Breached maximum altitude",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 3,
+                Name = "Boundary",
+                Description = "Breached fence boundary",
+            };
+            en.Entries.Add(ent);
+
+            mEnums.Add(en.Name, en);
+            en = new UasEnumMetadata() {
+                Name = "MavMountMode",
+                Description = "Enumeration of possible mount operation modes",
+            };
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 0,
+                Name = "Retract",
+                Description = "Load and keep safe position (Roll,Pitch,Yaw) from permant memory and stop stabilization",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 1,
+                Name = "Neutral",
+                Description = "Load and keep neutral position (Roll,Pitch,Yaw) from permanent memory.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 2,
+                Name = "MavlinkTargeting",
+                Description = "Load neutral position and start MAVLink Roll,Pitch,Yaw control with stabilization",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 3,
+                Name = "RcTargeting",
+                Description = "Load neutral position and start RC Roll,Pitch,Yaw control with stabilization",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 4,
+                Name = "GpsPoint",
+                Description = "Load neutral position and start to point to Lat,Lon,Alt",
             };
             en.Entries.Add(ent);
 
@@ -20939,6 +25663,21 @@ namespace MavLinkNet
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
+                Value = 30,
+                Name = "NavContinueAndChangeAlt",
+                Description = "Continue on the current course and climb/descend to specified altitude.  When the altitude is reached continue to the next command (i.e., don't proceed to the next command until the desired altitude is reached.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Desired altitude in meters");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
                 Value = 80,
                 Name = "NavRoi",
                 Description = "Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras.",
@@ -20966,6 +25705,36 @@ namespace MavLinkNet
             ent.Params.Add("Latitude/X of goal");
             ent.Params.Add("Longitude/Y of goal");
             ent.Params.Add("Altitude/Z of goal");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 82,
+                Name = "NavSplineWaypoint",
+                Description = "Navigate to MISSION using a spline path.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Hold time in decimal seconds. (ignored by fixed wing, time to stay at MISSION for rotary wing)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Latitude/X of goal");
+            ent.Params.Add("Longitude/Y of goal");
+            ent.Params.Add("Altitude/Z of goal");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 92,
+                Name = "NavGuidedEnable",
+                Description = "hand control over to an external controller",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("On / Off (> 0.5f on)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
@@ -21065,7 +25834,7 @@ namespace MavLinkNet
             };
             ent.Params = new List<String>();
             ent.Params.Add("Mode, as defined by ENUM MAV_MODE");
-            ent.Params.Add("Empty");
+            ent.Params.Add("Custom mode - this is system specific, please refer to the individual autopilot specifications for details.");
             ent.Params.Add("Empty");
             ent.Params.Add("Empty");
             ent.Params.Add("Empty");
@@ -21194,6 +25963,66 @@ namespace MavLinkNet
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
+                Value = 185,
+                Name = "DoFlighttermination",
+                Description = "Terminate flight immediately",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Flight termination activated if > 0.5");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 189,
+                Name = "DoLandStart",
+                Description = "Mission command to perform a landing. This is used as a marker in a mission to tell the autopilot where a sequence of mission items that represents a landing starts. It may also be sent via a COMMAND_LONG to trigger a landing, in which case the nearest (geographically) landing sequence in the mission will be used. The Latitude/Longitude is optional, and may be set to 0/0 if not needed. If specified then it will be used to help find the closest landing sequence.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Latitude");
+            ent.Params.Add("Longitude");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 190,
+                Name = "DoRallyLand",
+                Description = "Mission command to perform a landing from a rally point.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Break altitude (meters)");
+            ent.Params.Add("Landing speed (m/s)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 191,
+                Name = "DoGoAround",
+                Description = "Mission command to safely abort an autonmous landing.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Altitude (meters)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
                 Value = 200,
                 Name = "DoControlVideo",
                 Description = "Control onboard camera system.",
@@ -21224,6 +26053,171 @@ namespace MavLinkNet
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
+                Value = 202,
+                Name = "DoDigicamConfigure",
+                Description = "Mission command to configure an on-board camera controller system.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Modes: P, TV, AV, M, Etc");
+            ent.Params.Add("Shutter speed: Divisor number for one second");
+            ent.Params.Add("Aperture: F stop number");
+            ent.Params.Add("ISO number e.g. 80, 100, 200, Etc");
+            ent.Params.Add("Exposure type enumerator");
+            ent.Params.Add("Command Identity");
+            ent.Params.Add("Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 203,
+                Name = "DoDigicamControl",
+                Description = "Mission command to control an on-board camera controller system.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Session control e.g. show/hide lens");
+            ent.Params.Add("Zoom's absolute position");
+            ent.Params.Add("Zooming step value to offset zoom from the current position");
+            ent.Params.Add("Focus Locking, Unlocking or Re-locking");
+            ent.Params.Add("Shooting Command");
+            ent.Params.Add("Command Identity");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 204,
+                Name = "DoMountConfigure",
+                Description = "Mission command to configure a camera or antenna mount",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Mount operation mode (see MAV_MOUNT_MODE enum)");
+            ent.Params.Add("stabilize roll? (1 = yes, 0 = no)");
+            ent.Params.Add("stabilize pitch? (1 = yes, 0 = no)");
+            ent.Params.Add("stabilize yaw? (1 = yes, 0 = no)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 205,
+                Name = "DoMountControl",
+                Description = "Mission command to control a camera or antenna mount",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("pitch or lat in degrees, depending on mount mode.");
+            ent.Params.Add("roll or lon in degrees depending on mount mode");
+            ent.Params.Add("yaw or alt (in meters) depending on mount mode");
+            ent.Params.Add("reserved");
+            ent.Params.Add("reserved");
+            ent.Params.Add("reserved");
+            ent.Params.Add("MAV_MOUNT_MODE enum value");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 206,
+                Name = "DoSetCamTriggDist",
+                Description = "Mission command to set CAM_TRIGG_DIST for this flight",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Camera trigger distance (meters)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 207,
+                Name = "DoFenceEnable",
+                Description = "Mission command to enable the geofence",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("enable? (0=disable, 1=enable)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 208,
+                Name = "DoParachute",
+                Description = "Mission command to trigger a parachute",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("action (0=disable, 1=enable, 2=release, for some systems see PARACHUTE_ACTION enum, not in general message set.)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 210,
+                Name = "DoInvertedFlight",
+                Description = "Change to/from inverted flight",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("inverted (0=normal, 1=inverted)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 220,
+                Name = "DoMountControlQuat",
+                Description = "Mission command to control a camera or antenna mount, using a quaternion as reference.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("q1 - quaternion param #1, w (1 in null-rotation)");
+            ent.Params.Add("q2 - quaternion param #2, x (0 in null-rotation)");
+            ent.Params.Add("q3 - quaternion param #3, y (0 in null-rotation)");
+            ent.Params.Add("q4 - quaternion param #4, z (0 in null-rotation)");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 221,
+                Name = "DoGuidedMaster",
+                Description = "set id of master controller",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("System ID");
+            ent.Params.Add("Component ID");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 222,
+                Name = "DoGuidedLimits",
+                Description = "set limits for external control",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("timeout - maximum time (in seconds) that external controller will be allowed to control vehicle. 0 means no timeout");
+            ent.Params.Add("absolute altitude min (in meters, AMSL) - if vehicle moves below this alt, the command will be aborted and the mission will continue.  0 means no lower altitude limit");
+            ent.Params.Add("absolute altitude max (in meters)- if vehicle moves above this alt, the command will be aborted and the mission will continue.  0 means no upper altitude limit");
+            ent.Params.Add("horizontal move limit (in meters, AMSL) - if vehicle moves more than this distance from it's location at the moment the command was executed, the command will be aborted and the mission will continue. 0 means no horizontal altitude limit");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            ent.Params.Add("Empty");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
                 Value = 240,
                 Name = "DoLast",
                 Description = "NOP - This command is only used to mark the upper limit of the DO commands in the enumeration",
@@ -21249,7 +26243,7 @@ namespace MavLinkNet
             ent.Params.Add("Ground pressure: 0: no, 1: yes");
             ent.Params.Add("Radio calibration: 0: no, 1: yes");
             ent.Params.Add("Accelerometer calibration: 0: no, 1: yes");
-            ent.Params.Add("Empty");
+            ent.Params.Add("Compass/Motor interference calibration: 0: no, 1: yes");
             ent.Params.Add("Empty");
             en.Entries.Add(ent);
 
@@ -21259,7 +26253,7 @@ namespace MavLinkNet
                 Description = "Set sensor offsets. This command will be only accepted if in pre-flight mode.",
             };
             ent.Params = new List<String>();
-            ent.Params.Add("Sensor to adjust the offsets for: 0: gyros, 1: accelerometer, 2: magnetometer, 3: barometer, 4: optical flow");
+            ent.Params.Add("Sensor to adjust the offsets for: 0: gyros, 1: accelerometer, 2: magnetometer, 3: barometer, 4: optical flow, 5: second magnetometer");
             ent.Params.Add("X axis offset (or generic dimension 1), in the sensor's raw units");
             ent.Params.Add("Y axis offset (or generic dimension 2), in the sensor's raw units");
             ent.Params.Add("Z axis offset (or generic dimension 3), in the sensor's raw units");
@@ -21343,78 +26337,97 @@ namespace MavLinkNet
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
-                Value = 202,
-                Name = "DoDigicamConfigure",
-                Description = "Mission command to configure an on-board camera controller system.",
+                Value = 520,
+                Name = "RequestAutopilotCapabilities",
+                Description = "Request autopilot capabilities",
             };
             ent.Params = new List<String>();
-            ent.Params.Add("Modes: P, TV, AV, M, Etc");
-            ent.Params.Add("Shutter speed: Divisor number for one second");
-            ent.Params.Add("Aperture: F stop number");
-            ent.Params.Add("ISO number e.g. 80, 100, 200, Etc");
-            ent.Params.Add("Exposure type enumerator");
-            ent.Params.Add("Command Identity");
-            ent.Params.Add("Main engine cut-off time before camera trigger in seconds/10 (0 means no cut-off)");
+            ent.Params.Add("1: Request autopilot version");
+            ent.Params.Add("Reserved (all remaining params)");
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
-                Value = 203,
-                Name = "DoDigicamControl",
-                Description = "Mission command to control an on-board camera controller system.",
+                Value = 2000,
+                Name = "ImageStartCapture",
+                Description = "Start image capture sequence",
             };
             ent.Params = new List<String>();
-            ent.Params.Add("Session control e.g. show/hide lens");
-            ent.Params.Add("Zoom's absolute position");
-            ent.Params.Add("Zooming step value to offset zoom from the current position");
-            ent.Params.Add("Focus Locking, Unlocking or Re-locking");
-            ent.Params.Add("Shooting Command");
-            ent.Params.Add("Command Identity");
-            ent.Params.Add("Empty");
+            ent.Params.Add("Duration between two consecutive pictures (in seconds)");
+            ent.Params.Add("Number of images to capture total - 0 for unlimited capture");
+            ent.Params.Add("Resolution in megapixels (0.3 for 640x480, 1.3 for 1280x720, etc)");
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
-                Value = 204,
-                Name = "DoMountConfigure",
-                Description = "Mission command to configure a camera or antenna mount",
+                Value = 2001,
+                Name = "ImageStopCapture",
+                Description = "Stop image capture sequence",
             };
             ent.Params = new List<String>();
-            ent.Params.Add("Mount operation mode (see MAV_MOUNT_MODE enum)");
-            ent.Params.Add("stabilize roll? (1 = yes, 0 = no)");
-            ent.Params.Add("stabilize pitch? (1 = yes, 0 = no)");
-            ent.Params.Add("stabilize yaw? (1 = yes, 0 = no)");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
+            ent.Params.Add("Reserved");
+            ent.Params.Add("Reserved");
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
-                Value = 205,
-                Name = "DoMountControl",
-                Description = "Mission command to control a camera or antenna mount",
+                Value = 2500,
+                Name = "VideoStartCapture",
+                Description = "Starts video capture",
             };
             ent.Params = new List<String>();
-            ent.Params.Add("pitch(deg*100) or lat, depending on mount mode.");
-            ent.Params.Add("roll(deg*100) or lon depending on mount mode");
-            ent.Params.Add("yaw(deg*100) or alt (in cm) depending on mount mode");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
+            ent.Params.Add("Camera ID (0 for all cameras), 1 for first, 2 for second, etc.");
+            ent.Params.Add("Frames per second");
+            ent.Params.Add("Resolution in megapixels (0.3 for 640x480, 1.3 for 1280x720, etc)");
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
-                Value = 206,
-                Name = "DoSetCamTriggDist",
-                Description = "Mission command to set CAM_TRIGG_DIST for this flight",
+                Value = 2501,
+                Name = "VideoStopCapture",
+                Description = "Stop the current video capture",
             };
             ent.Params = new List<String>();
-            ent.Params.Add("Camera trigger distance (meters)");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
-            ent.Params.Add("Empty");
+            ent.Params.Add("Reserved");
+            ent.Params.Add("Reserved");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 2800,
+                Name = "PanoramaCreate",
+                Description = "Create a panorama at the current position",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Viewing angle horizontal of the panorama (in degrees, +- 0.5 the total angle)");
+            ent.Params.Add("Viewing angle vertical of panorama (in degrees)");
+            ent.Params.Add("Speed of the horizontal rotation (in degrees per second)");
+            ent.Params.Add("Speed of the vertical rotation (in degrees per second)");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 30001,
+                Name = "PayloadPrepareDeploy",
+                Description = "Deploy payload on a Lat / Lon / Alt position. This includes the navigation to reach the required release position and velocity.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Operation mode. 0: prepare single payload deploy (overwriting previous requests), but do not execute it. 1: execute payload deploy immediately (rejecting further deploy commands during execution, but allowing abort). 2: add payload deploy to existing deployment list.");
+            ent.Params.Add("Desired approach vector in degrees compass heading (0..360). A negative value indicates the system can define the approach vector at will.");
+            ent.Params.Add("Desired ground speed at release time. This can be overriden by the airframe in case it needs to meet minimum airspeed. A negative value indicates the system can define the ground speed at will.");
+            ent.Params.Add("Minimum altitude clearance to the release position in meters. A negative value indicates the system can define the clearance at will.");
+            ent.Params.Add("Latitude unscaled for MISSION_ITEM or in 1e7 degrees for MISSION_ITEM_INT");
+            ent.Params.Add("Longitude unscaled for MISSION_ITEM or in 1e7 degrees for MISSION_ITEM_INT");
+            ent.Params.Add("Altitude, in meters AMSL");
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 30002,
+                Name = "PayloadControlDeploy",
+                Description = "Control the payload deployment.",
+            };
+            ent.Params = new List<String>();
+            ent.Params.Add("Operation mode. 0: Abort deployment, continue normal mission. 1: switch to payload deploment mode. 100: delete first payload deployment request. 101: delete all payload deployment requests.");
+            ent.Params.Add("Reserved");
+            ent.Params.Add("Reserved");
+            ent.Params.Add("Reserved");
+            ent.Params.Add("Reserved");
+            ent.Params.Add("Reserved");
+            ent.Params.Add("Reserved");
             en.Entries.Add(ent);
 
             mEnums.Add(en.Name, en);
@@ -21888,205 +26901,350 @@ namespace MavLinkNet
 
             mEnums.Add(en.Name, en);
             en = new UasEnumMetadata() {
-                Name = "MavMountMode",
-                Description = "Enumeration of possible mount operation modes",
+                Name = "MavPowerStatus",
+                Description = "Power supply status flags (bitmask)",
             };
-
-            ent = new UasEnumEntryMetadata() {
-                Value = 0,
-                Name = "Retract",
-                Description = "Load and keep safe position (Roll,Pitch,Yaw) from EEPROM and stop stabilization",
-            };
-            en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 1,
-                Name = "Neutral",
-                Description = "Load and keep neutral position (Roll,Pitch,Yaw) from EEPROM.",
+                Name = "BrickValid",
+                Description = "main brick power supply valid",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 2,
-                Name = "MavlinkTargeting",
-                Description = "Load neutral position and start MAVLink Roll,Pitch,Yaw control with stabilization",
-            };
-            en.Entries.Add(ent);
-
-            ent = new UasEnumEntryMetadata() {
-                Value = 3,
-                Name = "RcTargeting",
-                Description = "Load neutral position and start RC Roll,Pitch,Yaw control with stabilization",
+                Name = "ServoValid",
+                Description = "main servo power supply valid for FMU",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 4,
-                Name = "GpsPoint",
-                Description = "Load neutral position and start to point to Lat,Lon,Alt",
+                Name = "UsbConnected",
+                Description = "USB power is connected",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 8,
+                Name = "PeriphOvercurrent",
+                Description = "peripheral supply is in over-current state",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 16,
+                Name = "PeriphHipowerOvercurrent",
+                Description = "hi-power peripheral supply is in over-current state",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 32,
+                Name = "Changed",
+                Description = "Power status has changed since boot",
             };
             en.Entries.Add(ent);
 
             mEnums.Add(en.Name, en);
             en = new UasEnumMetadata() {
-                Name = "FenceAction",
-                Description = "",
+                Name = "SerialControlDev",
+                Description = "SERIAL_CONTROL device types",
             };
 
             ent = new UasEnumEntryMetadata() {
                 Value = 0,
-                Name = "None",
-                Description = "Disable fenced mode",
+                Name = "Telem1",
+                Description = "First telemetry port",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 1,
-                Name = "Guided",
-                Description = "Switched to guided mode to return point (fence point 0)",
+                Name = "Telem2",
+                Description = "Second telemetry port",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 2,
-                Name = "Report",
-                Description = "Report fence breach, but don't take action",
+                Name = "Gps1",
+                Description = "First GPS port",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 3,
-                Name = "GuidedThrPass",
-                Description = "Switched to guided mode to return point (fence point 0) with manual throttle control",
+                Name = "Gps2",
+                Description = "Second GPS port",
             };
             en.Entries.Add(ent);
 
             mEnums.Add(en.Name, en);
             en = new UasEnumMetadata() {
-                Name = "FenceBreach",
-                Description = "",
+                Name = "SerialControlFlag",
+                Description = "SERIAL_CONTROL flags (bitmask)",
             };
-
-            ent = new UasEnumEntryMetadata() {
-                Value = 0,
-                Name = "None",
-                Description = "No last fence breach",
-            };
-            en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 1,
-                Name = "Minalt",
-                Description = "Breached minimum altitude",
+                Name = "Reply",
+                Description = "Set if this is a reply",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 2,
-                Name = "Maxalt",
-                Description = "Breached maximum altitude",
-            };
-            en.Entries.Add(ent);
-
-            ent = new UasEnumEntryMetadata() {
-                Value = 3,
-                Name = "Boundary",
-                Description = "Breached fence boundary",
-            };
-            en.Entries.Add(ent);
-
-            mEnums.Add(en.Name, en);
-            en = new UasEnumMetadata() {
-                Name = "LimitsState",
-                Description = "",
-            };
-
-            ent = new UasEnumEntryMetadata() {
-                Value = 0,
-                Name = "LimitsInit",
-                Description = " pre-initialization",
-            };
-            en.Entries.Add(ent);
-
-            ent = new UasEnumEntryMetadata() {
-                Value = 1,
-                Name = "LimitsDisabled",
-                Description = " disabled",
-            };
-            en.Entries.Add(ent);
-
-            ent = new UasEnumEntryMetadata() {
-                Value = 2,
-                Name = "LimitsEnabled",
-                Description = " checking limits",
-            };
-            en.Entries.Add(ent);
-
-            ent = new UasEnumEntryMetadata() {
-                Value = 3,
-                Name = "LimitsTriggered",
-                Description = " a limit has been breached",
+                Name = "Respond",
+                Description = "Set if the sender wants the receiver to send a response as another SERIAL_CONTROL message",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 4,
-                Name = "LimitsRecovering",
-                Description = " taking action eg. RTL",
+                Name = "Exclusive",
+                Description = "Set if access to the serial port should be removed from whatever driver is currently using it, giving exclusive access to the SERIAL_CONTROL protocol. The port can be handed back by sending a request without this flag set",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 8,
+                Name = "Blocking",
+                Description = "Block on writes to the serial port",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 16,
+                Name = "Multi",
+                Description = "Send multiple replies until port is drained",
+            };
+            en.Entries.Add(ent);
+
+            mEnums.Add(en.Name, en);
+            en = new UasEnumMetadata() {
+                Name = "MavDistanceSensor",
+                Description = "Enumeration of distance sensor types",
+            };
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 0,
+                Name = "Laser",
+                Description = "Laser altimeter, e.g. LightWare SF02/F or PulsedLight units",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 1,
+                Name = "Ultrasound",
+                Description = "Ultrasound altimeter, e.g. MaxBotix units",
+            };
+            en.Entries.Add(ent);
+
+            mEnums.Add(en.Name, en);
+            en = new UasEnumMetadata() {
+                Name = "MavProtocolCapability",
+                Description = "Bitmask of (optional) autopilot capabilities (64 bit). If a bit is set, the autopilot supports this capability.",
+            };
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 1,
+                Name = "MissionFloat",
+                Description = "Autopilot supports MISSION float message type.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 2,
+                Name = "ParamFloat",
+                Description = "Autopilot supports the new param float message type.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 4,
+                Name = "MissionInt",
+                Description = "Autopilot supports MISSION_INT scaled integer message type.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 8,
+                Name = "CommandInt",
+                Description = "Autopilot supports COMMAND_INT scaled integer message type.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 16,
+                Name = "ParamUnion",
+                Description = "Autopilot supports the new param union message type.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 32,
+                Name = "Ftp",
+                Description = "Autopilot supports the new param union message type.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 64,
+                Name = "SetAttitudeTarget",
+                Description = "Autopilot supports commanding attitude offboard.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 128,
+                Name = "SetPositionTargetLocalNed",
+                Description = "Autopilot supports commanding position and velocity targets in local NED frame.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 256,
+                Name = "SetPositionTargetGlobalInt",
+                Description = "Autopilot supports commanding position and velocity targets in global scaled integers.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 512,
+                Name = "Terrain",
+                Description = "Autopilot supports terrain protocol / data handling.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 1024,
+                Name = "SetActuatorTarget",
+                Description = "Autopilot supports direct actuator control.",
+            };
+            en.Entries.Add(ent);
+
+            mEnums.Add(en.Name, en);
+            en = new UasEnumMetadata() {
+                Name = "MavEstimatorType",
+                Description = "Enumeration of estimator types",
+            };
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 1,
+                Name = "Naive",
+                Description = "This is a naive estimator without any real covariance feedback.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 2,
+                Name = "Vision",
+                Description = "Computer vision based estimate. Might be up to scale.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 3,
+                Name = "Vio",
+                Description = "Visual-inertial estimate.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 4,
+                Name = "Gps",
+                Description = "Plain GPS estimate.",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 5,
-                Name = "LimitsRecovered",
-                Description = " we're no longer in breach of a limit",
+                Name = "GpsIns",
+                Description = "Estimator integrating GPS and inertial sensing.",
             };
             en.Entries.Add(ent);
 
             mEnums.Add(en.Name, en);
             en = new UasEnumMetadata() {
-                Name = "LimitModule",
-                Description = "",
+                Name = "MavBatteryType",
+                Description = "Enumeration of battery types",
             };
 
             ent = new UasEnumEntryMetadata() {
+                Value = 0,
+                Name = "Unknown",
+                Description = "Not specified.",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
                 Value = 1,
-                Name = "LimitGpslock",
-                Description = " pre-initialization",
+                Name = "Lipo",
+                Description = "Lithium polymere battery",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 2,
-                Name = "LimitGeofence",
-                Description = " disabled",
+                Name = "Life",
+                Description = "Lithium ferrite battery",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 3,
+                Name = "Lion",
+                Description = "Lithium-ION battery",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 4,
-                Name = "LimitAltitude",
-                Description = " checking limits",
+                Name = "Nimh",
+                Description = "Nickel metal hydride battery",
             };
             en.Entries.Add(ent);
 
             mEnums.Add(en.Name, en);
             en = new UasEnumMetadata() {
-                Name = "RallyFlags",
-                Description = "Flags in RALLY_POINT message",
+                Name = "MavBatteryFunction",
+                Description = "Enumeration of battery functions",
             };
 
             ent = new UasEnumEntryMetadata() {
+                Value = 0,
+                Name = "Unknown",
+                Description = "Lithium polymere battery",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
                 Value = 1,
-                Name = "FavorableWind",
-                Description = "Flag set when requiring favorable winds for landing. ",
+                Name = "All",
+                Description = "Battery supports all flight systems",
             };
             en.Entries.Add(ent);
 
             ent = new UasEnumEntryMetadata() {
                 Value = 2,
-                Name = "LandImmediately",
-                Description = "Flag set when plane is to immediately descend to break altitude and land without GCS intervention.  Flag not set when plane is to loiter at Rally point until commanded to land.",
+                Name = "Propulsion",
+                Description = "Battery for the propulsion system",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 3,
+                Name = "Avionics",
+                Description = "Avionics battery",
+            };
+            en.Entries.Add(ent);
+
+            ent = new UasEnumEntryMetadata() {
+                Value = 4,
+                Name = "MavBatteryTypePayload",
+                Description = "Payload battery",
             };
             en.Entries.Add(ent);
 

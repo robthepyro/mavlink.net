@@ -49,6 +49,13 @@ namespace MavLinkNet
             InitializeSerialPort(SerialPortName);
         }
 
+
+        //overide
+        public void newAsyncWalker(int bufferSize)
+        {
+            mMavLink = new MavLinkAsyncWalker(bufferSize);
+        }
+
         public override void Dispose()
         {
             mIsActive = false;
@@ -190,6 +197,11 @@ namespace MavLinkNet
 
             // Signal send thread
             mSendSignal.Set();
+        }
+
+        public string checkBuffer()
+        {
+            return mMavLink.checkBuffer();
         }
     }
 }

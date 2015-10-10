@@ -21,6 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
+/*
+ * E:\Users\RobThePyro\Docs\GitHub\mavlink.net\mavlinkgen\bin\Debug>mavlinkgen.exe
+-output="E:\Users\RobThePyro\Docs\GitHub\mavlink.net\mavlink.net\GeneratedMessag
+es.cs" "E:\Users\RobThePyro\Docs\GitHub\SolarForce1\CAN Embedded\MAVLink\mavlink
+_generator\message_definitions\v1.0\solarCar.xml"
+ */
+
 using System;
 using System.IO;
 using System.Xml;

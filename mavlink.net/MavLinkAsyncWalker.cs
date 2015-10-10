@@ -49,6 +49,19 @@ namespace MavLinkNet
             ThreadPool.QueueUserWorkItem(new WaitCallback(PacketProcessingWorker));
         }
 
+        // Overide with buffer size
+        public MavLinkAsyncWalker(int bufferSize)
+        {
+            mProcessStream = new BlockingCircularStream(bufferSize);
+
+            ThreadPool.QueueUserWorkItem(new WaitCallback(PacketProcessingWorker));
+        }
+
+        public string checkBuffer()
+        {
+            return mProcessStream.ToString();
+        }
+
         /// <summary>
         /// Add bytes to the processing queue.
         /// </summary>
